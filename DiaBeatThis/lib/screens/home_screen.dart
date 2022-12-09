@@ -1,3 +1,4 @@
+import 'package:diabeatthis/data/dummy_data.dart';
 import 'package:diabeatthis/screens/post_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -9,7 +10,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  List<Post>? posts;
+  List<Post>? posts = DummyData().returnData;
 
 
 
@@ -39,8 +40,13 @@ class _HomeScreenState extends State<HomeScreen> {
     final Post post = posts![index];
     return ListTile(
         title: Text(
-          '${index + 1}. ${post.recipe.title}',
-          style: TextStyle(fontSize: 17),
+          post.recipe.title,
+          style: TextStyle(fontSize: 22),
+        ),
+        subtitle: Text(
+          '${post.recipe.description} \nby User ${post.creator.username}',
+          style: TextStyle(fontSize: 16),
+
         ),
         trailing: Icon(Icons.arrow_forward_ios_outlined),
         onTap: () {

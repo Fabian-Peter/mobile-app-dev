@@ -22,7 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('101 Game of Thrones Characters'),
+        title: Text('Home Screen'),
       ),
       body: SafeArea(
         child: ListView.separated(

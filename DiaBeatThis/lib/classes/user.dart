@@ -6,18 +6,18 @@ class User {
       {required this.username,
       required this.name,
       required this.rights,
-      required this.follower,
-      required this.following,
+      this.follower,
+      this.following,
       required this.mailAddress,
-      required this.favorites,
-      required this.posts});
+      this.favorites,
+      this.posts});
 
   String username;
   String name;
-  Bool rights;
-  List<User> follower;
-  List<User> following;
+  bool rights;
+  List<User>? follower;
+  List<User>? following;
   String mailAddress;
-  List<Post> favorites;
-  List<Post> posts;
+  List<Post>? favorites;
+  List<Post>? posts;
 }

@@ -1,5 +1,6 @@
 import 'package:diabeatthis/classes/recipe.dart';
 import 'package:diabeatthis/classes/user.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 class Post {
   Post(

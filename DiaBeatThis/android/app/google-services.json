@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "838320979576",
+    "project_id": "diabeathis-f8ee3",
+    "storage_bucket": "diabeathis-f8ee3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:838320979576:android:d5ab9b55ec3e545084778d",
+        "android_client_info": {
+          "package_name": "com.example.diabeatthis"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "838320979576-5v4j5024ous77il1p7srmv9l3v5a946u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD6_iosMavAH2omAfUilTOKzLAyK0xadpM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "838320979576-5v4j5024ous77il1p7srmv9l3v5a946u.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

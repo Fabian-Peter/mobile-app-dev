@@ -1,6 +1,7 @@
 import 'package:diabeatthis/data/dummy_data.dart';
 import 'package:diabeatthis/screens/post_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 import '../classes/Post.dart';
 
@@ -10,6 +11,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  bool isvisible = false;
   List<Post>? posts = DummyData().returnData;
 
 
@@ -21,17 +23,34 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Home Screen'),
       ),
-      body: SafeArea(
+      body: NotificationListener<UserScrollNotification>(
+        onNotification: (notification){
+          if(notification.direction == ScrollDirection.forward) {
+            if (!isvisible) setState(() => isvisible = true);
+          }else if (notification.direction == ScrollDirection.reverse)
+            if(isvisible) setState(() => isvisible = false);
+          return true;
+        },
+      child:SafeArea(
         child: ListView.separated(
           itemBuilder: (context, index) => _buildRecipeTile(index),
           separatorBuilder: (_, __) => Divider(),
           itemCount: posts?.length ?? 0,
         ),
       ),
+      ),
+      floatingActionButton: isvisible
+        ? FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed:(){},
+
+      )
+          : null,
     );
   }
 

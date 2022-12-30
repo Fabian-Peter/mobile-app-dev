@@ -68,6 +68,7 @@ class DummyData {
     List<Post> posts = <Post>[];
     posts.add(post1);
     posts.add(post2);
+    posts.add(post3);
     posts.add(post1);
     posts.add(post2);
     posts.add(post3);

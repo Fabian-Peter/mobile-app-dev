@@ -18,8 +18,8 @@ class DummyData{
         recipe: recipe2, creator: user2, creationDate: DateTime.now());
 
     List<Post> posts = <Post>[];
-    posts.add(post1);
-    posts.add(post2);
+      posts.add(post1);
+      posts.add(post2);
     posts.add(post1);
     posts.add(post2);
     posts.add(post1);
@@ -37,6 +37,6 @@ class DummyData{
     posts.add(post1);
     posts.add(post2);
 
-    return posts;
+      return posts;
   }
 }

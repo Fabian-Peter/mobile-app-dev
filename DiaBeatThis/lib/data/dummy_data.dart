@@ -14,7 +14,7 @@ class DummyData {
         '5 radishes'
       ],
       description:
-      'A delicious salad with greek cheese, peppers and radishes. Very easy to make with only few ingredients.',
+          'A delicious salad with greek cheese, peppers and radishes. Very easy to make with only few ingredients.',
       directions: [
         'Wash all vegetables with water.',
         'Cut the lettuce head in half, hold and finely slice the wedges vertically for long strips of lettuce.',
@@ -33,7 +33,7 @@ class DummyData {
       title: 'Vegan BBQ Burger',
       ingredients: ['lettuce', 'meat', 'buns'],
       description:
-      'Easy to make vegan burger with a unique and spicy BBQ sauce.',
+          'Easy to make vegan burger with a unique and spicy BBQ sauce.',
       directions: ['do this', 'and that'],
       tags: ['vegan', 'yummi'],
       nutrition: ['proteins', 'carbs']);
@@ -59,15 +59,15 @@ class DummyData {
 
   List<Post> get returnData {
     Post post1 =
-    Post(recipe: recipe1, creator: user1, creationDate: DateTime.now());
+        Post(recipe: recipe1, creator: user1, creationDate: DateTime.now());
     Post post2 =
-    Post(recipe: recipe2, creator: user2, creationDate: DateTime.now());
+        Post(recipe: recipe2, creator: user2, creationDate: DateTime.now());
     Post post3 =
-    Post(recipe: recipe3, creator: user1, creationDate: DateTime.now());
+        Post(recipe: recipe3, creator: user1, creationDate: DateTime.now());
 
     List<Post> posts = <Post>[];
-      posts.add(post1);
-      posts.add(post2);
+    posts.add(post1);
+    posts.add(post2);
     posts.add(post1);
     posts.add(post2);
     posts.add(post3);
@@ -96,6 +96,6 @@ class DummyData {
     posts.add(post2);
     posts.add(post3);
 
-      return posts;
+    return posts;
   }
 }

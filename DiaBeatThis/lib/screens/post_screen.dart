@@ -21,16 +21,22 @@ class PostScreen extends StatelessWidget {
               _buildTextRow('Created at:',
                   "${post.creationDate.day}.${post.creationDate.month}.${post.creationDate.year}"),
               const SizedBox(height: 8),
+
               _buildTextRow('Posted by:', post.creator.name),
               const SizedBox(height: 8),
+
               _buildTextRow('Tags:', post.recipe.tags.join(', ')),
               const SizedBox(height: 8),
+
               _buildTextRow('Nutrition:', post.recipe.nutrition.join(', ')),
               const SizedBox(height: 25),
+
               Text(post.recipe.description),
               const SizedBox(height: 35),
-              Image.asset('assets/images/recipe_salad.png'), //TODO: mit gespeichertem bild ersetzen
+
+              Image.asset('assets/images/${post.recipe.title}.png'), //TODO: mit gespeichertem bild aus datenbank ersetzen
               const SizedBox(height: 25),
+
               const Text(
                 "Ingredients:",
                 style: TextStyle(
@@ -39,8 +45,10 @@ class PostScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 15),
+
               _buildIngredients(post.recipe.ingredients),
               const SizedBox(height: 25),
+
               const Text(
                 "Directions:",
                 style: TextStyle(
@@ -49,14 +57,21 @@ class PostScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 15),
+
               _buildGuide(post.recipe.directions),
               const SizedBox(height: 25),
-              _buildTextRow('Comments:', post.comments?.first ?? "no comments"), //TODO
+
+              _buildTextRow('Comments:', post.comments?.first ?? "no comments"),
+              //TODO
               const SizedBox(height: 8),
-              _buildTextRow('Likes:', post.likes?.first.name ?? "no likes"), //TODO
+
+              _buildTextRow('Likes:', post.likes?.first.name ?? "no likes"),
+              //TODO
               const SizedBox(height: 8),
+
               _buildTextRow(
-                  'Reactions:', post.reactions?.toString() ?? "no reactions"), //TODO
+                  'Reactions:', post.reactions?.toString() ?? "no reactions"),
+              //TODO
             ],
           ),
         ),

@@ -25,10 +25,10 @@ class PostScreen extends StatelessWidget {
               _buildTextRow('Posted by:', post.creator.name),
               const SizedBox(height: 8),
 
-              _buildTextRow('Tags:', post.recipe.tags.join(', ')),
+              _buildTextRow('Tags:', post.recipe.tags!.join(', ')),
               const SizedBox(height: 8),
 
-              _buildTextRow('Nutrition:', post.recipe.nutrition.join(', ')),
+              _buildTextRow('Nutrition:', post.recipe.nutrition!.join(', ')),
               const SizedBox(height: 25),
 
               Text(post.recipe.description),

@@ -5,16 +5,14 @@ class Recipe {
       {required this.title,
       required this.ingredients,
       required this.description,
-      required this.directions,
-      required this.tags,
-      required this.nutrition,
+      this.tags,
+      this.nutrition,
       this.pictureUrl});
 
   String title;
   List<String> ingredients;
   String description;
-  List<String> directions;
-  List<String> tags;
-  List<String> nutrition;
+  List<String>? tags;
+  List<String>? nutrition;
   XFile? pictureUrl;
 }

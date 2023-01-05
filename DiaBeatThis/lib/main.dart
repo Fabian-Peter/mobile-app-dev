@@ -1,10 +1,13 @@
+import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider;
 import 'package:flutter/material.dart';
 import 'package:diabeatthis/screens/home_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  await Firebase.initializeApp();
+  await FirebaseAuth.instance.signInAnonymously();
   runApp(MyApp());
 }
 
@@ -24,15 +27,35 @@ class MyApp extends StatelessWidget {
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               print('error${snapshot.error.toString()}');
-              return Text('Something went wrong!');
+              return const Text('Something went wrong!');
             } else if (snapshot.hasData) {
-              return HomeScreen();
+              return const AuthGate();
             } else {
-              return Center(
+              return const Center(
                 child: CircularProgressIndicator(),
               );
             }
           }),
     );
+  }
+}
+
+class AuthGate extends StatelessWidget {
+  const AuthGate({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    FirebaseUIAuth.configureProviders([
+      EmailAuthProvider(),
+      // other providers
+    ]);
+    return StreamBuilder<User?>(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const SignInScreen();
+          }
+          return HomeScreen();
+        });
   }
 }

@@ -53,6 +53,12 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
               maxLines: null,
               decoration: InputDecoration(labelText: 'description'),
             ),
+            FloatingActionButton(
+              child: Icon(Icons.camera_alt),
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white,
+              onPressed: () => {},
+            ),
             ElevatedButton(
                 onPressed: () {
                   final newRecipe = <String, dynamic>{

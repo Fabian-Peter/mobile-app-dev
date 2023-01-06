@@ -68,9 +68,11 @@ class _HomeScreenState extends State<HomeScreen> {
           return true;
         },
         child: SafeArea(
-          child: ListView.builder(itemBuilder: (context, index) {
-            return _buildPosts(context, index);
-          }),
+          child: Padding(
+              padding: const EdgeInsets.only(top: 7),
+              child: ListView.builder(itemBuilder: (context, index) {
+                return _buildPosts(context, index);
+              })),
         ),
       ),
       floatingActionButton: isVisible

@@ -41,6 +41,7 @@ dependencies:
   firebase_database: ^10.0.7
   firebase_auth: ^4.2.3
   firebase_ui_auth: ^1.1.6
+  anim_search_bar: ^2.0.3
 
 dev_dependencies:
   flutter_test:
@@ -73,6 +74,9 @@ flutter:
     - assets/images/Greek salad with feta.png
     - assets/images/Vegan BBQ Burger.png
     - assets/images/Grilled Alaska fish.png
+    - assets/images/Avatar.png
+    - assets/images/Profile.png
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
@@ -99,3 +103,18 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+  fonts:
+    - family: Aloja
+      fonts:
+        - asset: assets/fonts/aloja_font.ttf
+    - family: Visby
+      fonts:
+        - asset: assets/fonts/VisbyRegular.otf
+    - family: VisbyMedium
+      fonts:
+        - asset: assets/fonts/VisbyMedium.otf
+    - family: VisbyDemiBold
+      fonts:
+        - asset: assets/fonts/VisbyDemiBold.otf
+

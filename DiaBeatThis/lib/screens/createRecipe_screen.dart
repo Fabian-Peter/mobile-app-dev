@@ -85,6 +85,13 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
             foregroundColor: Colors.white,
             onPressed: () => pickImage(ImageSource.camera),
           ),
+          FloatingActionButton(
+            heroTag: "btn3",
+            child: Icon(Icons.image),
+            backgroundColor: Colors.blue,
+            foregroundColor: Colors.white,
+            onPressed: () => pickImage(ImageSource.gallery),
+          ),
 
           ElevatedButton(
               onPressed: () {

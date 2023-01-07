@@ -76,6 +76,9 @@ flutter:
     - assets/images/Grilled Alaska fish.png
     - assets/images/Avatar.png
     - assets/images/Profile.png
+    - assets/images/Proteins.png
+    - assets/images/Carbs.png
+    - assets/images/Fats.png
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

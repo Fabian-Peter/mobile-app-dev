@@ -23,7 +23,7 @@ class DummyData {
         'Cut the radishes in fine slices.',
         'Combine all vegetables in a big bowl.',
         'Crumble the feta over the bowl',
-        'Add the dressing as well as salt & pepper',
+        'Add the dressing as well as salt and pepper',
         'Mix all well together.'
       ],
       tags: ['vegetarian', 'gluten free'],

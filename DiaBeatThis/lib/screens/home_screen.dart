@@ -77,7 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       floatingActionButton: isVisible
           ? FloatingActionButton(
-              heroTag: "createButton",
+              heroTag: "btn2",
               child: const Icon(Icons.add),
               onPressed: () {
                 Navigator.push(

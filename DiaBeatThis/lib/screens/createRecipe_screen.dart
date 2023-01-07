@@ -30,6 +30,34 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
     }
   }
 
+  void _pictureEditBottomSheet(context) {
+    showModalBottomSheet(
+        context: context, builder: (BuildContext bc) {
+      return SizedBox(
+          height: 110,
+
+          child: ListView(
+          children: [
+            ElevatedButton.icon(style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white, foregroundColor: Colors.black),
+              icon: Icon(Icons.image),
+              onPressed: () => pickImage(ImageSource.gallery),
+              label: Text('Gallery'),
+            ),
+            ElevatedButton.icon(style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.white, foregroundColor: Colors.black),
+              onPressed: () => pickImage(ImageSource.camera),
+              icon: Icon(Icons.camera_alt),
+              label: Text('Camera'),
+
+            )
+          ]
+      )
+      );}
+    );
+  }
+
+
   @override
   Widget build(BuildContext context) {
     TextEditingController titleController = TextEditingController();
@@ -83,14 +111,9 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
             child: Icon(Icons.camera_alt),
             backgroundColor: Colors.blue,
             foregroundColor: Colors.white,
-            onPressed: () => pickImage(ImageSource.camera),
-          ),
-          FloatingActionButton(
-            heroTag: "btn3",
-            child: Icon(Icons.image),
-            backgroundColor: Colors.blue,
-            foregroundColor: Colors.white,
-            onPressed: () => pickImage(ImageSource.gallery),
+            onPressed: () {
+              _pictureEditBottomSheet(context);
+            },
           ),
 
           ElevatedButton(
@@ -114,5 +137,8 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
         ],
       ),
     );
+
+
+
   }
 }

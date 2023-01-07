@@ -1,10 +1,12 @@
 import 'dart:io';
-
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:diabeatthis/screens/home_screen.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:firebase_core/firebase_core.dart' as firebase_core;
+import 'package:uuid/uuid.dart';
 
 class CreateRecipeScreen extends StatefulWidget {
   @override
@@ -17,6 +19,11 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
               "https://diabeathis-f8ee3-default-rtdb.europe-west1.firebasedatabase.app")
       .reference();
   File? image;
+  final firebase_storage.FirebaseStorage storage =
+      firebase_storage.FirebaseStorage.instance;
+  var uuid = Uuid();
+
+
 
   Future pickImage(ImageSource source) async {
     try {
@@ -29,6 +36,20 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
       print('Failed to pick image: $e');
     }
   }
+
+  Future<void> uploadPicture (File file) async {
+    String name = uuid.v1().toString();
+    try {
+      await storage.ref('image/$name').putFile(file);
+    }
+    on firebase_core.FirebaseException catch (e) {
+      print(e) {
+        print(e);
+      }
+    }
+  }
+
+
 
   void _pictureEditBottomSheet(context) {
     showModalBottomSheet(
@@ -118,6 +139,7 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
 
           ElevatedButton(
               onPressed: () {
+                uploadPicture(image!);
                 final newRecipe = <String, dynamic>{
                   'title': titleController.text,
                   'description': descriptionController.text,

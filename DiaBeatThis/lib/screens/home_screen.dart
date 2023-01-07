@@ -206,6 +206,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   _buildImage(context, index),
                   _buildDescription(context, index),
                   _buildCommentsAndLikes(context, index),
+                  //TODO: tags icons
                   //TODO: reactions
                 ],
               ),
@@ -222,7 +223,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildCreator(BuildContext context, int index) {
-    final Post post = posts![index + 1]; //TODO: remove +1
+    final Post post = posts![index]; //TODO: remove +1
     return Row(
       children: [
         Padding(
@@ -235,13 +236,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   height: USER_ICON_POST_SIZE,
                   width: USER_ICON_POST_SIZE,
                 ),
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) {
-                      return PostScreen(
-                          post: post); //TODO: open user profile instead
-                    }),
-                  );
+                onTap: () { //TODO: open user profile
                 },
               )),
         ),

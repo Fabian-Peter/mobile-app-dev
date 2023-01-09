@@ -6,6 +6,7 @@ import 'package:flutter/rendering.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:diabeatthis/utils/constants.dart';
 import 'package:anim_search_bar/anim_search_bar.dart';
+import 'package:outline_search_bar/outline_search_bar.dart';
 
 import '../classes/Post.dart';
 
@@ -16,7 +17,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   IconData _favIconOutlined = Icons.favorite_outline;
-  IconData _newIcon = Icons.fiber_new;
+  IconData _newIcon = Icons.fiber_new_outlined;
   TextEditingController textController = TextEditingController();
   bool isVisible = false;
   List<Post>? posts = DummyData().returnData;
@@ -36,19 +37,51 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         titleSpacing: 10,
         title: const Padding(
-          padding: EdgeInsets.only(top: 14),
+          padding: EdgeInsets.only(top: 11),
           child: Text('DiaBeatThis!', style: DIABEATTHIS_LOGO),
         ),
         actions: <Widget>[
           Row(
-            children: [_buildLogButton(context), _buildProfileIcon(context)],
+            children: [
+              //_buildLogButton(context), //TODO: goes to profile
+              _buildProfileIcon(context)
+            ],
           )
         ],
-        bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(50.0),
-            child: Row(
-              children: [_buildFiltersRow(context)],
-            )),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: COLOR_INDIGO,
+        showSelectedLabels: false,
+        showUnselectedLabels: false,
+        iconSize: 25,
+        items: [
+          BottomNavigationBarItem(
+              icon: Icon(_newIcon, color: COLOR_WHITE), label: ""),
+          const BottomNavigationBarItem(
+              icon:
+                  Icon(Icons.add_circle_outline, color: COLOR_WHITE),
+              label: ""),
+          const BottomNavigationBarItem(
+              icon:
+                  Icon(Icons.filter_alt_outlined, color: COLOR_WHITE),
+              label: ""),
+        ],
+        onTap: (value) {
+          if (value == 0) {
+            setState(() {
+              if (_newIcon == Icons.fiber_new_outlined) {
+                _newIcon = Icons.star_border;
+              } else {
+                _newIcon = Icons.fiber_new_outlined;
+              }
+            });
+          }
+          if (value == 1) {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => CreateRecipeScreen()));
+          }
+          if (value == 2) {}
+        },
       ),
       body: NotificationListener<UserScrollNotification>(
         onNotification: (notification) {
@@ -68,25 +101,15 @@ class _HomeScreenState extends State<HomeScreen> {
           return true;
         },
         child: SafeArea(
-          child: Padding(
-              padding: const EdgeInsets.only(top: 7),
-              child: ListView.builder(itemBuilder: (context, index) {
-                return _buildPosts(context, index);
-              })),
-        ),
+            child: Column(
+          children: [
+            _buildSearchBar (context),
+            Flexible(child: ListView.builder(itemBuilder: (context, index) {
+              return _buildPosts(context, index);
+            }))
+          ],
+        )),
       ),
-      floatingActionButton: isVisible
-          ? FloatingActionButton(
-              heroTag: "btn2",
-              child: const Icon(Icons.add),
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => CreateRecipeScreen()));
-              },
-            )
-          : null,
     );
   }
 
@@ -115,7 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return ClipRRect(
       borderRadius: BorderRadius.circular(PROFILE_ICON_BAR_SIZE / 2),
       child: Padding(
-          padding: const EdgeInsets.only(right: 10, top: 8),
+          padding: const EdgeInsets.only(right: 10),
           child: InkWell(
               child: Image.asset(
                 //TODO: if guest, then show anonymous profile icon
@@ -127,6 +150,18 @@ class _HomeScreenState extends State<HomeScreen> {
               onTap: () {
                 //TODO: open profile instead
               })),
+    );
+  }
+
+  Widget _buildSearchBar(BuildContext context) {
+    return const SizedBox(
+        width: 400,
+        height: 48,
+        child: OutlineSearchBar(
+            margin:
+            EdgeInsets.only(top: 7, bottom: 6, left: 8, right: 8),
+            borderColor: COLOR_INDIGO,
+            textStyle: TEXT_PLAIN)
     );
   }
 
@@ -157,7 +192,7 @@ class _HomeScreenState extends State<HomeScreen> {
             padding: const EdgeInsets.only(bottom: 2),
             child: IconButton(
               icon: const Icon(
-                Icons.filter_list_alt,
+                Icons.filter_alt_outlined,
                 color: COLOR_WHITE,
                 size: 35,
               ),
@@ -194,7 +229,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Container(
             decoration: BoxDecoration(
               color: COLOR_WHITE,
-              border: Border.all(width: 5, color: COLOR_INDIGO_LIGHT),
+              border: Border.all(width: 3, color: COLOR_INDIGO_LIGHT),
               borderRadius: BorderRadius.circular(12),
             ),
             child: SafeArea(
@@ -236,7 +271,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   height: USER_ICON_POST_SIZE,
                   width: USER_ICON_POST_SIZE,
                 ),
-                onTap: () { //TODO: open user profile
+                onTap: () {
+                  //TODO: open user profile
                 },
               )),
         ),

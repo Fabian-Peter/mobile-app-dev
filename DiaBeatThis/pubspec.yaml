@@ -42,6 +42,7 @@ dependencies:
   firebase_auth: ^4.2.3
   firebase_ui_auth: ^1.1.6
   anim_search_bar: ^2.0.3
+  outline_search_bar: ^2.3.0
 
 dev_dependencies:
   flutter_test:

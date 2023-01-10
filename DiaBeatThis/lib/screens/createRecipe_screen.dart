@@ -29,6 +29,7 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
   TextEditingController descriptionController = TextEditingController();
   TextEditingController instructionController = TextEditingController();
   TextfieldTagsController tagsController = TextfieldTagsController();
+  TextEditingController nutritionController = TextEditingController();
   late String name;
 
   static const List<String> _pickTags = <String>[
@@ -74,10 +75,14 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
 
   void _pictureEditBottomSheet(context) {
     showModalBottomSheet(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
         context: context,
         builder: (BuildContext bc) {
-          return SizedBox(
+          return Container(
               height: 110,
+              padding: EdgeInsets.only(left: 10, right: 10),
               child: ListView(children: [
                 ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
@@ -107,6 +112,7 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
       ingredientsController.dispose();
       descriptionController.dispose();
       instructionController.dispose();
+      tagsController.dispose();
       super.dispose();
     }
 
@@ -238,7 +244,7 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                       helperStyle: const TextStyle(
                         color: Colors.black,
                       ),
-                      hintText: tagsController.hasTags ? '' : "Enter tag...",
+                      labelText: 'Enter tags',
                       errorText: error,
                       prefixIcon: tags.isNotEmpty
                           ? SingleChildScrollView(
@@ -296,7 +302,23 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
               });
             },
           ),
-
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextFormField(
+              controller: nutritionController,
+              keyboardType: TextInputType.multiline,
+              decoration: const InputDecoration(
+                labelText: 'Nutritional Values',
+                isDense: true,
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Colors.blue,
+                    width: 3.0,
+                  ),
+                ),
+              ),
+            ),
+          ),
           FloatingActionButton(
             heroTag: "btn1",
             child: Icon(Icons.camera_alt),
@@ -320,7 +342,8 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                   'tags' : tagList,
                   'timestamp': DateTime.now().toString(),
                   'currentUser': FirebaseAuth.instance.currentUser?.uid,
-                  'pictureID' : name
+                  'pictureID' : name,
+                  'nutrition' : nutritionController.text
                 };
 
                 database

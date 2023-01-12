@@ -334,23 +334,29 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                 uploadPicture(image!);
 
                 List<String>? tagList = tagsController.getTags;
+                List<String>? reactions;
+                List<String>? comments;
                 final newRecipe = <String, dynamic>{
+
                   'title': titleController.text,
                   'description': descriptionController.text,
                   'ingredients': ingredientsController.text,
                   'instructions': instructionController.text,
                   'tags' : tagList,
+                  //'reactions' : reactions,
+                  //'comments' : comments,
                   'timestamp': DateTime.now().toString(),
                   'currentUser': FirebaseAuth.instance.currentUser?.uid,
                   'pictureID' : name,
                   'nutrition' : nutritionController.text
                 };
-
                 database
-                    .child('recipes')
+                    .child('post')
                     .push()
                     .set(newRecipe)
                     .then((_) => print("call has been made"));
+
+                //.child(uniqueUserID).push(comment)
                 dispose();
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => HomeScreen()));

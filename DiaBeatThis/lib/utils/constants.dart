@@ -24,6 +24,10 @@ const TextStyle LOGBUTTON =
     TextStyle(color: COLOR_INDIGO, fontSize: 16, fontFamily: 'VisbyDemiBold');
 const TextStyle POST_CAPTION_INDIGO_LIGHT =
 TextStyle(color: COLOR_INDIGO_LIGHT, fontSize: 16, fontFamily: 'VisbyDemiBold');
+const TextStyle POST_CAPTION_INDIGO =
+TextStyle(color: COLOR_INDIGO, fontSize: 16, fontFamily: 'VisbyDemiBold');
+const TextStyle POST_CAPTION_BLACK =
+TextStyle(color: COLOR_BLACK, fontSize: 16, fontFamily: 'VisbyDemiBold');
 
 //ICON SIZE
 const double PROFILE_ICON_BAR_SIZE = 43;

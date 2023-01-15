@@ -83,6 +83,7 @@ flutter:
     - assets/images/Proteins.png
     - assets/images/Carbs.png
     - assets/images/Fats.png
+    - assets/images/recipeCamera.png
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

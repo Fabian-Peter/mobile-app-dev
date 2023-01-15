@@ -1,20 +1,21 @@
-import 'dart:math';
-
 import 'package:diabeatthis/data/dummy_data.dart';
 import 'package:diabeatthis/screens/createRecipe_screen.dart';
 import 'package:diabeatthis/screens/post_screen.dart';
+import 'package:diabeatthis/screens/profile_screen.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' hide User;
 import 'package:diabeatthis/utils/constants.dart';
 import 'package:outline_search_bar/outline_search_bar.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 import '../classes/Post.dart';
+import '../classes/user.dart';
 
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -27,6 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
   TextEditingController textController = TextEditingController();
   bool isVisible = false;
   List<Post>? posts = DummyData().returnData;
+  User userTest = DummyData().user1;
   final firebase_storage.FirebaseStorage storage =
       firebase_storage.FirebaseStorage.instance;
 
@@ -127,21 +129,28 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildProfileIcon(BuildContext context) {
+    final User profile = userTest;
     return ClipRRect(
       borderRadius: BorderRadius.circular(PROFILE_ICON_BAR_SIZE / 2),
       child: Padding(
           padding: const EdgeInsets.only(right: 10),
           child: InkWell(
-              child: Image.asset(
-                //TODO: if guest, then show anonymous profile icon
-                'assets/images/Profile.png',
-                //TODO: replace with user image
-                height: PROFILE_ICON_BAR_SIZE,
-                width: PROFILE_ICON_BAR_SIZE,
-              ),
-              onTap: () {
-                //TODO: open profile instead
-              })),
+            child: Image.asset(
+              //TODO: if guest, then show anonymous profile icon
+              'assets/images/Profile.png',
+              //TODO: replace with user image
+              height: PROFILE_ICON_BAR_SIZE,
+              width: PROFILE_ICON_BAR_SIZE,
+            ),
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) {
+                  return const ProfileScreen();
+                }),
+              );
+            },
+            //TODO: open profile instead
+          )),
     );
   }
 
@@ -279,17 +288,16 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildCommentsAndLikes(
       BuildContext context, DataSnapshot snapshot, int index) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        Padding(
-            padding: const EdgeInsets.only(left: 260),
-            child: IconButton(
-              icon: const Icon(
-                Icons.mode_comment_outlined,
-                color: COLOR_INDIGO_LIGHT,
-                size: 20,
-              ),
-              onPressed: () {},
-            )),
+        IconButton(
+          icon: const Icon(
+            Icons.mode_comment_outlined,
+            color: COLOR_INDIGO_LIGHT,
+            size: 20,
+          ),
+          onPressed: () {},
+        ),
         IconButton(
           icon: Icon(
             _favIconOutlined,

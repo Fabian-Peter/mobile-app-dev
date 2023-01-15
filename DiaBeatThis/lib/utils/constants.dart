@@ -12,6 +12,8 @@ const TextStyle DIABEATTHIS_LOGO =
     TextStyle(color: COLOR_WHITE, fontSize: 25, fontFamily: 'Aloja');
 const TextStyle HEADLINE_BOLD_BLACK =
     TextStyle(color: COLOR_BLACK, fontSize: 21, fontFamily: 'VisbyDemiBold');
+const TextStyle PROFILE_HEADLINE_BOLD_BLACK =
+TextStyle(color: COLOR_BLACK, fontSize: 10, fontFamily: 'VisbyDemiBold');
 const TextStyle HEADLINE_BOLD_WHITE =
     TextStyle(color: COLOR_WHITE, fontSize: 21, fontFamily: 'VisbyDemiBold');
 const TextStyle TEXT_PLAIN =

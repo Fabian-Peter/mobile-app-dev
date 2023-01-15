@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:diabeatthis/data/dummy_data.dart';
 import 'package:diabeatthis/screens/createRecipe_screen.dart';
 import 'package:diabeatthis/screens/post_screen.dart';
@@ -8,6 +10,7 @@ import 'package:flutter/rendering.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:diabeatthis/utils/constants.dart';
 import 'package:outline_search_bar/outline_search_bar.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 import '../classes/Post.dart';
 
@@ -24,6 +27,8 @@ class _HomeScreenState extends State<HomeScreen> {
   TextEditingController textController = TextEditingController();
   bool isVisible = false;
   List<Post>? posts = DummyData().returnData;
+  final firebase_storage.FirebaseStorage storage =
+      firebase_storage.FirebaseStorage.instance;
 
   @override
   void initState() {
@@ -32,6 +37,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _signout() async {
     await FirebaseAuth.instance.signOut();
+  }
+
+  Future<String> downloadURL(String imageName) async{
+    String downloadURL = await storage.ref('image/$imageName').getDownloadURL();
+    return downloadURL;
   }
 
   @override
@@ -81,24 +91,24 @@ class _HomeScreenState extends State<HomeScreen> {
           if (value == 2) {}
         },
       ),
-      body: NotificationListener<UserScrollNotification>(
-        onNotification: (notification) {
-          if (notification.direction == ScrollDirection.forward) {
-            if (!isVisible) {
-              setState(() => isVisible = true);
-            }
-          } else if (notification.direction == ScrollDirection.reverse) {
-            if (isVisible) {
-              setState(() => isVisible = false);
-            }
-          } else if (notification.direction == ScrollDirection.reverse) {
-            if (isVisible) {
-              setState(() => isVisible = false);
-            }
-          }
-          return true;
-        },
-        child: SafeArea(
+      //body: NotificationListener<UserScrollNotification>(
+      //  onNotification: (notification) {
+      //    if (notification.direction == ScrollDirection.forward) {
+      //      if (!isVisible) {
+      //        setState(() => isVisible = true);
+      //      }
+      //    } else if (notification.direction == ScrollDirection.reverse) {
+      //      if (isVisible) {
+      //        setState(() => isVisible = false);
+      //      }
+      //    } else if (notification.direction == ScrollDirection.reverse) {
+      //      if (isVisible) {
+      //        setState(() => isVisible = false);
+      //      }
+      //    }
+      //    return true;
+      //  },
+        body: SafeArea(
             child: Column(
           children: [
             const SizedBox(height: 1),
@@ -112,7 +122,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     }))
           ],
         )),
-      ),
+
     );
   }
 
@@ -221,22 +231,38 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: HEADLINE_BOLD_BLACK)));
   }
 
-  Widget _buildImage(BuildContext context, DataSnapshot snapshot, int index) {
-    return Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 9,
-          vertical: 8,
-        ),
-        child: AspectRatio(
-          aspectRatio: 2,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: Image.asset('assets/images/Grilled Alaska fish.png',
-                //TODO: ersetzen mit bild
-                fit: BoxFit.fill),
-          ),
-        ));
-  }
+ Widget _buildImage(BuildContext context, DataSnapshot snapshot, int index){
+   String tempUrl = snapshot.child('pictureID').value.toString();
+   return FutureBuilder<String>(
+     future: downloadURL(tempUrl),
+     builder: (context, AsyncSnapshot<String> snapshot) {
+       if (snapshot.connectionState == ConnectionState.waiting) {
+         return const CircularProgressIndicator.adaptive();
+       }
+       if (snapshot.hasError) {
+         return Text(snapshot.error.toString());
+       }
+       else {
+          print (snapshot);
+         return Padding(
+             padding: const EdgeInsets.symmetric(
+               horizontal: 9,
+               vertical: 8,
+             ),
+             child: AspectRatio(
+               aspectRatio: 2,
+               child: ClipRRect(
+                 borderRadius: BorderRadius.circular(10),
+                 child: Image.network(snapshot.data!,
+                     //TODO: ersetzen mit bild
+                     fit: BoxFit.fill),
+               ),
+             ));
+       }
+
+     }
+   );
+ }
 
   Widget _buildDescription(
       BuildContext context, DataSnapshot snapshot, int index) {

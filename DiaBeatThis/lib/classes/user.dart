@@ -1,20 +1,23 @@
-import 'dart:ffi';
+import 'package:image_picker/image_picker.dart';
+
 import 'Post.dart';
 
 class User {
   User(
-      {required this.username,
+      {required this.uid,
+      required this.username,
       required this.name,
-      required this.rights,
+      this.profilePicture,
       this.follower,
       this.following,
       required this.mailAddress,
       this.favorites,
       this.posts});
 
+  String uid;
   String username;
   String name;
-  bool rights;
+  XFile? profilePicture;
   List<User>? follower;
   List<User>? following;
   String mailAddress;

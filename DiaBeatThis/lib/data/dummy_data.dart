@@ -47,14 +47,14 @@ class DummyData {
       nutrition: ['proteins', 'fats']);
 
   User user1 = User(
+      uid: '12',
       username: 'Fred1214',
       name: 'Frederick',
-      rights: true,
       mailAddress: 'fred1214@gmail.com');
   User user2 = User(
+      uid: '1234',
       username: 'Tommy1156',
       name: 'Thomas',
-      rights: true,
       mailAddress: 'thomasMueller@outlook.com');
 
   List<Post> get returnData {

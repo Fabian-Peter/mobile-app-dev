@@ -337,18 +337,17 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                 List<String>? reactions;
                 List<String>? comments;
                 final newRecipe = <String, dynamic>{
-
                   'title': titleController.text,
                   'description': descriptionController.text,
                   'ingredients': ingredientsController.text,
                   'instructions': instructionController.text,
-                  'tags' : tagList,
+                  'tags': tagList,
                   //'reactions' : reactions,
                   //'comments' : comments,
                   'timestamp': DateTime.now().toString(),
                   'currentUser': FirebaseAuth.instance.currentUser?.uid,
-                  'pictureID' : name,
-                  'nutrition' : nutritionController.text
+                  'pictureID': name,
+                  'nutrition': nutritionController.text
                 };
                 database
                     .child('post')

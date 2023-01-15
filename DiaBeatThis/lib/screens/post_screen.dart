@@ -1,11 +1,12 @@
-import 'package:flutter/cupertino.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:diabeatthis/utils/constants.dart';
 
-import '../classes/Post.dart';
-
 class PostScreen extends StatelessWidget {
-  final Post post;
+  final DataSnapshot post;
+  FirebaseStorage storage = FirebaseStorage.instance;
+
   IconData _favIconOutlined = Icons.favorite_outline;
 
   PostScreen({required this.post});
@@ -14,7 +15,8 @@ class PostScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-            title: Text(post.recipe.title, style: HEADLINE_BOLD_WHITE),
+            title: Text(post.child('title').value.toString(),
+                style: HEADLINE_BOLD_WHITE),
             actions: <Widget>[_buildProfileIcon(context)]),
         body: SafeArea(
           child: Padding(
@@ -67,18 +69,25 @@ class PostScreen extends StatelessWidget {
         ),
         const SizedBox(width: 10),
         Text(
-          post.creator.name,
+          //post.child('currentUser').value.toString(), //TODO: currentUser to name
+          "User",
           style: HOME_POST_CREATOR,
         ),
-        const SizedBox(width: 160),
+        const Spacer(),
+        _buildDate(context)
+      ],
+    );
+  }
+
+  Widget _buildDate(BuildContext context) {
+    DateTime dt = DateTime.parse(post.child('timestamp').value.toString());
+    return Row(
+      children: [
         const Padding(
-            padding: EdgeInsets.only(bottom: 3),
+            padding: EdgeInsets.only(bottom: 4),
             child: Icon(Icons.calendar_month_rounded, size: 13)),
         const SizedBox(width: 5),
-        Text(
-            "${post.creationDate.day}.${post.creationDate.month}.${post
-                .creationDate.year}",
-            style: TEXT_BOLD)
+        Text("${dt.day}.${dt.month}.${dt.year}", style: TEXT_BOLD)
       ],
     );
   }
@@ -104,7 +113,8 @@ class PostScreen extends StatelessWidget {
   Widget _buildDescription(BuildContext context) {
     return Padding(
         padding: const EdgeInsets.only(top: 20),
-        child: Text(post.recipe.description, style: TEXT_PLAIN));
+        child: Text(post.child('description').value.toString(),
+            style: TEXT_PLAIN));
   }
 
   Widget _buildNutrition() {
@@ -156,6 +166,8 @@ class PostScreen extends StatelessWidget {
   }
 
   Widget _buildImage(BuildContext context) {
+    String imageID = post.child("pictureID").value.toString();
+    Reference imageRef = storage.ref().child('image/$imageID');
     return Padding(
         padding: const EdgeInsets.only(
           top: 20,
@@ -164,7 +176,7 @@ class PostScreen extends StatelessWidget {
           aspectRatio: 2,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10),
-            child: Image.asset('assets/images/${post.recipe.title}.png',
+            child: Image.network("",
                 //TODO: mit gespeichertem bild aus datenbank ersetzen
                 fit: BoxFit.fill),
           ),
@@ -174,49 +186,15 @@ class PostScreen extends StatelessWidget {
   Widget _buildIngredients(BuildContext context) {
     return Padding(
         padding: const EdgeInsets.only(left: 5, right: 5),
-        child: Column(
-          children: post.recipe.ingredients.map((ingredient) {
-            return Row(children: [
-              const Text(
-                "\u2022",
-                style: TEXT_BOLD,
-              ),
-              const SizedBox(
-                width: 10,
-              ),
-              Expanded(
-                child: Text(
-                  ingredient,
-                  style: TEXT_PLAIN,
-                ),
-              )
-            ]);
-          }).toList(),
-        ));
+        child: Text(post.child('ingredients').value.toString(),
+            style: TEXT_PLAIN));
   }
 
   Widget _buildGuide(BuildContext context) {
     return Padding(
         padding: const EdgeInsets.only(left: 5, right: 5),
-        child: Column(
-          children: post.recipe.directions.map((step) {
-            return Row(children: [
-              Text(
-                "${post.recipe.directions.indexOf(step) + 1}.", //start from 1
-                style: TEXT_BOLD,
-              ),
-              const SizedBox(
-                width: 10,
-              ),
-              Expanded(
-                child: Text(
-                  step,
-                  style: TEXT_PLAIN,
-                ),
-              )
-            ]);
-          }).toList(),
-        ));
+        child: Text(post.child('instructions').value.toString(),
+            style: TEXT_PLAIN));
   }
 
   Widget _buildCommunity(BuildContext context) {
@@ -238,14 +216,15 @@ class PostScreen extends StatelessWidget {
                     //TODO: add state to widget?
                   },
                 )),
-            Padding(padding: const EdgeInsets.only(top: 20),
+            Padding(
+                padding: const EdgeInsets.only(top: 20),
                 child: _buildTextRow("Comments:", "No comments yet"))
           ],
         ));
   }
 
-  Widget _buildContainerCaption(BuildContext context, Widget widget,
-      String caption) {
+  Widget _buildContainerCaption(
+      BuildContext context, Widget widget, String caption) {
     return Padding(
       padding: const EdgeInsets.only(top: 20),
       child: Stack(
@@ -253,6 +232,7 @@ class PostScreen extends StatelessWidget {
           Container(
               margin: const EdgeInsets.only(top: 10),
               padding: const EdgeInsets.only(top: 15, bottom: 10),
+              width: 370,
               decoration: BoxDecoration(
                   color: COLOR_WHITE,
                   border: Border.all(width: 3, color: COLOR_INDIGO_LIGHT),
@@ -270,7 +250,7 @@ class PostScreen extends StatelessWidget {
               top: 0,
               child: Container(
                 padding:
-                const EdgeInsets.only(bottom: 2, top: 2, left: 7, right: 7),
+                    const EdgeInsets.only(bottom: 2, top: 2, left: 7, right: 7),
                 color: COLOR_WHITE,
                 child: Text(
                   caption,

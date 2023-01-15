@@ -1,11 +1,13 @@
 import 'package:diabeatthis/data/dummy_data.dart';
 import 'package:diabeatthis/screens/createRecipe_screen.dart';
 import 'package:diabeatthis/screens/post_screen.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:diabeatthis/utils/constants.dart';
-import 'package:anim_search_bar/anim_search_bar.dart';
+import 'package:outline_search_bar/outline_search_bar.dart';
 
 import '../classes/Post.dart';
 
@@ -15,8 +17,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final ref = FirebaseDatabase.instance.ref("post");
+
   IconData _favIconOutlined = Icons.favorite_outline;
-  IconData _newIcon = Icons.fiber_new;
+  IconData _newIcon = Icons.fiber_new_outlined;
   TextEditingController textController = TextEditingController();
   bool isVisible = false;
   List<Post>? posts = DummyData().returnData;
@@ -36,19 +40,46 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         titleSpacing: 10,
         title: const Padding(
-          padding: EdgeInsets.only(top: 14),
+          padding: EdgeInsets.only(top: 11),
           child: Text('DiaBeatThis!', style: DIABEATTHIS_LOGO),
         ),
         actions: <Widget>[
           Row(
-            children: [_buildLogButton(context), _buildProfileIcon(context)],
+            children: [_buildProfileIcon(context)],
           )
         ],
-        bottom: PreferredSize(
-            preferredSize: const Size.fromHeight(50.0),
-            child: Row(
-              children: [_buildFiltersRow(context)],
-            )),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: COLOR_INDIGO,
+        showSelectedLabels: false,
+        showUnselectedLabels: false,
+        iconSize: 25,
+        items: [
+          BottomNavigationBarItem(
+              icon: Icon(_newIcon, color: COLOR_WHITE), label: ""),
+          const BottomNavigationBarItem(
+              icon: Icon(Icons.add_circle_outline, color: COLOR_WHITE),
+              label: ""),
+          const BottomNavigationBarItem(
+              icon: Icon(Icons.filter_alt_outlined, color: COLOR_WHITE),
+              label: ""),
+        ],
+        onTap: (value) {
+          if (value == 0) {
+            setState(() {
+              if (_newIcon == Icons.fiber_new_outlined) {
+                _newIcon = Icons.star_border;
+              } else {
+                _newIcon = Icons.fiber_new_outlined;
+              }
+            });
+          }
+          if (value == 1) {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => CreateRecipeScreen()));
+          }
+          if (value == 2) {}
+        },
       ),
       body: NotificationListener<UserScrollNotification>(
         onNotification: (notification) {
@@ -68,54 +99,28 @@ class _HomeScreenState extends State<HomeScreen> {
           return true;
         },
         child: SafeArea(
-          child: Padding(
-              padding: const EdgeInsets.only(top: 7),
-              child: ListView.builder(itemBuilder: (context, index) {
-                return _buildPosts(context, index);
-              })),
-        ),
+            child: Column(
+          children: [
+            const SizedBox(height: 1),
+            _buildSearchBar(context),
+            Flexible(
+                child: FirebaseAnimatedList(
+                    query: ref,
+                    defaultChild: const Text("Loading...", style: TEXT_PLAIN),
+                    itemBuilder: (context, snapshot, animation, index) {
+                      return _buildPosts(context, snapshot, index);
+                    }))
+          ],
+        )),
       ),
-      floatingActionButton: isVisible
-          ? FloatingActionButton(
-              heroTag: "btn2",
-              child: const Icon(Icons.add),
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => CreateRecipeScreen()));
-              },
-            )
-          : null,
     );
-  }
-
-  Widget _buildLogButton(BuildContext context) {
-    return Padding(
-        padding: const EdgeInsets.only(right: 13, top: 7),
-        child: SizedBox(
-            height: 28,
-            width: 100,
-            child: FloatingActionButton.extended(
-                heroTag: "logButton",
-                backgroundColor: COLOR_WHITE,
-                label: FirebaseAuth.instance.currentUser!.isAnonymous
-                    ? const Text("Login", style: LOGBUTTON)
-                    : const Text("Logout", style: LOGBUTTON),
-                icon: Icon(
-                    FirebaseAuth.instance.currentUser!.isAnonymous
-                        ? Icons.login
-                        : Icons.logout,
-                    size: 19.0,
-                    color: COLOR_INDIGO),
-                onPressed: () => _signout())));
   }
 
   Widget _buildProfileIcon(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(PROFILE_ICON_BAR_SIZE / 2),
       child: Padding(
-          padding: const EdgeInsets.only(right: 10, top: 8),
+          padding: const EdgeInsets.only(right: 10),
           child: InkWell(
               child: Image.asset(
                 //TODO: if guest, then show anonymous profile icon
@@ -130,61 +135,17 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildFiltersRow(BuildContext context) {
-    return Row(
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(bottom: 3),
-          child: IconButton(
-            icon: Icon(
-              _newIcon,
-              color: COLOR_WHITE,
-              size: 35,
-            ),
-            onPressed: () {
-              //TODO: switch between new and popular posts
-              setState(() {
-                if (_newIcon == Icons.fiber_new) {
-                  _newIcon = Icons.star;
-                } else {
-                  _newIcon = Icons.fiber_new;
-                }
-              });
-            },
-          ),
-        ),
-        Padding(
-            padding: const EdgeInsets.only(bottom: 2),
-            child: IconButton(
-              icon: const Icon(
-                Icons.filter_list_alt,
-                color: COLOR_WHITE,
-                size: 35,
-              ),
-              onPressed: () {
-                //TODO: implement filter option
-              },
-            )),
-        SizedBox(
-            width: 290,
-            height: 40,
-            child: AnimSearchBar(
-              rtl: true,
-              width: 270,
-              textController: textController,
-              onSuffixTap: () {
-                setState(() {
-                  textController.clear();
-                });
-              },
-              onSubmitted: (String) {},
-            ))
-      ],
-    );
+  Widget _buildSearchBar(BuildContext context) {
+    return const SizedBox(
+        width: 400,
+        height: 48,
+        child: OutlineSearchBar(
+            margin: EdgeInsets.only(top: 7, bottom: 6, left: 8, right: 8),
+            borderColor: COLOR_INDIGO,
+            textStyle: TEXT_PLAIN));
   }
 
-  Widget _buildPosts(BuildContext context, int index) {
-    final Post post = posts![index];
+  Widget _buildPosts(BuildContext context, DataSnapshot snapshot, int index) {
     return Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: 9,
@@ -194,18 +155,18 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Container(
             decoration: BoxDecoration(
               color: COLOR_WHITE,
-              border: Border.all(width: 5, color: COLOR_INDIGO_LIGHT),
+              border: Border.all(width: 3, color: COLOR_INDIGO_LIGHT),
               borderRadius: BorderRadius.circular(12),
             ),
             child: SafeArea(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildCreator(context, index),
-                  _buildTitle(context, index),
-                  _buildImage(context, index),
-                  _buildDescription(context, index),
-                  _buildCommentsAndLikes(context, index),
+                  _buildCreator(context, snapshot, index),
+                  _buildTitle(context, snapshot, index),
+                  _buildImage(context, snapshot, index),
+                  _buildDescription(context, snapshot, index),
+                  _buildCommentsAndLikes(context, snapshot, index),
                   //TODO: tags icons
                   //TODO: reactions
                 ],
@@ -215,15 +176,14 @@ class _HomeScreenState extends State<HomeScreen> {
           onTap: () {
             Navigator.of(context).push(
               MaterialPageRoute(builder: (_) {
-                return PostScreen(post: post);
+                return PostScreen(post: snapshot);
               }),
             );
           },
         ));
   }
 
-  Widget _buildCreator(BuildContext context, int index) {
-    final Post post = posts![index]; //TODO: remove +1
+  Widget _buildCreator(BuildContext context, DataSnapshot snapshot, int index) {
     return Row(
       children: [
         Padding(
@@ -236,31 +196,32 @@ class _HomeScreenState extends State<HomeScreen> {
                   height: USER_ICON_POST_SIZE,
                   width: USER_ICON_POST_SIZE,
                 ),
-                onTap: () { //TODO: open user profile
+                onTap: () {
+                  //TODO: open user profile
                 },
               )),
         ),
         Text(
-          post.creator.name,
+          //post.child('currentUser').value.toString(), //TODO: currentUser to name
+          "User",
           style: HOME_POST_CREATOR,
         )
       ],
     );
   }
 
-  Widget _buildTitle(BuildContext context, int index) {
-    final Post post = posts![index];
+  Widget _buildTitle(BuildContext context, DataSnapshot snapshot, int index) {
     return Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: 8,
           vertical: 1,
         ),
-        child:
-            Center(child: Text(post.recipe.title, style: HEADLINE_BOLD_BLACK)));
+        child: Center(
+            child: Text(snapshot.child('title').value.toString(),
+                style: HEADLINE_BOLD_BLACK)));
   }
 
-  Widget _buildImage(BuildContext context, int index) {
-    final Post post = posts![index];
+  Widget _buildImage(BuildContext context, DataSnapshot snapshot, int index) {
     return Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: 9,
@@ -270,24 +231,27 @@ class _HomeScreenState extends State<HomeScreen> {
           aspectRatio: 2,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10),
-            child: Image.asset('assets/images/${post.recipe.title}.png',
+            child: Image.asset('assets/images/Grilled Alaska fish.png',
+                //TODO: ersetzen mit bild
                 fit: BoxFit.fill),
           ),
         ));
   }
 
-  Widget _buildDescription(BuildContext context, int index) {
-    final Post post = posts![index];
+  Widget _buildDescription(
+      BuildContext context, DataSnapshot snapshot, int index) {
     return Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: 8,
           vertical: 4,
         ),
-        child: Center(child: Text(post.recipe.description, style: TEXT_PLAIN)));
+        child: Center(
+            child: Text(snapshot.child('description').value.toString(),
+                style: TEXT_PLAIN)));
   }
 
-  Widget _buildCommentsAndLikes(BuildContext context, int index) {
-    final Post post = posts![index];
+  Widget _buildCommentsAndLikes(
+      BuildContext context, DataSnapshot snapshot, int index) {
     return Row(
       children: [
         Padding(

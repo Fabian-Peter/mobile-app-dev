@@ -234,7 +234,7 @@ class _HomeScreenState extends State<HomeScreen> {
  Widget _buildImage(BuildContext context, DataSnapshot snapshot, int index){
    String tempUrl = snapshot.child('pictureID').value.toString();
    return FutureBuilder<String>(
-     future: downloadURL(tempUrl),
+     future: downloadURL(tempUrl), //TODO: (normally) Big no no, will be loaded every time state changes, that's why state listener commented out
      builder: (context, AsyncSnapshot<String> snapshot) {
        if (snapshot.connectionState == ConnectionState.waiting) {
          return const CircularProgressIndicator.adaptive();
@@ -254,7 +254,7 @@ class _HomeScreenState extends State<HomeScreen> {
                child: ClipRRect(
                  borderRadius: BorderRadius.circular(10),
                  child: Image.network(snapshot.data!,
-                     //TODO: ersetzen mit bild
+                     //TODO: ersetzen mit besser
                      fit: BoxFit.fill),
                ),
              ));

@@ -11,6 +11,11 @@ class PostScreen extends StatelessWidget {
 
   PostScreen({required this.post});
 
+  Future<String> downloadURL(String imageName) async{
+    String downloadURL = await storage.ref('image/$imageName').getDownloadURL();
+    return downloadURL;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -167,20 +172,37 @@ class PostScreen extends StatelessWidget {
 
   Widget _buildImage(BuildContext context) {
     String imageID = post.child("pictureID").value.toString();
-    Reference imageRef = storage.ref().child('image/$imageID');
-    return Padding(
-        padding: const EdgeInsets.only(
-          top: 20,
-        ),
-        child: AspectRatio(
-          aspectRatio: 2,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: Image.network("",
-                //TODO: mit gespeichertem bild aus datenbank ersetzen
-                fit: BoxFit.fill),
-          ),
-        ));
+    print(imageID);
+    
+    return FutureBuilder<String>(
+        future: downloadURL(imageID),
+        builder: (context, AsyncSnapshot<String> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const CircularProgressIndicator.adaptive();
+          }
+          if (snapshot.hasError) {
+            return Text(snapshot.error.toString());
+          }
+          else {
+            print (snapshot);
+            return Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 9,
+                  vertical: 8,
+                ),
+                child: AspectRatio(
+                  aspectRatio: 2,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.network(snapshot.data!,
+                        //TODO: ersetzen mit bild
+                        fit: BoxFit.fill),
+                  ),
+                ));
+          }
+
+        }
+    );
   }
 
   Widget _buildIngredients(BuildContext context) {

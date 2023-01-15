@@ -52,7 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         titleSpacing: 10,
         title: const Padding(
-          padding: EdgeInsets.only(top: 11),
+          padding: EdgeInsets.only(bottom: 2),
           child: Text('DiaBeatThis!', style: DIABEATTHIS_LOGO),
         ),
         actions: <Widget>[

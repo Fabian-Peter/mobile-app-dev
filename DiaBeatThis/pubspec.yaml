@@ -125,4 +125,7 @@ flutter:
     - family: VisbyDemiBold
       fonts:
         - asset: assets/fonts/VisbyDemiBold.otf
+    - family: QueensidesMedium
+      fonts:
+        - asset: assets/fonts/QueensidesMedium.ttf
 

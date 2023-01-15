@@ -9,7 +9,7 @@ const COLOR_BLACK = Colors.black87;
 
 //TEXTSTYLE
 const TextStyle DIABEATTHIS_LOGO =
-    TextStyle(color: COLOR_WHITE, fontSize: 25, fontFamily: 'Aloja');
+    TextStyle(color: COLOR_WHITE, fontSize: 25, fontFamily: 'QueensidesMedium');
 const TextStyle HEADLINE_BOLD_BLACK =
     TextStyle(color: COLOR_BLACK, fontSize: 21, fontFamily: 'VisbyDemiBold');
 const TextStyle PROFILE_HEADLINE_BOLD_BLACK =

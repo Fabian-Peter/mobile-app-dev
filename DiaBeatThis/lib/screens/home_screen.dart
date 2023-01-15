@@ -17,10 +17,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final ref = FirebaseDatabase(
-      databaseURL:
-      "https://diabeathis-f8ee3-default-rtdb.europe-west1.firebasedatabase.app")
-      .reference();
+  final ref = FirebaseDatabase.instance.ref("post");
+
   IconData _favIconOutlined = Icons.favorite_outline;
   IconData _newIcon = Icons.fiber_new_outlined;
   TextEditingController textController = TextEditingController();

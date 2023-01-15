@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:diabeatthis/utils/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:diabeatthis/screens/home_screen.dart';
@@ -118,38 +119,80 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Create Recipe'),
+        title: Text('Create new Post', style: HEADLINE_BOLD_WHITE),
       ),
       body: ListView(
         children: [
           if (image != null)
-            Image.file(image!, width: 160, height: 160, fit: BoxFit.cover)
+            Stack(
+                clipBehavior: Clip.none,
+                children: [
+              Image.file(image!, height: 160, width: 400, fit: BoxFit.cover),
+              Positioned(
+                  top: 120,
+                  left: 165,
+                  child: FloatingActionButton(
+                    heroTag: "btn1",
+                    child: Icon(Icons.camera_alt),
+                    backgroundColor: COLOR_INDIGO,
+                    foregroundColor: Colors.white,
+                    onPressed: () {
+                      _pictureEditBottomSheet(context);
+                    },
+                  )),
+            ])
           else
-            Image.network(
-                'https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Blue_circle_for_diabetes.svg/375px-Blue_circle_for_diabetes.svg.png',
-                height: 160,
-                width: 160,
-                fit: BoxFit.cover),
+
+            Stack(
+                clipBehavior: Clip.none,
+                children: [
+                      Image.asset('assets/images/recipeCamera.png',
+                          height: 160, width: 400, fit: BoxFit.cover),
+              Positioned(
+                  top: 120,
+                  left: 165,
+                  child: FloatingActionButton(
+                    heroTag: "btn1",
+                    backgroundColor: COLOR_INDIGO,
+                    foregroundColor: Colors.white,
+                    onPressed: () {
+                      _pictureEditBottomSheet(context);
+                    },
+                    child: Icon(Icons.camera_alt),
+                  )),
+            ]),
           //Hier könnte Ihr Logo stehen!
           const SizedBox(
-            height: 24,
+            height: 30,
           ),
           Padding(
-            padding: const EdgeInsets.all(8.0),
+              padding: EdgeInsets.only(left: 8),
+              child: Text("Title", style: POST_CAPTION_INDIGO_LIGHT)),
+          Padding(
+            padding: const EdgeInsets.all(9.0),
             child: TextFormField(
               controller: titleController,
               decoration: const InputDecoration(
-                labelText: 'The title of your awesome recipe',
+                labelText: 'The title of your recipe',
+                labelStyle: TextStyle(fontFamily: "VisbyMedium", fontSize: 14, color: COLOR_INDIGO_LIGHT),
                 isDense: true,
+                enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: COLOR_INDIGO_LIGHT,
+                    )
+                ),
                 border: OutlineInputBorder(
                   borderSide: BorderSide(
-                    color: Colors.blue,
+                    color: COLOR_INDIGO_LIGHT,
                     width: 3.0,
                   ),
                 ),
               ),
             ),
           ),
+          Padding(
+              padding: EdgeInsets.only(left: 8, top: 8),
+              child: Text("Description", style: POST_CAPTION_INDIGO_LIGHT)),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextFormField(
@@ -158,7 +201,13 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
               maxLines: null,
               decoration: const InputDecoration(
                 labelText: 'A short description of your dish',
+                labelStyle: TextStyle(fontFamily: "VisbyMedium", fontSize: 14, color: COLOR_INDIGO_LIGHT),
                 isDense: true,
+                enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: COLOR_INDIGO_LIGHT,
+                    )
+                ),
                 border: OutlineInputBorder(
                   borderSide: BorderSide(
                     color: Colors.blue,
@@ -169,22 +218,34 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
             ),
           ),
           Padding(
+              padding: EdgeInsets.only(left: 8, top: 8),
+              child: Text("Ingredients", style: POST_CAPTION_INDIGO_LIGHT)),
+          Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextFormField(
               controller: ingredientsController,
               keyboardType: TextInputType.multiline,
               decoration: const InputDecoration(
-                labelText: 'All of the tasty ingredients go here',
+                labelText: 'All of the tasty ingredients',
+                labelStyle: TextStyle(fontFamily: "VisbyMedium", fontSize: 14, color: COLOR_INDIGO_LIGHT),
                 isDense: true,
+                enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: COLOR_INDIGO_LIGHT,
+                    )
+                ),
                 border: OutlineInputBorder(
                   borderSide: BorderSide(
-                    color: Colors.blue,
+                    color: COLOR_INDIGO_LIGHT,
                     width: 3.0,
                   ),
                 ),
               ),
             ),
           ),
+          Padding(
+              padding: EdgeInsets.only(left: 8, top: 8),
+              child: Text("Instructions", style: POST_CAPTION_INDIGO_LIGHT)),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextFormField(
@@ -193,27 +254,36 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
               minLines: 3,
               maxLines: null,
               decoration: const InputDecoration(
-                labelText: 'Now tell us, how to make it',
+                labelText: 'Now tell us, how to make it...',
+                labelStyle: TextStyle(fontFamily: "VisbyMedium", fontSize: 14, color: COLOR_INDIGO_LIGHT),
                 isDense: true,
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: COLOR_INDIGO_LIGHT,
+                  )
+                ),
                 border: OutlineInputBorder(
                   borderSide: BorderSide(
-                    color: Colors.blue,
+                    color: COLOR_INDIGO_LIGHT,
                     width: 3.0,
                   ),
                 ),
               ),
             ),
           ),
+          Padding(
+              padding: EdgeInsets.only(left: 8, top: 8),
+              child: Text("Tags", style: POST_CAPTION_INDIGO_LIGHT)),
           TextFieldTags(
             textfieldTagsController: tagsController,
             initialTags: const [
-              'Your Tags go here',
+              'Your tags',
             ],
             textSeparators: [' ', ','],
             letterCase: LetterCase.normal,
             validator: (String tag) {
               if (tagsController.getTags!.contains(tag)) {
-                return 'you already entered that';
+                return 'You already entered that';
               }
               return null;
             },
@@ -227,24 +297,30 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                     focusNode: fn,
                     decoration: InputDecoration(
                       isDense: true,
+                      enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: COLOR_INDIGO_LIGHT,
+                          )
+                      ),
                       border: const OutlineInputBorder(
                         borderSide: BorderSide(
-                          color: Colors.blue,
+                          color: COLOR_INDIGO_LIGHT,
                           width: 3.0,
                         ),
                       ),
                       focusedBorder: const OutlineInputBorder(
                         borderSide: BorderSide(
-                          color: Colors.blue,
+                          color: COLOR_INDIGO_LIGHT,
                           width: 3.0,
                         ),
                       ),
                       helperText:
                           'Some tags to help the hungry find your recipe',
                       helperStyle: const TextStyle(
-                        color: Colors.black,
+                        color: COLOR_INDIGO, fontFamily: "VisbyMedium"
                       ),
                       labelText: 'Enter tags',
+                      labelStyle: TextStyle(fontFamily: "VisbyMedium", fontSize: 14, color: COLOR_INDIGO_LIGHT),
                       errorText: error,
                       prefixIcon: tags.isNotEmpty
                           ? SingleChildScrollView(
@@ -257,7 +333,7 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                                     borderRadius: BorderRadius.all(
                                       Radius.circular(20.0),
                                     ),
-                                    color: Colors.blue,
+                                    color: COLOR_INDIGO,
                                   ),
                                   margin: const EdgeInsets.symmetric(
                                       horizontal: 5.0),
@@ -303,64 +379,65 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
             },
           ),
           Padding(
+              padding: EdgeInsets.only(left: 8, top: 8),
+              child: Text("Nutritions", style: POST_CAPTION_INDIGO_LIGHT)),
+          Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextFormField(
               controller: nutritionController,
               keyboardType: TextInputType.multiline,
               decoration: const InputDecoration(
                 labelText: 'Nutritional Values',
+                labelStyle: TextStyle(fontFamily: "VisbyMedium", fontSize: 14, color: COLOR_INDIGO_LIGHT),
                 isDense: true,
+                enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: COLOR_INDIGO_LIGHT,
+                    )
+                ),
                 border: OutlineInputBorder(
                   borderSide: BorderSide(
-                    color: Colors.blue,
+                    color: COLOR_INDIGO_LIGHT,
                     width: 3.0,
                   ),
                 ),
               ),
             ),
           ),
-          FloatingActionButton(
-            heroTag: "btn1",
-            child: Icon(Icons.camera_alt),
-            backgroundColor: Colors.blue,
-            foregroundColor: Colors.white,
-            onPressed: () {
-              _pictureEditBottomSheet(context);
-            },
-          ),
+          Padding(
+              padding: EdgeInsets.only(left: 10, right: 10, bottom: 10, top: 14),
+              child: ElevatedButton(
+                  onPressed: () {
+                    uploadPicture(image!);
 
-          ElevatedButton(
-              onPressed: () {
-                uploadPicture(image!);
+                    List<String>? tagList = tagsController.getTags;
+                    List<String>? reactions;
+                    List<String>? comments;
+                    final newRecipe = <String, dynamic>{
+                      'title': titleController.text,
+                      'description': descriptionController.text,
+                      'ingredients': ingredientsController.text,
+                      'instructions': instructionController.text,
+                      'tags': tagList,
+                      //'reactions' : reactions,
+                      //'comments' : comments,
+                      'timestamp': DateTime.now().toString(),
+                      'currentUser': FirebaseAuth.instance.currentUser?.uid,
+                      'pictureID': name,
+                      'nutrition': nutritionController.text
+                    };
+                    database
+                        .child('post')
+                        .push()
+                        .set(newRecipe)
+                        .then((_) => print("call has been made"));
 
-                List<String>? tagList = tagsController.getTags;
-                List<String>? reactions;
-                List<String>? comments;
-                final newRecipe = <String, dynamic>{
-                  'title': titleController.text,
-                  'description': descriptionController.text,
-                  'ingredients': ingredientsController.text,
-                  'instructions': instructionController.text,
-                  'tags': tagList,
-                  //'reactions' : reactions,
-                  //'comments' : comments,
-                  'timestamp': DateTime.now().toString(),
-                  'currentUser': FirebaseAuth.instance.currentUser?.uid,
-                  'pictureID': name,
-                  'nutrition': nutritionController.text
-                };
-                database
-                    .child('post')
-                    .push()
-                    .set(newRecipe)
-                    .then((_) => print("call has been made"));
-
-                //.child(uniqueUserID).push(comment)
-                dispose();
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => HomeScreen()));
-              },
-              child: Text('Submit'))
+                    //.child(uniqueUserID).push(comment)
+                    dispose();
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => HomeScreen()));
+                  },
+                  child: Text('Post', style: TextStyle(fontFamily: "VisbyDemiBold", fontSize: 18))))
         ],
       ),
     );

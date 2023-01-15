@@ -57,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         actions: <Widget>[
           Row(
-            children: [_buildProfileIcon(context)],
+            children: [_buildLogButton(context), _buildProfileIcon(context)],
           )
         ],
       ),
@@ -127,6 +127,28 @@ class _HomeScreenState extends State<HomeScreen> {
 
     );
   }
+
+  Widget _buildLogButton(BuildContext context) {
+    return Padding(
+        padding: const EdgeInsets.only(right: 13),
+        child: SizedBox(
+            height: 28,
+            width: 100,
+            child: FloatingActionButton.extended(
+                heroTag: "logButton",
+                backgroundColor: COLOR_WHITE,
+                label: FirebaseAuth.instance.currentUser!.isAnonymous
+                    ? const Text("Login", style: LOGBUTTON)
+                    : const Text("Logout", style: LOGBUTTON),
+                icon: Icon(
+                    FirebaseAuth.instance.currentUser!.isAnonymous
+                        ? Icons.login
+                        : Icons.logout,
+                    size: 19.0,
+                    color: COLOR_INDIGO),
+                onPressed: () => _signout())));
+  }
+
 
   Widget _buildProfileIcon(BuildContext context) {
     final User profile = userTest;

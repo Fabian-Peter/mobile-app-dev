@@ -33,6 +33,7 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
   TextEditingController nutritionController = TextEditingController();
   late String name;
 
+
   static const List<String> _pickTags = <String>[
     'Hearty',
     'Dessert',
@@ -63,16 +64,18 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
     }
   }
 
-  Future<void> uploadPicture(File file) async {
+  Future<String> uploadPicture(File file) async {
     name = uuid.v1().toString();
-    try {
-      await storage.ref('image/$name').putFile(file);
-    } on firebase_core.FirebaseException catch (e) {
-      print(e) {
-        print(e);
+    var storeImage = firebase_storage.FirebaseStorage.instance.ref().child('image/$name');
+    firebase_storage.UploadTask task1 = storeImage.putFile(file);
+    String imageURL = await(await task1).ref.getDownloadURL();
+    print(imageURL);
+      return imageURL;
       }
-    }
-  }
+
+
+
+
 
   void _pictureEditBottomSheet(context) {
     showModalBottomSheet(
@@ -407,12 +410,15 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
           Padding(
               padding: EdgeInsets.only(left: 10, right: 10, bottom: 10, top: 14),
               child: ElevatedButton(
-                  onPressed: () {
-                    uploadPicture(image!);
+                  onPressed: () async {
+                    //TODO add loading animation
+                    String imageURL = await uploadPicture(image!);
+
 
                     List<String>? tagList = tagsController.getTags;
                     List<String>? reactions;
                     List<String>? comments;
+                    String timestamp = DateTime.now().toString();
                     final newRecipe = <String, dynamic>{
                       'title': titleController.text,
                       'description': descriptionController.text,
@@ -421,9 +427,9 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                       'tags': tagList,
                       //'reactions' : reactions,
                       //'comments' : comments,
-                      'timestamp': DateTime.now().toString(),
+                      'timestamp': '-$timestamp',
                       'currentUser': FirebaseAuth.instance.currentUser?.uid,
-                      'pictureID': name,
+                      'pictureID': imageURL,
                       'nutrition': nutritionController.text
                     };
                     database

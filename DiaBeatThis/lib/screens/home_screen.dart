@@ -37,24 +37,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
-    getData();
     super.initState();
-  }
-
-  Future<void>getData() async {
-    DataSnapshot snapshot = await ref.get();
-    final data = snapshot.value.toString();
-    var list = jsonDecode(data);
-    print(list);
   }
 
   Future<void> _signout() async {
     await FirebaseAuth.instance.signOut();
-  }
-
-  Future<String> downloadURL(String imageName) async{
-    String downloadURL = await storage.ref('image/$imageName').getDownloadURL();
-    return downloadURL;
   }
 
   @override
@@ -121,21 +108,20 @@ class _HomeScreenState extends State<HomeScreen> {
       //    }
       //    return true;
       //  },
-        body: SafeArea(
-            child: Column(
-          children: [
-            const SizedBox(height: 1),
-            _buildSearchBar(context),
-            Flexible(
-                child: FirebaseAnimatedList(
-                    query: ref,
-                    defaultChild: const Text("Loading...", style: TEXT_PLAIN),
-                    itemBuilder: (context, snapshot, animation, index) {
-                      return _buildPosts(context, snapshot, index);
-                    }))
-          ],
-        )),
-
+      body: SafeArea(
+          child: Column(
+        children: [
+          const SizedBox(height: 1),
+          _buildSearchBar(context),
+          Flexible(
+              child: FirebaseAnimatedList(
+                  query: ref.orderByChild('timestamp'),
+                  defaultChild: const Text("Loading...", style: TEXT_PLAIN),
+                  itemBuilder: (context, snapshot, animation, index) {
+                    return _buildPosts(context, snapshot, index);
+                  }))
+        ],
+      )),
     );
   }
 
@@ -159,7 +145,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     color: COLOR_INDIGO),
                 onPressed: () => _signout())));
   }
-
 
   Widget _buildProfileIcon(BuildContext context) {
     final User profile = userTest;
@@ -273,38 +258,33 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: HEADLINE_BOLD_BLACK)));
   }
 
- Widget _buildImage(BuildContext context, DataSnapshot snapshot, int index){
-   String tempUrl = snapshot.child('pictureID').value.toString();
-   return FutureBuilder<String>(
-     future: downloadURL(tempUrl), //TODO: (normally) Big no no, will be loaded every time state changes, that's why state listener commented out
-     builder: (context, AsyncSnapshot<String> snapshot) {
-       if (snapshot.connectionState == ConnectionState.waiting) {
-         return const CircularProgressIndicator.adaptive();
-       }
-       if (snapshot.hasError) {
-         return Text(snapshot.error.toString());
-       }
-       else {
-          print (snapshot);
-         return Padding(
-             padding: const EdgeInsets.symmetric(
-               horizontal: 9,
-               vertical: 8,
-             ),
-             child: AspectRatio(
-               aspectRatio: 2,
-               child: ClipRRect(
-                 borderRadius: BorderRadius.circular(10),
-                 child: Image.network(snapshot.data!,
-                     //TODO: ersetzen mit besser
-                     fit: BoxFit.fill),
-               ),
-             ));
-       }
+  Widget _buildImage(BuildContext context, DataSnapshot snapshot, int index) {
+    String url = snapshot.child('pictureID').value.toString();
 
-     }
-   );
- }
+    return Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 9,
+          vertical: 8,
+        ),
+        child: AspectRatio(
+          aspectRatio: 2,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Image.network(url, fit: BoxFit.fill, loadingBuilder: (BuildContext context, Widget child,
+                ImageChunkEvent? loadingProgress) {
+              if (loadingProgress == null) return child;
+              return Center(
+                child: CircularProgressIndicator(
+                  value: loadingProgress.expectedTotalBytes != null
+                      ? loadingProgress.cumulativeBytesLoaded /
+                      loadingProgress.expectedTotalBytes!
+                      : null,
+                ),
+              );
+            },),
+          ),
+        ));
+  }
 
   Widget _buildDescription(
       BuildContext context, DataSnapshot snapshot, int index) {

@@ -11,7 +11,7 @@ class PostScreen extends StatelessWidget {
 
   PostScreen({required this.post});
 
-  Future<String> downloadURL(String imageName) async{
+  Future<String> downloadURL(String imageName) async {
     String downloadURL = await storage.ref('image/$imageName').getDownloadURL();
     return downloadURL;
   }
@@ -172,34 +172,16 @@ class PostScreen extends StatelessWidget {
 
   Widget _buildImage(BuildContext context) {
     String imageID = post.child("pictureID").value.toString();
-    print(imageID);
-
-    return FutureBuilder<String>(
-        future: downloadURL(imageID), //TODO: (normally) Big no no, will be loaded every time state changes
-        builder: (context, AsyncSnapshot<String> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator.adaptive();
-          }
-          if (snapshot.hasError) {
-            return Text(snapshot.error.toString());
-          }
-          else {
-            print (snapshot);
-            return Padding(
-                padding: const EdgeInsets.only(top: 20),
-                child: AspectRatio(
-                  aspectRatio: 2,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Image.network(snapshot.data!,
-                        //TODO: ersetzen mit besser
-                        fit: BoxFit.fill),
-                  ),
-                ));
-          }
-
-        }
-    );
+    return Padding(
+        padding: const EdgeInsets.only(top: 20),
+        child: AspectRatio(
+          aspectRatio: 2,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Image.network(imageID,
+                fit: BoxFit.fill),
+          ),
+        ));
   }
 
   Widget _buildIngredients(BuildContext context) {

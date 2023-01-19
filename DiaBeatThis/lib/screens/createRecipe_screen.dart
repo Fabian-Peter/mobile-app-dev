@@ -411,12 +411,14 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
               padding: EdgeInsets.only(left: 10, right: 10, bottom: 10, top: 14),
               child: ElevatedButton(
                   onPressed: () async {
+                    //TODO add loading animation
                     String imageURL = await uploadPicture(image!);
 
 
                     List<String>? tagList = tagsController.getTags;
                     List<String>? reactions;
                     List<String>? comments;
+                    String timestamp = DateTime.now().toString();
                     final newRecipe = <String, dynamic>{
                       'title': titleController.text,
                       'description': descriptionController.text,
@@ -425,7 +427,7 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                       'tags': tagList,
                       //'reactions' : reactions,
                       //'comments' : comments,
-                      'timestamp': DateTime.now().toString(),
+                      'timestamp': '-$timestamp',
                       'currentUser': FirebaseAuth.instance.currentUser?.uid,
                       'pictureID': imageURL,
                       'nutrition': nutritionController.text

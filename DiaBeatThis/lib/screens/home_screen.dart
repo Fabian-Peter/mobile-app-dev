@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:diabeatthis/data/dummy_data.dart';
 import 'package:diabeatthis/screens/createRecipe_screen.dart';
 import 'package:diabeatthis/screens/post_screen.dart';
@@ -31,10 +33,19 @@ class _HomeScreenState extends State<HomeScreen> {
   User userTest = DummyData().user1;
   final firebase_storage.FirebaseStorage storage =
       firebase_storage.FirebaseStorage.instance;
+  late Future<String> dataFuture;
 
   @override
   void initState() {
+    getData();
     super.initState();
+  }
+
+  Future<void>getData() async {
+    DataSnapshot snapshot = await ref.get();
+    final data = snapshot.value.toString();
+    var list = jsonDecode(data);
+    print(list);
   }
 
   Future<void> _signout() async {

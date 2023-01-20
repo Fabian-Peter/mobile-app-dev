@@ -139,17 +139,6 @@ class _HomeScreenState extends State<HomeScreen> {
     ));
   }
 
-  Widget _buildScreen2(BuildContext context, String identifier) {
-    //TODO:
-    return Flexible(
-        child: FirebaseAnimatedList(
-            query: ref.orderByChild('timestamp'),
-            defaultChild: const Text("Loading...", style: TEXT_PLAIN),
-            itemBuilder: (context, snapshot, animation, index) {
-              return _buildPosts(context, snapshot, index);
-            }));
-  }
-
   Widget _buildLogButton(BuildContext context) {
     return Padding(
         padding: const EdgeInsets.only(right: 13),

@@ -26,7 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final ref = FirebaseDatabase.instance.ref("post");
 
   IconData _favIconOutlined = Icons.favorite_outline;
-  IconData _newIcon = Icons.fiber_new_outlined;
+  IconData _homeIcon = Icons.home;
   TextEditingController textController = TextEditingController();
   bool isVisible = false;
   List<Post>? posts = DummyData().returnData;
@@ -46,83 +46,108 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final PageController controller = PageController();
     return Scaffold(
-      appBar: AppBar(
-        titleSpacing: 10,
-        title: const Padding(
-          padding: EdgeInsets.only(bottom: 2),
-          child: Text('DiaBeatThis!', style: DIABEATTHIS_LOGO),
+        appBar: AppBar(
+          titleSpacing: 10,
+          title: const Padding(
+            padding: EdgeInsets.only(bottom: 2),
+            child: Text('DiaBeatThis!', style: DIABEATTHIS_LOGO),
+          ),
+          actions: <Widget>[
+            Row(
+              children: [_buildLogButton(context), _buildProfileIcon(context)],
+            )
+          ],
         ),
-        actions: <Widget>[
-          Row(
-            children: [_buildLogButton(context), _buildProfileIcon(context)],
-          )
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: COLOR_INDIGO,
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
-        iconSize: 25,
-        items: [
-          BottomNavigationBarItem(
-              icon: Icon(_newIcon, color: COLOR_WHITE), label: ""),
-          const BottomNavigationBarItem(
-              icon: Icon(Icons.add_circle_outline, color: COLOR_WHITE),
-              label: ""),
-          const BottomNavigationBarItem(
-              icon: Icon(Icons.filter_alt_outlined, color: COLOR_WHITE),
-              label: ""),
-        ],
-        onTap: (value) {
-          if (value == 0) {
+        bottomNavigationBar: BottomNavigationBar(
+          backgroundColor: COLOR_INDIGO,
+          showSelectedLabels: false,
+          showUnselectedLabels: false,
+          iconSize: 25,
+          items: [
+            const BottomNavigationBarItem(
+                icon: Icon(Icons.filter_alt_outlined, color: COLOR_WHITE),
+                label: ""),
+            BottomNavigationBarItem(
+                icon: Icon(_homeIcon, color: COLOR_WHITE), label: ""),
+            const BottomNavigationBarItem(
+                icon: Icon(Icons.add_circle_outline, color: COLOR_WHITE),
+                label: ""),
+          ],
+          onTap: (value) {
+            if (value == 0) {}
+            if (value == 1) {}
+            if (value == 2) {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => CreateRecipeScreen()));
+            }
+          },
+        ),
+        //body: NotificationListener<UserScrollNotification>(
+        //  onNotification: (notification) {
+        //    if (notification.direction == ScrollDirection.forward) {
+        //      if (!isVisible) {
+        //        setState(() => isVisible = true);
+        //      }
+        //    } else if (notification.direction == ScrollDirection.reverse) {
+        //      if (isVisible) {
+        //        setState(() => isVisible = false);
+        //      }
+        //    } else if (notification.direction == ScrollDirection.reverse) {
+        //      if (isVisible) {
+        //        setState(() => isVisible = false);
+        //      }
+        //    }
+        //    return true;
+        //  },
+        body: PageView(
+          controller: controller,
+          children: [
+            _buildScreen(context, "Home"),
+            _buildScreen(context, "Discover")
+          ],
+          onPageChanged: (page) {
             setState(() {
-              if (_newIcon == Icons.fiber_new_outlined) {
-                _newIcon = Icons.star_border;
+              if (_homeIcon == Icons.home) {
+                _homeIcon = Icons.explore;
               } else {
-                _newIcon = Icons.fiber_new_outlined;
+                _homeIcon = Icons.home;
               }
             });
-          }
-          if (value == 1) {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => CreateRecipeScreen()));
-          }
-          if (value == 2) {}
-        },
-      ),
-      //body: NotificationListener<UserScrollNotification>(
-      //  onNotification: (notification) {
-      //    if (notification.direction == ScrollDirection.forward) {
-      //      if (!isVisible) {
-      //        setState(() => isVisible = true);
-      //      }
-      //    } else if (notification.direction == ScrollDirection.reverse) {
-      //      if (isVisible) {
-      //        setState(() => isVisible = false);
-      //      }
-      //    } else if (notification.direction == ScrollDirection.reverse) {
-      //      if (isVisible) {
-      //        setState(() => isVisible = false);
-      //      }
-      //    }
-      //    return true;
-      //  },
-      body: SafeArea(
-          child: Column(
-        children: [
-          const SizedBox(height: 1),
-          _buildSearchBar(context),
-          Flexible(
-              child: FirebaseAnimatedList(
-                  query: ref.orderByChild('timestamp'),
-                  defaultChild: const Text("Loading...", style: TEXT_PLAIN),
-                  itemBuilder: (context, snapshot, animation, index) {
-                    return _buildPosts(context, snapshot, index);
-                  }))
-        ],
-      )),
-    );
+          },
+        ));
+  }
+
+  Widget _buildScreen(BuildContext context, String identifier) {
+    //TODO: load posts depending on identifier
+    return SafeArea(
+        child: Column(
+      children: [
+        const SizedBox(height: 1),
+        _buildSearchBar(context),
+        Flexible(
+            child: FirebaseAnimatedList(
+                query: ref.orderByChild('timestamp'),
+                defaultChild: const Text("Loading...", style: TEXT_PLAIN),
+                itemBuilder: (context, snapshot, animation, index) {
+                  return _buildPosts(context, snapshot, index);
+                }))
+      ],
+    ));
+  }
+
+  Widget _buildScreen2(BuildContext context, String identifier) {
+    //TODO:
+    return Flexible(
+        child: FirebaseAnimatedList(
+            query: ref.orderByChild('timestamp'),
+            defaultChild: const Text("Loading...", style: TEXT_PLAIN),
+            itemBuilder: (context, snapshot, animation, index) {
+              return _buildPosts(context, snapshot, index);
+            }));
   }
 
   Widget _buildLogButton(BuildContext context) {
@@ -194,6 +219,14 @@ class _HomeScreenState extends State<HomeScreen> {
               color: COLOR_WHITE,
               border: Border.all(width: 3, color: COLOR_INDIGO_LIGHT),
               borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.5),
+                  spreadRadius: 2,
+                  blurRadius: 3,
+                  offset: const Offset(0, 3),
+                ),
+              ],
             ),
             child: SafeArea(
               child: Column(
@@ -270,18 +303,22 @@ class _HomeScreenState extends State<HomeScreen> {
           aspectRatio: 2,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10),
-            child: Image.network(url, fit: BoxFit.fill, loadingBuilder: (BuildContext context, Widget child,
-                ImageChunkEvent? loadingProgress) {
-              if (loadingProgress == null) return child;
-              return Center(
-                child: CircularProgressIndicator(
-                  value: loadingProgress.expectedTotalBytes != null
-                      ? loadingProgress.cumulativeBytesLoaded /
-                      loadingProgress.expectedTotalBytes!
-                      : null,
-                ),
-              );
-            },),
+            child: Image.network(
+              url,
+              fit: BoxFit.cover,
+              loadingBuilder: (BuildContext context, Widget child,
+                  ImageChunkEvent? loadingProgress) {
+                if (loadingProgress == null) return child;
+                return Center(
+                  child: CircularProgressIndicator(
+                    value: loadingProgress.expectedTotalBytes != null
+                        ? loadingProgress.cumulativeBytesLoaded /
+                            loadingProgress.expectedTotalBytes!
+                        : null,
+                  ),
+                );
+              },
+            ),
           ),
         ));
   }

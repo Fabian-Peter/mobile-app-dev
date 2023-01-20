@@ -43,7 +43,9 @@ class PostScreen extends StatelessWidget {
           children: [
             _buildCreatorRow(context),
             _buildDescription(context),
-            _buildContainerCaption(context, _buildNutrition(), 'Nutrition'),
+            _buildContainerCaption(context, _buildTags(), 'Tags'),
+            _buildContainerCaption(
+                context, _buildNutrition(), 'Nutritional Values'),
             _buildImage(context),
             _buildContainerCaption(
                 context, _buildIngredients(context), 'Ingredients'),
@@ -122,52 +124,58 @@ class PostScreen extends StatelessWidget {
             style: TEXT_PLAIN));
   }
 
+  Widget _buildTags() {
+    return Padding(
+        padding: const EdgeInsets.only(left: 5, right: 5),
+        child: Text(
+            post.child('tags').value.toString(), //TODO: Liste berücksichtigen
+            style: TEXT_PLAIN));
+  }
+
   Widget _buildNutrition() {
     const double iconSize = 54;
-    return Row(children: [
-      const SizedBox(width: 43),
-      Column(children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(iconSize / 2),
-          child: Image.asset(
-            'assets/images/Fats.png',
-            height: iconSize,
-            width: iconSize,
+    return Padding(
+        padding: const EdgeInsets.only(left: 62, right: 62),
+        child: Column(children: [
+          Row(
+            children: [
+              Column(children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(iconSize / 2),
+                  child: Image.asset(
+                    'assets/images/Fats.png',
+                    height: iconSize,
+                    width: iconSize,
+                  ),
+                ),
+              ]),
+              const SizedBox(width: 30),
+              Column(children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(iconSize / 2),
+                  child: Image.asset(
+                    'assets/images/Carbs.png',
+                    height: iconSize,
+                    width: iconSize,
+                  ),
+                ),
+              ]),
+              const SizedBox(width: 30),
+              Column(children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(iconSize / 2),
+                  child: Image.asset(
+                    'assets/images/Proteins.png',
+                    height: iconSize,
+                    width: iconSize,
+                  ),
+                ),
+              ])
+            ],
           ),
-        ),
-        const SizedBox(height: 5),
-        const Text("Fats: 5g", style: TEXT_PLAIN)
-        //TODO: replace with post values
-      ]),
-      const SizedBox(width: 30),
-      Column(children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(iconSize / 2),
-          child: Image.asset(
-            'assets/images/Carbs.png',
-            height: iconSize,
-            width: iconSize,
-          ),
-        ),
-        const SizedBox(height: 5),
-        const Text("Carbs: 20g", style: TEXT_PLAIN)
-        //TODO: replace with post values
-      ]),
-      const SizedBox(width: 28),
-      Column(children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(iconSize / 2),
-          child: Image.asset(
-            'assets/images/Proteins.png',
-            height: iconSize,
-            width: iconSize,
-          ),
-        ),
-        const SizedBox(height: 5),
-        const Text("Proteins: 13g", style: TEXT_PLAIN)
-        //TODO: replace with post values
-      ])
-    ]);
+          const SizedBox(height: 12),
+          Text(post.child("nutrition").value.toString())
+        ]));
   }
 
   Widget _buildImage(BuildContext context) {
@@ -178,8 +186,7 @@ class PostScreen extends StatelessWidget {
           aspectRatio: 2,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10),
-            child: Image.network(imageID,
-                fit: BoxFit.fill),
+            child: Image.network(imageID, fit: BoxFit.cover),
           ),
         ));
   }
@@ -235,9 +242,18 @@ class PostScreen extends StatelessWidget {
               padding: const EdgeInsets.only(top: 15, bottom: 10),
               width: 370,
               decoration: BoxDecoration(
-                  color: COLOR_WHITE,
-                  border: Border.all(width: 3, color: COLOR_INDIGO_LIGHT),
-                  borderRadius: BorderRadius.circular(12)),
+                color: COLOR_WHITE,
+                border: Border.all(width: 3, color: COLOR_INDIGO_LIGHT),
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 2,
+                    blurRadius: 3,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
               child: Padding(
                   padding: const EdgeInsets.only(
                       left: 5, top: 5, right: 5, bottom: 5),

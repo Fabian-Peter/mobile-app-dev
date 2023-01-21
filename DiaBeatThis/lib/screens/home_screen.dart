@@ -16,14 +16,15 @@ import '../classes/Post.dart';
 import '../classes/user.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
-
+  const HomeScreen({super.key, this.uid});
+  final String? uid;
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
   final ref = FirebaseDatabase.instance.ref("post");
+  final user = FirebaseAuth.instance.currentUser!;
 
   IconData _favIconOutlined = Icons.favorite_outline;
   IconData _homeIcon = Icons.home;
@@ -38,10 +39,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-  }
-
-  Future<void> _signout() async {
-    await FirebaseAuth.instance.signOut();
   }
 
   @override
@@ -157,7 +154,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         : Icons.logout,
                     size: 19.0,
                     color: COLOR_INDIGO),
-                onPressed: () => _signout())));
+                onPressed: () => FirebaseAuth.instance.signOut())));
   }
 
   Widget _buildProfileIcon(BuildContext context) {

@@ -1,3 +1,4 @@
+import 'package:diabeatthis/screens/settings_screen.dart';
 import 'package:diabeatthis/utils/constants.dart';
 import 'package:diabeatthis/screens/post_screen.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +11,7 @@ class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
   @override
-  _ProfileScreenState createState() => _ProfileScreenState();
+  State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
@@ -33,7 +34,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   _buildProfileIcon(context),
-                  _buildFollowIcon(context),
+                  _buildEditIcon(context),
                   _buildProfile(context),
                   _buildListOfPosts(context)
                 ],
@@ -72,17 +73,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildFollowIcon(BuildContext context) {
+  Widget _buildEditIcon(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
         FloatingActionButton.extended(
-          heroTag: "followButton",
+          heroTag: "editButton",
           backgroundColor: COLOR_INDIGO,
-          label: const Text("Follow"),
-          icon: const Icon(Icons.add, color: COLOR_WHITE),
-          onPressed: () {},
-          // Todo if you follow this account change button to unfollow
+          label: const Text("Edit"),
+          icon: const Icon(Icons.edit, color: COLOR_WHITE),
+          onPressed: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) {
+                return SettingsScreen();
+              }),
+            );
+          },
         )
       ]),
     );

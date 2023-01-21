@@ -2,6 +2,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:diabeatthis/utils/constants.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class PostScreen extends StatelessWidget {
   final DataSnapshot post;
@@ -186,7 +187,8 @@ class PostScreen extends StatelessWidget {
           aspectRatio: 2,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10),
-            child: Image.network(imageID, fit: BoxFit.cover),
+            child: CachedNetworkImage(
+                imageUrl: imageID, fit: BoxFit.cover),
           ),
         ));
   }

@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:diabeatthis/data/dummy_data.dart';
 import 'package:diabeatthis/screens/createRecipe_screen.dart';
 import 'package:diabeatthis/screens/post_screen.dart';
@@ -11,7 +10,7 @@ import 'package:firebase_auth/firebase_auth.dart' hide User;
 import 'package:diabeatthis/utils/constants.dart';
 import 'package:outline_search_bar/outline_search_bar.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
-
+import 'package:cached_network_image/cached_network_image.dart';
 import '../classes/Post.dart';
 import '../classes/user.dart';
 
@@ -279,7 +278,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildImage(BuildContext context, DataSnapshot snapshot, int index) {
     String url = snapshot.child('pictureID').value.toString();
-
     return Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: 9,
@@ -289,21 +287,10 @@ class _HomeScreenState extends State<HomeScreen> {
           aspectRatio: 2,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10),
-            child: Image.network(
-              url,
+            child: CachedNetworkImage(
+              imageUrl: url,
               fit: BoxFit.cover,
-              loadingBuilder: (BuildContext context, Widget child,
-                  ImageChunkEvent? loadingProgress) {
-                if (loadingProgress == null) return child;
-                return Center(
-                  child: CircularProgressIndicator(
-                    value: loadingProgress.expectedTotalBytes != null
-                        ? loadingProgress.cumulativeBytesLoaded /
-                            loadingProgress.expectedTotalBytes!
-                        : null,
-                  ),
-                );
-              },
+              placeholder: (context, url) => CircularProgressIndicator(),
             ),
           ),
         ));

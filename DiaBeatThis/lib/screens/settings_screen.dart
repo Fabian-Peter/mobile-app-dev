@@ -140,8 +140,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             validator: (value) {
               if (value!.isEmpty) {
                 return "Enter Password";
-              } else if (value.length < 8) {
-                return "Password must be at least 8 characters!";
+              } else if (value.length < 6) {
+                return "Password must be at least 6 characters!";
               }
               return null;
             },

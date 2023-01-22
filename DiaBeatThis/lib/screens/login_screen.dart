@@ -1,10 +1,19 @@
+import 'package:diabeatthis/classes/utils.dart';
 import 'package:diabeatthis/utils/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import '../main.dart';
 
 class LoginScreen extends StatefulWidget {
+  final VoidCallback onClickedSignUp;
+
+  const LoginScreen({
+    Key? key,
+    required this.onClickedSignUp,
+  }) : super(key: key);
+
   @override
   State<LoginScreen> createState() => _LoginScreen();
 }
@@ -24,7 +33,7 @@ class _LoginScreen extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Log In", style: HEADLINE_BOLD_WHITE),
+        title: const Text("Login", style: HEADLINE_BOLD_WHITE),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -36,7 +45,7 @@ class _LoginScreen extends State<LoginScreen> {
               controller: emailController,
               cursorColor: Colors.white,
               textInputAction: TextInputAction.next,
-              decoration: const InputDecoration(labelText: "Email Adress"),
+              decoration: const InputDecoration(labelText: "Email Address"),
             ),
             const SizedBox(height: 4),
             TextField(
@@ -55,7 +64,31 @@ class _LoginScreen extends State<LoginScreen> {
                 style: TextStyle(fontSize: 24),
               ),
               onPressed: singIn,
-            )
+            ),
+            const SizedBox(height: 24),
+            RichText(
+                text: TextSpan(
+              style: const TextStyle(color: COLOR_INDIGO_LIGHT, fontSize: 20),
+              text: "No account?  ",
+              children: [
+                TextSpan(
+                  recognizer: TapGestureRecognizer()
+                    ..onTap = widget.onClickedSignUp,
+                  text: "Sign Up",
+                  style: TextStyle(
+                      decoration: TextDecoration.underline,
+                      color: Theme.of(context).colorScheme.secondary),
+                ),
+                const TextSpan(text: " or "),
+                TextSpan(
+                  recognizer: TapGestureRecognizer()..onTap = guestLogin,
+                  text: "Login as Guest",
+                  style: TextStyle(
+                      decoration: TextDecoration.underline,
+                      color: Theme.of(context).colorScheme.secondary),
+                )
+              ],
+            ))
           ],
         ),
       ),
@@ -75,8 +108,14 @@ class _LoginScreen extends State<LoginScreen> {
           password: passwordController.text.trim());
     } on FirebaseAuthException catch (e) {
       print(e);
+
+      Utils.showSnackBar(e.message);
     }
 
     navigatorKey.currentState!.popUntil((route) => route.isFirst);
+  }
+
+  Future guestLogin() async {
+    await FirebaseAuth.instance.signInAnonymously();
   }
 }

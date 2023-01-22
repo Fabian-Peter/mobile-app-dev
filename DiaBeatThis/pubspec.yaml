@@ -48,6 +48,7 @@ dependencies:
   firebase_storage: ^11.0.10
   cached_network_image: ^3.2.3
   modal_progress_hud_nsn: ^0.1.0-nullsafety-0
+  email_validator: ^2.1.17
 
 dev_dependencies:
   flutter_test:

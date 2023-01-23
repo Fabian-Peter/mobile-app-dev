@@ -144,8 +144,9 @@ class _SignUpScreen extends State<SignUpScreen> {
               email: emailController.text.trim(),
               password: passwordController.text.trim())
           .then((result) {
-        databaseReference.child(usernameController.text).set({
+        databaseReference.child(result.user!.uid).set({
           "email": emailController.text,
+          "username": usernameController.text
         });
       });
     } on FirebaseAuthException catch (e) {

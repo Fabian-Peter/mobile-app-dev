@@ -239,8 +239,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildCreator(BuildContext context, DataSnapshot snapshot, int index) {
-    String uiD = snapshot.child('currentUser').value.toString();
-    print(uiD);
     return Row(
       children: [
         Padding(
@@ -260,7 +258,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         Text(
            //TODO: currentUser to name
-          "User",
+          snapshot.child('currentUser').value.toString(),
           style: HOME_POST_CREATOR,
         )
       ],

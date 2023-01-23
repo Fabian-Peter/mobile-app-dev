@@ -424,6 +424,8 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                       List<String>? reactions;
                       List<String>? comments;
                       String timestamp = DateTime.now().toString();
+                      var timeIdent = new DateTime.now().millisecondsSinceEpoch;
+
                       final newRecipe = <String, dynamic>{
                         'title': titleController.text,
                         'description': descriptionController.text,
@@ -432,10 +434,11 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                         'tags': tagList,
                         //'reactions' : reactions,
                         //'comments' : comments,
-                        'timestamp': '-$timestamp',
+                        'timestamp': timestamp,
                         'currentUser': FirebaseAuth.instance.currentUser?.uid,
                         'pictureID': imageURL,
-                        'nutrition': nutritionController.text
+                        'nutrition': nutritionController.text,
+                        'timeSorter' : 0-timeIdent!
                       };
                       database
                           .child('post')

@@ -13,6 +13,7 @@ import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:cached_network_image/cached_network_image.dart';
 import '../classes/Post.dart';
 import '../classes/user.dart';
+import 'package:badges/badges.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, this.uid});
@@ -313,18 +314,27 @@ class _HomeScreenState extends State<HomeScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        IconButton(
+    Badge(
+      position: BadgePosition.topEnd(top: 2, end: 1),
+      badgeColor: Colors.blueAccent,
+      badgeContent: Text(snapshot.child('commentsAmount').value.toString()),
+      child: IconButton(
           icon: const Icon(
-            Icons.mode_comment_outlined,
+            Icons.comment_bank_sharp,
             color: COLOR_INDIGO_LIGHT,
             size: 20,
           ),
           onPressed: () {},
         ),
-        IconButton(
+    ),
+
+    Badge(
+        position: BadgePosition.topEnd(top: 2, end: 1),
+    badgeContent: Text(snapshot.child('commentsAmount').value.toString()),
+    child: IconButton(
           icon: Icon(
             _favIconOutlined,
-            color: COLOR_RED,
+            color: Colors.red,
             size: 20,
           ),
           onPressed: () {
@@ -338,7 +348,7 @@ class _HomeScreenState extends State<HomeScreen> {
             });
           },
         )
-      ],
+    )],
     );
   }
 }

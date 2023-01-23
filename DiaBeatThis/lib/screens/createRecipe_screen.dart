@@ -23,6 +23,7 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
           databaseURL:
               "https://diabeathis-f8ee3-default-rtdb.europe-west1.firebasedatabase.app")
       .reference();
+  final refUser = FirebaseDatabase.instance.ref('Users');
   File? image;
   final firebase_storage.FirebaseStorage storage =
       firebase_storage.FirebaseStorage.instance;
@@ -35,6 +36,12 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
   TextEditingController nutritionController = TextEditingController();
   late String name;
   bool _isInAsyncCall = false;
+  String? query = FirebaseAuth.instance.currentUser?.uid.toString();
+
+
+
+
+
 
 
   Future pickImage(ImageSource source) async {
@@ -49,15 +56,26 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
     }
   }
 
+  Future<String>getUsername() async {
+    DataSnapshot snapshot1 =   await FirebaseDatabase.instance.ref('Users/$query/username').get();
+    String username = await snapshot1.value.toString();
+    print (username);
+    return username;
+  }
+
   Future<String> uploadPicture(File file) async {
+
+
     name = uuid.v1().toString();
     var storeImage =
         firebase_storage.FirebaseStorage.instance.ref().child('image/$name');
     firebase_storage.UploadTask task1 = storeImage.putFile(file);
     String imageURL = await (await task1).ref.getDownloadURL();
-    print(imageURL);
+
     return imageURL;
   }
+
+
 
   void _pictureEditBottomSheet(context) {
     showModalBottomSheet(
@@ -425,6 +443,7 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                       List<String>? comments;
                       String timestamp = DateTime.now().toString();
                       var timeIdent = new DateTime.now().millisecondsSinceEpoch;
+                      String username = await getUsername();
 
                       final newRecipe = <String, dynamic>{
                         'title': titleController.text,
@@ -435,7 +454,7 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                         //'reactions' : reactions,
                         //'comments' : comments,
                         'timestamp': timestamp,
-                        'currentUser': FirebaseAuth.instance.currentUser?.uid,
+                        'currentUser': username,
                         'pictureID': imageURL,
                         'nutrition': nutritionController.text,
                         'timeSorter' : 0-timeIdent!

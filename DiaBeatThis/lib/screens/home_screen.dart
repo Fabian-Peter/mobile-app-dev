@@ -257,8 +257,8 @@ class _HomeScreenState extends State<HomeScreen> {
               )),
         ),
         Text(
-          //post.child('currentUser').value.toString(), //TODO: currentUser to name
-          "User",
+           //TODO: currentUser to name
+          snapshot.child('currentUser').value.toString(),
           style: HOME_POST_CREATOR,
         )
       ],

@@ -36,7 +36,9 @@ class DummyData {
           'Easy to make vegan burger with a unique and spicy BBQ sauce.',
       directions: ['do this', 'and that'],
       tags: ['vegan', 'yummi'],
-      nutrition: ['proteins', 'carbs']);
+      nutrition: ['proteins', 'carbs']
+
+  );
 
   Recipe recipe3 = Recipe(
       title: 'Grilled Alaska fish',

@@ -105,8 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
         body: PageView(
           controller: controller,
           children: [
-            _buildScreen(context, "Home"),
-            _buildScreen(context, "Discover")
+            _buildScreen(context, "Home")
           ],
           onPageChanged: (page) {
             setState(() {
@@ -260,7 +259,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   width: USER_ICON_POST_SIZE,
                 ),
                 onTap: () {
-                  //TODO: open user profile
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) {
+                      return FirebaseAuth.instance.currentUser!.isAnonymous
+                          ? AuthScreen()
+                          : const ProfileScreen();
+                    }),
+                  );
                 },
               )),
         ),

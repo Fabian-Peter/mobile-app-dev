@@ -1,6 +1,8 @@
 import 'package:diabeatthis/screens/settings_screen.dart';
 import 'package:diabeatthis/utils/constants.dart';
 import 'package:diabeatthis/screens/post_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:diabeatthis/data/dummy_data.dart';
 
@@ -15,16 +17,19 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  final User profile = DummyData().user1;
+  //final User profile = DummyData().user1;
   final List<Post> posts = DummyData().returnData;
   IconData _favIconOutlined = Icons.favorite_outline;
+  String? query = FirebaseAuth.instance.currentUser?.uid.toString();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) async {
+    String username = await getUsername();
     return Scaffold(
       appBar: AppBar(
-          title: Text(profile.username, style: HEADLINE_BOLD_WHITE),
-          actions: <Widget>[_buildSettingsIcon(context)]),
+          title: Text(username, style: HEADLINE_BOLD_WHITE),
+          //actions: <Widget>[_buildSettingsIcon(context)]
+          ),
       body: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Container(
@@ -40,6 +45,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ],
               ))),
     );
+  }
+
+  Future<String>getUsername() async {
+    DataSnapshot snapshot1 = await FirebaseDatabase.instance.ref('Users/$query/username').get();
+    String username = await snapshot1.value.toString();
+    return username;
   }
 
   Widget _buildSettingsIcon(BuildContext context) {
@@ -100,8 +111,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Row(
         children: [
           _buildNumberOfPosts(context),
-          _buildFollower(context),
-          _buildFollowing(context)
+          //_buildFollower(context),
+          //_buildFollowing(context)
         ],
       ),
     );
@@ -152,10 +163,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         itemBuilder: (context, index) {
           return _buildPosts(context, index);
         });
-  }
-
-  Widget? _buildChangeProfile(BuildContext context) {
-    return null;
   }
 
   Widget _buildPosts(BuildContext context, int index) {

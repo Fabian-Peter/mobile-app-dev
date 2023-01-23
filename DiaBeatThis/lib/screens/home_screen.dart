@@ -35,6 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final firebase_storage.FirebaseStorage storage =
       firebase_storage.FirebaseStorage.instance;
   late Future<String> dataFuture;
+  var counter = 0;
 
   @override
   void initState() {
@@ -315,9 +316,10 @@ class _HomeScreenState extends State<HomeScreen> {
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
     Badge(
-      position: BadgePosition.topEnd(top: 2, end: 1),
-      badgeColor: Colors.blueAccent,
-      badgeContent: Text(snapshot.child('commentsAmount').value.toString()),
+      borderRadius: BorderRadius.circular(8),
+      position: BadgePosition.topEnd(top: 1, end: -3),
+      badgeColor: COLOR_INDIGO_LIGHT,
+      badgeContent: Text('0', style: TextStyle(color: Colors.white)),
       child: IconButton(
           icon: const Icon(
             Icons.comment_bank_sharp,
@@ -329,8 +331,9 @@ class _HomeScreenState extends State<HomeScreen> {
     ),
 
     Badge(
+        borderRadius: BorderRadius.circular(8),
         position: BadgePosition.topEnd(top: 2, end: 1),
-    badgeContent: Text(snapshot.child('commentsAmount').value.toString()),
+    badgeContent: Text(counter.toString() ,style: TextStyle(color: Colors.white)),
     child: IconButton(
           icon: Icon(
             _favIconOutlined,
@@ -338,6 +341,7 @@ class _HomeScreenState extends State<HomeScreen> {
             size: 20,
           ),
           onPressed: () {
+            counter = counter+1;
             //TODO: individual likes for posts and users
             setState(() {
               if (_favIconOutlined == Icons.favorite_outline) {

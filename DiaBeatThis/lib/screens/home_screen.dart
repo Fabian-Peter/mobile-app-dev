@@ -1,5 +1,5 @@
-import 'dart:convert';
 import 'package:diabeatthis/data/dummy_data.dart';
+import 'package:diabeatthis/screens/auth_screen.dart';
 import 'package:diabeatthis/screens/createRecipe_screen.dart';
 import 'package:diabeatthis/screens/post_screen.dart';
 import 'package:diabeatthis/screens/profile_screen.dart';
@@ -78,7 +78,10 @@ class _HomeScreenState extends State<HomeScreen> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => CreateRecipeScreen()));
+                      builder: (context) =>
+                          FirebaseAuth.instance.currentUser!.isAnonymous
+                              ? AuthScreen()
+                              : CreateRecipeScreen()));
             }
           },
         ),
@@ -173,11 +176,16 @@ class _HomeScreenState extends State<HomeScreen> {
             onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) {
-                  return const ProfileScreen();
+                  return FirebaseAuth.instance.currentUser!.isAnonymous
+                      ? AuthScreen()
+                      : const ProfileScreen();
                 }),
               );
             },
-            //TODO: open profile instead
+            //TODO: open profile instead or login screen
+            // FirebaseAuth.instance.currentUser!.isAnonymous
+            //                         ? AuthScreen()
+            //                         :
           )),
     );
   }
@@ -257,7 +265,7 @@ class _HomeScreenState extends State<HomeScreen> {
               )),
         ),
         Text(
-           //TODO: currentUser to name
+          //TODO: currentUser to name
           snapshot.child('currentUser').value.toString(),
           style: HOME_POST_CREATOR,
         )
@@ -319,7 +327,12 @@ class _HomeScreenState extends State<HomeScreen> {
             color: COLOR_INDIGO_LIGHT,
             size: 20,
           ),
-          onPressed: () {},
+          onPressed: () {
+            //login screen if guest
+            // FirebaseAuth.instance.currentUser!.isAnonymous
+            //                         ? AuthScreen()
+            //                         :
+            },
         ),
         IconButton(
           icon: Icon(
@@ -328,7 +341,10 @@ class _HomeScreenState extends State<HomeScreen> {
             size: 20,
           ),
           onPressed: () {
-            //TODO: individual likes for posts and users
+            //TODO: individual likes for posts and users or login screen
+            // FirebaseAuth.instance.currentUser!.isAnonymous
+            //                         ? AuthScreen()
+            //                         :
             setState(() {
               if (_favIconOutlined == Icons.favorite_outline) {
                 _favIconOutlined = Icons.favorite;

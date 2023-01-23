@@ -52,40 +52,87 @@ class _SignUpScreen extends State<SignUpScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const SizedBox(height: 40),
-              TextFormField(
-                controller: usernameController,
-                decoration: const InputDecoration(
-                    labelText: "Enter Username", isDense: true),
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return "Enter Username";
-                  }
-                  return null;
-                },
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  controller: usernameController,
+                  decoration: const InputDecoration(
+                    labelText: "Enter Username",
+                    labelStyle: TextStyle(
+                        fontFamily: "VisbyMedium", color: COLOR_INDIGO_LIGHT),
+                    isDense: true,
+                    enabledBorder: OutlineInputBorder(
+                        borderSide:
+                            BorderSide(color: COLOR_INDIGO_LIGHT, width: 3.0)),
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: COLOR_INDIGO_LIGHT,
+                        width: 3.0,
+                      ),
+                    ),
+                  ),
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return "Enter Username";
+                    }
+                    return null;
+                  },
+                ),
               ),
-              TextFormField(
-                controller: emailController,
-                cursorColor: Colors.white,
-                textInputAction: TextInputAction.next,
-                decoration:
-                    const InputDecoration(labelText: "Enter Email Address"),
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                validator: (email) =>
-                    email != null && !EmailValidator.validate(email)
-                        ? "Enter a valid email"
-                        : null,
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  controller: emailController,
+                  cursorColor: Colors.white,
+                  textInputAction: TextInputAction.next,
+                  decoration: const InputDecoration(
+                    labelText: "Enter Email Address",
+                    labelStyle: TextStyle(
+                        fontFamily: "VisbyMedium", color: COLOR_INDIGO_LIGHT),
+                    enabledBorder: OutlineInputBorder(
+                        borderSide:
+                            BorderSide(color: COLOR_INDIGO_LIGHT, width: 3.0)),
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: COLOR_INDIGO_LIGHT,
+                        width: 3.0,
+                      ),
+                    ),
+                  ),
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  validator: (email) =>
+                      email != null && !EmailValidator.validate(email)
+                          ? "Enter a valid email"
+                          : null,
+                ),
               ),
               const SizedBox(height: 4),
-              TextFormField(
-                controller: passwordController,
-                textInputAction: TextInputAction.done,
-                decoration: const InputDecoration(labelText: "Enter Password"),
-                obscureText: true,
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                validator: (value) => value != null && value.length < 6
-                    ? "Password must be at least 6 characters!"
-                    : null,
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  controller: passwordController,
+                  textInputAction: TextInputAction.done,
+                  decoration: const InputDecoration(
+                    labelText: "Enter Password",
+                    labelStyle: TextStyle(
+                        fontFamily: "VisbyMedium", color: COLOR_INDIGO_LIGHT),
+                    enabledBorder: OutlineInputBorder(
+                        borderSide:
+                            BorderSide(color: COLOR_INDIGO_LIGHT, width: 3.0)),
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: COLOR_INDIGO_LIGHT,
+                        width: 3.0,
+                      ),
+                    ),
+                  ),
+                  obscureText: true,
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  validator: (value) => value != null && value.length < 6
+                      ? "Password must be at least 6 characters!"
+                      : null,
+                ),
               ),
               const SizedBox(height: 20),
               ElevatedButton.icon(
@@ -94,31 +141,40 @@ class _SignUpScreen extends State<SignUpScreen> {
                 icon: const Icon(Icons.arrow_forward, size: 32),
                 label: const Text(
                   "Sign Up",
-                  style: TextStyle(fontSize: 24),
+                  style: TextStyle(fontFamily: "VisbyMedium", fontSize: 24),
                 ),
-                onPressed: singUp,
+                onPressed: signUp,
               ),
               const SizedBox(height: 20),
               RichText(
                   text: TextSpan(
-                style: const TextStyle(color: COLOR_INDIGO_LIGHT, fontSize: 20),
+                style: const TextStyle(
+                    fontFamily: "VisbyMedium",
+                    color: COLOR_INDIGO_LIGHT,
+                    fontSize: 20),
                 text: "Already have an account? ",
                 children: [
                   TextSpan(
                     recognizer: TapGestureRecognizer()
                       ..onTap = widget.onClickedSignIn,
                     text: "Log In",
-                    style: TextStyle(
+                    style: const TextStyle(
+                        fontFamily: "VisbyMedium",
                         decoration: TextDecoration.underline,
-                        color: Theme.of(context).colorScheme.secondary),
+                        color: COLOR_INDIGO_LIGHT),
                   ),
-                  const TextSpan(text: " or "),
+                  const TextSpan(
+                      text: " or ",
+                      style: TextStyle(
+                          fontFamily: "VisbyMedium",
+                          color: COLOR_INDIGO_LIGHT)),
                   TextSpan(
                     recognizer: TapGestureRecognizer()..onTap = guestLogin,
                     text: "Login as Guest",
-                    style: TextStyle(
+                    style: const TextStyle(
+                        fontFamily: "VisbyMedium",
                         decoration: TextDecoration.underline,
-                        color: Theme.of(context).colorScheme.secondary),
+                        color: COLOR_INDIGO_LIGHT),
                   )
                 ],
               ))
@@ -129,7 +185,7 @@ class _SignUpScreen extends State<SignUpScreen> {
     );
   }
 
-  Future singUp() async {
+  Future signUp() async {
     final isValid = formKey.currentState!.validate();
     if (!isValid) return;
     showDialog(

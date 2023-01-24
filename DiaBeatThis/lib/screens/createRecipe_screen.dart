@@ -29,7 +29,9 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
       firebase_storage.FirebaseStorage.instance;
   var uuid = Uuid();
   TextEditingController titleController = TextEditingController();
-  TextEditingController ingredientsController = TextEditingController();
+  List<TextEditingController> ingredientsControllers = [];
+  List<TextEditingController> ingredientsQuantityControllers = [];
+  int fieldsNumber = 1;
   TextEditingController descriptionController = TextEditingController();
   TextEditingController instructionController = TextEditingController();
   TextfieldTagsController tagsController = TextfieldTagsController();
@@ -113,7 +115,12 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
     @override
     void dispose() {
       titleController.dispose();
-      ingredientsController.dispose();
+      for (TextEditingController element in ingredientsControllers) {
+        element.dispose();
+      }
+      for (TextEditingController element in ingredientsQuantityControllers) {
+        element.dispose();
+      }
       descriptionController.dispose();
       instructionController.dispose();
       tagsController.dispose();
@@ -136,351 +143,458 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
     );
   }
 
-    Widget _buildForm(context){
-      return ListView(
-          children: [
-            if (image != null)
-              Stack(clipBehavior: Clip.none, children: [
-                Image.file(image!, height: 160, width: 400, fit: BoxFit.cover),
-                Positioned(
-                    top: 120,
-                    left: 165,
-                    child: FloatingActionButton(
-                      heroTag: "btn1",
-                      child: Icon(Icons.camera_alt),
-                      backgroundColor: COLOR_INDIGO,
-                      foregroundColor: Colors.white,
-                      onPressed: () {
-                        _pictureEditBottomSheet(context);
-                      },
-                    )),
-              ])
-            else
-              Stack(clipBehavior: Clip.none, children: [
-                Image.asset('assets/images/recipeCamera.png',
-                    height: 160, width: 400, fit: BoxFit.cover),
-                Positioned(
-                    top: 120,
-                    left: 165,
-                    child: FloatingActionButton(
-                      heroTag: "btn1",
-                      backgroundColor: COLOR_INDIGO,
-                      foregroundColor: Colors.white,
-                      onPressed: () {
-                        _pictureEditBottomSheet(context);
-                      },
-                      child: Icon(Icons.camera_alt),
-                    )),
-              ]),
-            //Hier könnte Ihr Logo stehen!
-            const SizedBox(
-              height: 30,
-            ),
-            const Padding(
-                padding: EdgeInsets.only(left: 8),
-                child: Text("Title", style: POST_CAPTION_INDIGO_LIGHT)),
-            Padding(
-              padding: const EdgeInsets.all(9.0),
-              child: TextFormField(
-                controller: titleController,
-                decoration: const InputDecoration(
-                  labelText: 'The title of your recipe',
-                  labelStyle: TextStyle(
-                      fontFamily: "VisbyMedium",
-                      fontSize: 14,
-                      color: COLOR_INDIGO_LIGHT),
-                  isDense: true,
-                  enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: COLOR_INDIGO_LIGHT,
-                      )),
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: COLOR_INDIGO_LIGHT,
-                      width: 3.0,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            const Padding(
-                padding: EdgeInsets.only(left: 8, top: 8),
-                child: Text("Description", style: POST_CAPTION_INDIGO_LIGHT)),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextFormField(
-                controller: descriptionController,
-                keyboardType: TextInputType.multiline,
-                maxLines: null,
-                decoration: const InputDecoration(
-                  labelText: 'A short description of your dish',
-                  labelStyle: TextStyle(
-                      fontFamily: "VisbyMedium",
-                      fontSize: 14,
-                      color: COLOR_INDIGO_LIGHT),
-                  isDense: true,
-                  enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: COLOR_INDIGO_LIGHT,
-                      )),
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Colors.blue,
-                      width: 3.0,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            const Padding(
-                padding: EdgeInsets.only(left: 8, top: 8),
-                child: Text("Ingredients", style: POST_CAPTION_INDIGO_LIGHT)),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextFormField(
-                controller: ingredientsController,
-                keyboardType: TextInputType.multiline,
-                decoration: const InputDecoration(
-                  labelText: 'All of the tasty ingredients',
-                  labelStyle: TextStyle(
-                      fontFamily: "VisbyMedium",
-                      fontSize: 14,
-                      color: COLOR_INDIGO_LIGHT),
-                  isDense: true,
-                  enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: COLOR_INDIGO_LIGHT,
-                      )),
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: COLOR_INDIGO_LIGHT,
-                      width: 3.0,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            const Padding(
-                padding: EdgeInsets.only(left: 8, top: 8),
-                child: Text("Instructions", style: POST_CAPTION_INDIGO_LIGHT)),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextFormField(
-                controller: instructionController,
-                keyboardType: TextInputType.multiline,
-                minLines: 3,
-                maxLines: null,
-                decoration: const InputDecoration(
-                  labelText: 'Now tell us, how to make it...',
-                  labelStyle: TextStyle(
-                      fontFamily: "VisbyMedium",
-                      fontSize: 14,
-                      color: COLOR_INDIGO_LIGHT),
-                  isDense: true,
-                  enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: COLOR_INDIGO_LIGHT,
-                      )),
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: COLOR_INDIGO_LIGHT,
-                      width: 3.0,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            const Padding(
-                padding: EdgeInsets.only(left: 8, top: 8),
-                child: Text("Tags", style: POST_CAPTION_INDIGO_LIGHT)),
-            TextFieldTags(
-              textfieldTagsController: tagsController,
-              initialTags: const [
-                'Your tags',
-              ],
-              textSeparators: [' ', ','],
-              letterCase: LetterCase.normal,
-              validator: (String tag) {
-                if (tagsController.getTags!.contains(tag)) {
-                  return 'You already entered that';
-                }
-                return null;
-              },
-              inputfieldBuilder:
-                  (context, tec, fn, error, onChanged, onSubmitted) {
-                return ((context, sc, tags, onTagDelete) {
-                  return Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: TextField(
-                      controller: tec,
-                      focusNode: fn,
-                      decoration: InputDecoration(
-                        isDense: true,
-                        enabledBorder: const OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: COLOR_INDIGO_LIGHT,
-                            )),
-                        border: const OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: COLOR_INDIGO_LIGHT,
-                            width: 3.0,
-                          ),
-                        ),
-                        focusedBorder: const OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: COLOR_INDIGO_LIGHT,
-                            width: 3.0,
-                          ),
-                        ),
-                        helperText:
-                        'Some tags to help the hungry find your recipe',
-                        helperStyle: const TextStyle(
-                            color: COLOR_INDIGO, fontFamily: "VisbyMedium"),
-                        labelText: 'Enter tags',
-                        labelStyle: const TextStyle(
-                            fontFamily: "VisbyMedium",
-                            fontSize: 14,
-                            color: COLOR_INDIGO_LIGHT),
-                        errorText: error,
-                        prefixIcon: tags.isNotEmpty
-                            ? SingleChildScrollView(
-                          controller: sc,
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                              children: tags.map((String tag) {
-                                return Container(
-                                  decoration: const BoxDecoration(
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(20.0),
-                                    ),
-                                    color: COLOR_INDIGO,
-                                  ),
-                                  margin: const EdgeInsets.symmetric(
-                                      horizontal: 5.0),
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10.0, vertical: 5.0),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      InkWell(
-                                        child: Text(
-                                          '#$tag',
-                                          style: const TextStyle(
-                                              color: Colors.white),
-                                        ),
-                                        onTap: () {
-                                          //print("$tag selected");
-                                        },
-                                      ),
-                                      const SizedBox(width: 4.0),
-                                      InkWell(
-                                        child: const Icon(
-                                          Icons.cancel,
-                                          size: 14.0,
-                                          color: Colors.white,
-                                        ),
-                                        onTap: () {
-                                          onTagDelete(tag);
-                                        },
-                                      )
-                                    ],
-                                  ),
-                                );
-                              }).toList()),
-                        )
-                            : null,
-                      ),
-                      onChanged: onChanged,
-                      onSubmitted: onSubmitted,
-                    ),
-                  );
-                });
-              },
-            ),
-            const Padding(
-                padding: EdgeInsets.only(left: 8, top: 8),
-                child:
-                Text("Nutritional Values", style: POST_CAPTION_INDIGO_LIGHT)),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextFormField(
-                controller: nutritionController,
-                keyboardType: TextInputType.multiline,
-                decoration: const InputDecoration(
-                  labelText: 'Fat, Carbs, Protein & Sugar',
-                  labelStyle: TextStyle(
-                      fontFamily: "VisbyMedium",
-                      fontSize: 14,
-                      color: COLOR_INDIGO_LIGHT),
-                  isDense: true,
-                  enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: COLOR_INDIGO_LIGHT,
-                      )),
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: COLOR_INDIGO_LIGHT,
-                      width: 3.0,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-                padding: const EdgeInsets.only(
-                    left: 10, right: 10, bottom: 10, top: 14),
-                child: ElevatedButton(
-                    onPressed: () async {
-                      setState(() {
-                        _isInAsyncCall = true;
-                      });
-                      //TODO add loading animation
-                      String imageURL = await uploadPicture(image!);
-
-                      List<String>? tagList = tagsController.getTags;
-                      List<String>? reactions;
-                      List<String>? comments;
-                      String timestamp = DateTime.now().toString();
-                      var timeIdent = new DateTime.now().millisecondsSinceEpoch;
-                      String username = await getUsername();
-
-                      final newRecipe = <String, dynamic>{
-                        'title': titleController.text,
-                        'description': descriptionController.text,
-                        'ingredients': ingredientsController.text,
-                        'instructions': instructionController.text,
-                        'tags': tagList,
-                        //'reactions' : reactions,
-                        //'comments' : comments,
-                        'timestamp': timestamp,
-                        'currentUser': username,
-                        'pictureID': imageURL,
-                        'nutrition': nutritionController.text,
-                        'timeSorter' : 0-timeIdent!
-                      };
-                      database
-                          .child('post')
-                          .push()
-                          .set(newRecipe)
-                          .then((_) => print("call has been made"));
-
-                      //.child(uniqueUserID).push(comment)
-                      setState(() {
-                        _isInAsyncCall = false;
-                      });
-                      dispose();
-
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => HomeScreen()));
-                    },
-                    child: const Text('Post',
-                        style: TextStyle(
-                            fontFamily: "VisbyDemiBold", fontSize: 18))))
-          ],
-
-      );
-    }
+  Widget _buildForm(BuildContext context) {
+    return ListView(
+      children: [
+        if (image != null)
+          Stack(clipBehavior: Clip.none, children: [
+            Image.file(image!, height: 160, width: 400, fit: BoxFit.cover),
+            Positioned(
+                top: 120,
+                left: 165,
+                child: FloatingActionButton(
+                  heroTag: "btn1",
+                  child: Icon(Icons.camera_alt),
+                  backgroundColor: COLOR_INDIGO,
+                  foregroundColor: Colors.white,
+                  onPressed: () {
+                    _pictureEditBottomSheet(context);
+                  },
+                )),
+          ])
+        else
+          Stack(clipBehavior: Clip.none, children: [
+            Image.asset('assets/images/recipeCamera.png',
+                height: 160, width: 400, fit: BoxFit.cover),
+            Positioned(
+                top: 120,
+                left: 165,
+                child: FloatingActionButton(
+                  heroTag: "btn1",
+                  backgroundColor: COLOR_INDIGO,
+                  foregroundColor: Colors.white,
+                  onPressed: () {
+                    _pictureEditBottomSheet(context);
+                  },
+                  child: const Icon(Icons.camera_alt),
+                )),
+          ]),
+        //Hier könnte Ihr Logo stehen!
+        const SizedBox(
+          height: 30,
+        ),
+        _buildTitle(),
+        _buildDescription(),
+        Row(children: const [
+          Padding(
+              padding: EdgeInsets.only(left: 8, top: 8),
+              child: Text("Amount", style: POST_CAPTION_INDIGO_LIGHT)),
+          Padding(
+              padding: EdgeInsets.only(left: 28, top: 8),
+              child: Text("Ingredients", style: POST_CAPTION_INDIGO_LIGHT))
+        ]),
+        for (var i = 0; i < fieldsNumber; i++) _buildNewIngredientTile(i),
+        _buildAddButton(),
+        _buildInstructions(),
+        _buildTags(),
+        _buildNutritions(),
+        _buildSubmitButton()
+      ],
+    );
   }
 
+  Widget _buildTitle() {
+    return Column(
+      children: [
+        const Padding(
+            padding: EdgeInsets.only(right: 347),
+            child: Text("Title", style: POST_CAPTION_INDIGO_LIGHT)),
+        Padding(
+          padding: const EdgeInsets.all(9.0),
+          child: TextFormField(
+            controller: titleController,
+            decoration: const InputDecoration(
+              labelText: 'The title of your recipe',
+              labelStyle: TextStyle(
+                  fontFamily: "VisbyMedium",
+                  fontSize: 14,
+                  color: COLOR_INDIGO_LIGHT),
+              isDense: true,
+              enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                color: COLOR_INDIGO_LIGHT,
+              )),
+              border: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: COLOR_INDIGO_LIGHT,
+                  width: 3.0,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 
+  Widget _buildDescription() {
+    return Column(
+      children: [
+        const Padding(
+            padding: EdgeInsets.only(right: 293, top: 8),
+            child: Text("Description", style: POST_CAPTION_INDIGO_LIGHT)),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: TextFormField(
+            controller: descriptionController,
+            keyboardType: TextInputType.multiline,
+            maxLines: null,
+            decoration: const InputDecoration(
+              labelText: 'A short description of your dish',
+              labelStyle: TextStyle(
+                  fontFamily: "VisbyMedium",
+                  fontSize: 14,
+                  color: COLOR_INDIGO_LIGHT),
+              isDense: true,
+              enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                color: COLOR_INDIGO_LIGHT,
+              )),
+              border: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: Colors.blue,
+                  width: 3.0,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildNewIngredientTile(int index) {
+    TextEditingController ingredientsController = TextEditingController();
+    TextEditingController ingredientsQuantityController =
+        TextEditingController();
+    setState(() {
+      ingredientsQuantityControllers.add(ingredientsQuantityController);
+      ingredientsControllers.add(ingredientsController);
+    });
+    return Row(children: [
+      Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: SizedBox(
+            width: 60,
+            child: TextFormField(
+              controller: ingredientsQuantityControllers[index],
+              keyboardType: TextInputType.multiline,
+              decoration: const InputDecoration(
+                labelStyle: TextStyle(
+                    fontFamily: "VisbyMedium",
+                    fontSize: 14,
+                    color: COLOR_INDIGO_LIGHT),
+                isDense: true,
+                enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                  color: COLOR_INDIGO_LIGHT,
+                )),
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: COLOR_INDIGO_LIGHT,
+                    width: 3.0,
+                  ),
+                ),
+              ),
+            )),
+      ),
+      Padding(
+        padding: const EdgeInsets.only(left: 8, bottom: 8, top: 8),
+        child: SizedBox(
+            width: 301,
+            child: TextFormField(
+              controller: ingredientsControllers[index],
+              keyboardType: TextInputType.multiline,
+              decoration: const InputDecoration(
+                labelText: 'Tasty ingredient',
+                labelStyle: TextStyle(
+                    fontFamily: "VisbyMedium",
+                    fontSize: 14,
+                    color: COLOR_INDIGO_LIGHT),
+                isDense: true,
+                enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                  color: COLOR_INDIGO_LIGHT,
+                )),
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: COLOR_INDIGO_LIGHT,
+                    width: 3.0,
+                  ),
+                ),
+              ),
+            )),
+      )
+    ]);
+  }
+
+  Widget _buildAddButton() {
+    return IconButton(
+      icon: const Icon(Icons.add_circle_outline,
+          color: COLOR_INDIGO_LIGHT, size: 30),
+      onPressed: () {
+        setState(() {
+          fieldsNumber++;
+        });
+      },
+    );
+  }
+
+  Widget _buildInstructions() {
+    return Column(
+      children: [
+        const Padding(
+            padding: EdgeInsets.only(right: 290, top: 8),
+            child: Text("Instructions", style: POST_CAPTION_INDIGO_LIGHT)),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: TextFormField(
+            controller: instructionController,
+            keyboardType: TextInputType.multiline,
+            minLines: 3,
+            maxLines: null,
+            decoration: const InputDecoration(
+              labelText: 'Now tell us, how to make it...',
+              labelStyle: TextStyle(
+                  fontFamily: "VisbyMedium",
+                  fontSize: 14,
+                  color: COLOR_INDIGO_LIGHT),
+              isDense: true,
+              enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                color: COLOR_INDIGO_LIGHT,
+              )),
+              border: OutlineInputBorder(
+                borderSide: BorderSide(
+                  color: COLOR_INDIGO_LIGHT,
+                  width: 3.0,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTags() {
+    return Column(
+      children: [
+        const Padding(
+            padding: EdgeInsets.only(right: 342, top: 8),
+            child: Text("Tags", style: POST_CAPTION_INDIGO_LIGHT)),
+        TextFieldTags(
+          textfieldTagsController: tagsController,
+          initialTags: const [
+            'Your tags',
+          ],
+          textSeparators: [' ', ','],
+          letterCase: LetterCase.normal,
+          validator: (String tag) {
+            if (tagsController.getTags!.contains(tag)) {
+              return 'You already entered that';
+            }
+            return null;
+          },
+          inputfieldBuilder: (context, tec, fn, error, onChanged, onSubmitted) {
+            return ((context, sc, tags, onTagDelete) {
+              return Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: TextField(
+                  controller: tec,
+                  focusNode: fn,
+                  decoration: InputDecoration(
+                    isDense: true,
+                    enabledBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(
+                      color: COLOR_INDIGO_LIGHT,
+                    )),
+                    border: const OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: COLOR_INDIGO_LIGHT,
+                        width: 3.0,
+                      ),
+                    ),
+                    focusedBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: COLOR_INDIGO_LIGHT,
+                        width: 3.0,
+                      ),
+                    ),
+                    helperText: 'Some tags to help the hungry find your recipe',
+                    helperStyle: const TextStyle(
+                        color: COLOR_INDIGO, fontFamily: "VisbyMedium"),
+                    labelText: 'Enter tags',
+                    labelStyle: const TextStyle(
+                        fontFamily: "VisbyMedium",
+                        fontSize: 14,
+                        color: COLOR_INDIGO_LIGHT),
+                    errorText: error,
+                    prefixIcon: tags.isNotEmpty
+                        ? SingleChildScrollView(
+                            controller: sc,
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                                children: tags.map((String tag) {
+                              return Container(
+                                decoration: const BoxDecoration(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(20.0),
+                                  ),
+                                  color: COLOR_INDIGO,
+                                ),
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 5.0),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10.0, vertical: 5.0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    InkWell(
+                                      child: Text(
+                                        '#$tag',
+                                        style: const TextStyle(
+                                            color: Colors.white),
+                                      ),
+                                      onTap: () {
+                                        //print("$tag selected");
+                                      },
+                                    ),
+                                    const SizedBox(width: 4.0),
+                                    InkWell(
+                                      child: const Icon(
+                                        Icons.cancel,
+                                        size: 14.0,
+                                        color: Colors.white,
+                                      ),
+                                      onTap: () {
+                                        onTagDelete(tag);
+                                      },
+                                    )
+                                  ],
+                                ),
+                              );
+                            }).toList()),
+                          )
+                        : null,
+                  ),
+                  onChanged: onChanged,
+                  onSubmitted: onSubmitted,
+                ),
+              );
+            });
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildNutritions() {
+    return Column(children: [
+      const Padding(
+          padding: EdgeInsets.only(top: 8, right: 244),
+          child: Text("Nutritional Values", style: POST_CAPTION_INDIGO_LIGHT)),
+      Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: TextFormField(
+          controller: nutritionController,
+          keyboardType: TextInputType.multiline,
+          decoration: const InputDecoration(
+            labelText: 'Fat, Carbs, Protein & Sugar',
+            labelStyle: TextStyle(
+                fontFamily: "VisbyMedium",
+                fontSize: 14,
+                color: COLOR_INDIGO_LIGHT),
+            isDense: true,
+            enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide(
+              color: COLOR_INDIGO_LIGHT,
+            )),
+            border: OutlineInputBorder(
+              borderSide: BorderSide(
+                color: COLOR_INDIGO_LIGHT,
+                width: 3.0,
+              ),
+            ),
+          ),
+        ),
+      )
+    ]);
+  }
+
+  Widget _buildSubmitButton() {
+    return Padding(
+        padding: const EdgeInsets.only(
+            left: 10, right: 10, bottom: 10, top: 14),
+        child: ElevatedButton(
+            onPressed: () async {
+              setState(() {
+                _isInAsyncCall = true;
+              });
+              //TODO add loading animation
+
+              List<String> ingredientList = [];
+              for (var element in ingredientsControllers) {
+                ingredientList.add(element.text);
+              }
+
+              List<String> ingredientQuantityList = [];
+              for (var element in ingredientsQuantityControllers) {
+                ingredientQuantityList.add(element.text);
+              }
+
+              String imageURL = await uploadPicture(image!);
+
+              List<String>? tagList = tagsController.getTags;
+              List<String>? reactions;
+              List<String>? comments;
+              String timestamp = DateTime.now().toString();
+              var timeIdent = new DateTime.now().millisecondsSinceEpoch;
+              String username = await getUsername();
+
+              final newRecipe = <String, dynamic>{
+                'title': titleController.text,
+                'description': descriptionController.text,
+                'ingredients': ingredientList,
+                'ingredientsQuantity': ingredientQuantityList,
+                'instructions': instructionController.text,
+                'tags': tagList,
+                //'reactions' : reactions,
+                //'comments' : comments,
+                'timestamp': timestamp,
+                'currentUser': username,
+                'pictureID': imageURL,
+                'nutrition': nutritionController.text,
+                'timeSorter' : 0-timeIdent!
+              };
+              database
+                  .child('post')
+                  .push()
+                  .set(newRecipe)
+                  .then((_) => print("call has been made"));
+
+              //.child(uniqueUserID).push(comment)
+              setState(() {
+                _isInAsyncCall = false;
+              });
+              dispose();
+
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => HomeScreen()));
+            },
+            child: const Text('Post',
+                style: TextStyle(
+                    fontFamily: "VisbyDemiBold", fontSize: 18))));
+  }
+}

@@ -25,7 +25,10 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final ref = FirebaseDatabase.instance.ref("post");
   final user = FirebaseAuth.instance.currentUser!;
-
+  final database = FirebaseDatabase(
+      databaseURL:
+      "https://diabeathis-f8ee3-default-rtdb.europe-west1.firebasedatabase.app")
+      .reference();
   IconData _favIconOutlined = Icons.favorite_outline;
   IconData _homeIcon = Icons.home;
   TextEditingController textController = TextEditingController();
@@ -340,8 +343,38 @@ class _HomeScreenState extends State<HomeScreen> {
             color: Colors.red,
             size: 20,
           ),
-          onPressed: () {
-            counter = counter+1;
+          onPressed: () async {
+            DataSnapshot snap = await snapshot.child('likes');
+            if(snap.value == null){
+              String path = (snapshot.child('reference').value.toString());
+              String? ident = FirebaseAuth.instance.currentUser?.uid;
+              print(ident);
+              database.child('post/$path/likes/$ident').push();
+              print('working as it should be');
+            }
+            else print(snap.value);
+            //print(snap.value.toString());
+            //String? resultList = snap.value.toString();
+            //print(resultList);
+            //List<String> stringlist= [];
+            //stringlist.add(resultList);
+
+            //String? userID = FirebaseAuth.instance.currentUser?.uid;
+//
+            //if(stringlist.contains(userID!)){
+            //  stringlist.remove(userID);
+            //
+            //  print(snapshot.child('likes').value.toString());
+            //  print('set ID');
+            //}
+            //else{
+            //  stringlist.add(userID);
+            //  database.child('post/$path/likes/').set(stringlist);
+            //  print(snapshot.child('likes').value.toString());
+            //  print('removeID');
+            //}
+//
+          //String path = (snapshot.child('reference').value.toString());
             //TODO: individual likes for posts and users
             setState(() {
               if (_favIconOutlined == Icons.favorite_outline) {

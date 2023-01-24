@@ -19,6 +19,12 @@ class CreateRecipeScreen extends StatefulWidget {
 }
 
 class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
+  late TextEditingController titleController;
+  late TextEditingController ingredientsController;
+  late TextEditingController descriptionController;
+  late TextEditingController instructionController;
+  late TextfieldTagsController tagsController;
+  late TextEditingController nutritionController;
   final database = FirebaseDatabase(
           databaseURL:
               "https://diabeathis-f8ee3-default-rtdb.europe-west1.firebasedatabase.app")
@@ -27,14 +33,23 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
   final firebase_storage.FirebaseStorage storage =
       firebase_storage.FirebaseStorage.instance;
   var uuid = Uuid();
-  TextEditingController titleController = TextEditingController();
-  TextEditingController ingredientsController = TextEditingController();
-  TextEditingController descriptionController = TextEditingController();
-  TextEditingController instructionController = TextEditingController();
-  TextfieldTagsController tagsController = TextfieldTagsController();
-  TextEditingController nutritionController = TextEditingController();
   late String name;
   bool _isInAsyncCall = false;
+
+
+
+  @override
+  void initState() {
+    super.initState();
+     titleController = TextEditingController();
+     ingredientsController = TextEditingController();
+     descriptionController = TextEditingController();
+     instructionController = TextEditingController();
+     tagsController = TextfieldTagsController();
+     nutritionController = TextEditingController();
+  }
+
+
 
 
   Future pickImage(ImageSource source) async {
@@ -277,9 +292,7 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                 child: Text("Tags", style: POST_CAPTION_INDIGO_LIGHT)),
             TextFieldTags(
               textfieldTagsController: tagsController,
-              initialTags: const [
-                'Your tags',
-              ],
+
               textSeparators: [' ', ','],
               letterCase: LetterCase.normal,
               validator: (String tag) {
@@ -288,6 +301,7 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                 }
                 return null;
               },
+
               inputfieldBuilder:
                   (context, tec, fn, error, onChanged, onSubmitted) {
                 return ((context, sc, tags, onTagDelete) {
@@ -414,35 +428,39 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                     left: 10, right: 10, bottom: 10, top: 14),
                 child: ElevatedButton(
                     onPressed: () async {
+                      List<String>? tagList = tagsController.getTags;
                       setState(() {
                         _isInAsyncCall = true;
                       });
                       //TODO add loading animation
                       String imageURL = await uploadPicture(image!);
 
-                      List<String>? tagList = tagsController.getTags;
-                      List<String>? reactions;
+
+
+                      List<String>? likes = ['no likes yet'];
                       List<String>? comments;
                       String timestamp = DateTime.now().toString();
                       var timeIdent = new DateTime.now().millisecondsSinceEpoch;
-
+                      var myRef = database.child('post').push();
+                      var key = myRef.key!;
+                      print(key);
                       final newRecipe = <String, dynamic>{
                         'title': titleController.text,
                         'description': descriptionController.text,
                         'ingredients': ingredientsController.text,
                         'instructions': instructionController.text,
                         'tags': tagList,
-                        //'reactions' : reactions,
+                        'likes' : likes,
                         //'comments' : comments,
                         'timestamp': timestamp,
                         'currentUser': FirebaseAuth.instance.currentUser?.uid,
                         'pictureID': imageURL,
                         'nutrition': nutritionController.text,
-                        'timeSorter' : 0-timeIdent!
+                        'timeSorter' : 0-timeIdent!,
+                        'reference' : key
                       };
                       database
-                          .child('post')
-                          .push()
+                          .child('post/$key')
                           .set(newRecipe)
                           .then((_) => print("call has been made"));
 

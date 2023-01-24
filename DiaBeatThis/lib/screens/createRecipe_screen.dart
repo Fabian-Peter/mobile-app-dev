@@ -12,7 +12,6 @@ import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:uuid/uuid.dart';
 import 'package:textfield_tags/textfield_tags.dart';
 
-
 class CreateRecipeScreen extends StatefulWidget {
   @override
   State<CreateRecipeScreen> createState() => _CreateRecipeScreenState();
@@ -20,8 +19,8 @@ class CreateRecipeScreen extends StatefulWidget {
 
 class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
   final database = FirebaseDatabase(
-          databaseURL:
-              "https://diabeathis-f8ee3-default-rtdb.europe-west1.firebasedatabase.app")
+      databaseURL:
+      "https://diabeathis-f8ee3-default-rtdb.europe-west1.firebasedatabase.app")
       .reference();
   final refUser = FirebaseDatabase.instance.ref('Users');
   File? image;
@@ -29,8 +28,11 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
       firebase_storage.FirebaseStorage.instance;
   var uuid = Uuid();
   TextEditingController titleController = TextEditingController();
-  List<TextEditingController> ingredientsControllers = [];
-  List<TextEditingController> ingredientsQuantityControllers = [];
+  List<TextEditingController> ingredientsControllers = <TextEditingController>[
+    TextEditingController()
+  ];
+  List<TextEditingController> ingredientsQuantityControllers =
+  <TextEditingController>[TextEditingController()];
   int fieldsNumber = 1;
   TextEditingController descriptionController = TextEditingController();
   TextEditingController instructionController = TextEditingController();
@@ -39,12 +41,6 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
   late String name;
   bool _isInAsyncCall = false;
   String? query = FirebaseAuth.instance.currentUser?.uid.toString();
-
-
-
-
-
-
 
   Future pickImage(ImageSource source) async {
     try {
@@ -58,26 +54,22 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
     }
   }
 
-  Future<String>getUsername() async {
-    DataSnapshot snapshot1 =   await FirebaseDatabase.instance.ref('Users/$query/username').get();
+  Future<String> getUsername() async {
+    DataSnapshot snapshot1 =
+    await FirebaseDatabase.instance.ref('Users/$query/username').get();
     String username = await snapshot1.value.toString();
-    print (username);
     return username;
   }
 
   Future<String> uploadPicture(File file) async {
-
-
     name = uuid.v1().toString();
     var storeImage =
-        firebase_storage.FirebaseStorage.instance.ref().child('image/$name');
+    firebase_storage.FirebaseStorage.instance.ref().child('image/$name');
     firebase_storage.UploadTask task1 = storeImage.putFile(file);
     String imageURL = await (await task1).ref.getDownloadURL();
 
     return imageURL;
   }
-
-
 
   void _pictureEditBottomSheet(context) {
     showModalBottomSheet(
@@ -113,12 +105,8 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
   @override
   void dispose() {
     titleController.dispose();
-    for (TextEditingController element in ingredientsControllers) {
-      element.dispose();
-    }
-    for (TextEditingController element in ingredientsQuantityControllers) {
-      element.dispose();
-    }
+    ingredientsControllers.clear();
+    ingredientsQuantityControllers.clear();
     descriptionController.dispose();
     instructionController.dispose();
     tagsController.dispose();
@@ -127,21 +115,18 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Create new Post', style: HEADLINE_BOLD_WHITE),
       ),
-    body: ModalProgressHUD(
-      inAsyncCall: _isInAsyncCall,
-      // demo of some additional parameters
-      opacity: 0.5,
-      progressIndicator: CircularProgressIndicator(),
+      body: ModalProgressHUD(
+        inAsyncCall: _isInAsyncCall,
+        // demo of some additional parameters
+        opacity: 0.5,
+        progressIndicator: CircularProgressIndicator(),
 
-          child: _buildForm(context),
-        ),
-
-
+        child: _buildForm(context),
+      ),
     );
   }
 
@@ -192,7 +177,7 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
               padding: EdgeInsets.only(left: 8, top: 8),
               child: Text("Amount", style: POST_CAPTION_INDIGO_LIGHT)),
           Padding(
-              padding: EdgeInsets.only(left: 28, top: 8),
+              padding: EdgeInsets.only(left: 17, top: 8),
               child: Text("Ingredients", style: POST_CAPTION_INDIGO_LIGHT))
         ]),
         for (var i = 0; i < fieldsNumber; i++) _buildNewIngredientTile(i),
@@ -224,8 +209,8 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
               isDense: true,
               enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(
-                color: COLOR_INDIGO_LIGHT,
-              )),
+                    color: COLOR_INDIGO_LIGHT,
+                  )),
               border: OutlineInputBorder(
                 borderSide: BorderSide(
                   color: COLOR_INDIGO_LIGHT,
@@ -260,8 +245,8 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
               isDense: true,
               enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(
-                color: COLOR_INDIGO_LIGHT,
-              )),
+                    color: COLOR_INDIGO_LIGHT,
+                  )),
               border: OutlineInputBorder(
                 borderSide: BorderSide(
                   color: Colors.blue,
@@ -276,13 +261,6 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
   }
 
   Widget _buildNewIngredientTile(int index) {
-    TextEditingController ingredientsController = TextEditingController();
-    TextEditingController ingredientsQuantityController =
-        TextEditingController();
-    setState(() {
-      ingredientsQuantityControllers.add(ingredientsQuantityController);
-      ingredientsControllers.add(ingredientsController);
-    });
     return Row(children: [
       Padding(
         padding: const EdgeInsets.all(8.0),
@@ -299,8 +277,8 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                 isDense: true,
                 enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(
-                  color: COLOR_INDIGO_LIGHT,
-                )),
+                      color: COLOR_INDIGO_LIGHT,
+                    )),
                 border: OutlineInputBorder(
                   borderSide: BorderSide(
                     color: COLOR_INDIGO_LIGHT,
@@ -326,8 +304,8 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                 isDense: true,
                 enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(
-                  color: COLOR_INDIGO_LIGHT,
-                )),
+                      color: COLOR_INDIGO_LIGHT,
+                    )),
                 border: OutlineInputBorder(
                   borderSide: BorderSide(
                     color: COLOR_INDIGO_LIGHT,
@@ -341,15 +319,25 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
   }
 
   Widget _buildAddButton() {
-    return IconButton(
-      icon: const Icon(Icons.add_circle_outline,
-          color: COLOR_INDIGO_LIGHT, size: 30),
-      onPressed: () {
-        setState(() {
-          fieldsNumber++;
-        });
-      },
-    );
+    return Row(children: [
+      IconButton(
+          icon: const Icon(Icons.add_circle_outline,
+              color: COLOR_INDIGO_LIGHT, size: 30),
+          onPressed: () {
+            setState(() {
+              fieldsNumber++;
+              ingredientsQuantityControllers.add(TextEditingController());
+              ingredientsControllers.add(TextEditingController());
+            });
+          }),
+      const Padding(
+          padding: EdgeInsets.only(left: 2, top: 2),
+          child: Text("Add new ingredient",
+              style: TextStyle(
+                  color: COLOR_INDIGO_LIGHT,
+                  fontSize: 14,
+                  fontFamily: 'VisbyDemiBold')))
+    ]);
   }
 
   Widget _buildInstructions() {
@@ -374,8 +362,8 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
               isDense: true,
               enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(
-                color: COLOR_INDIGO_LIGHT,
-              )),
+                    color: COLOR_INDIGO_LIGHT,
+                  )),
               border: OutlineInputBorder(
                 borderSide: BorderSide(
                   color: COLOR_INDIGO_LIGHT,
@@ -419,8 +407,8 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                     isDense: true,
                     enabledBorder: const OutlineInputBorder(
                         borderSide: BorderSide(
-                      color: COLOR_INDIGO_LIGHT,
-                    )),
+                          color: COLOR_INDIGO_LIGHT,
+                        )),
                     border: const OutlineInputBorder(
                       borderSide: BorderSide(
                         color: COLOR_INDIGO_LIGHT,
@@ -444,51 +432,51 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                     errorText: error,
                     prefixIcon: tags.isNotEmpty
                         ? SingleChildScrollView(
-                            controller: sc,
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                                children: tags.map((String tag) {
-                              return Container(
-                                decoration: const BoxDecoration(
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(20.0),
-                                  ),
-                                  color: COLOR_INDIGO,
+                      controller: sc,
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                          children: tags.map((String tag) {
+                            return Container(
+                              decoration: const BoxDecoration(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(20.0),
                                 ),
-                                margin:
-                                    const EdgeInsets.symmetric(horizontal: 5.0),
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 10.0, vertical: 5.0),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    InkWell(
-                                      child: Text(
-                                        '#$tag',
-                                        style: const TextStyle(
-                                            color: Colors.white),
-                                      ),
-                                      onTap: () {
-                                        //print("$tag selected");
-                                      },
+                                color: COLOR_INDIGO,
+                              ),
+                              margin:
+                              const EdgeInsets.symmetric(horizontal: 5.0),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10.0, vertical: 5.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                MainAxisAlignment.spaceBetween,
+                                children: [
+                                  InkWell(
+                                    child: Text(
+                                      '#$tag',
+                                      style: const TextStyle(
+                                          color: Colors.white),
                                     ),
-                                    const SizedBox(width: 4.0),
-                                    InkWell(
-                                      child: const Icon(
-                                        Icons.cancel,
-                                        size: 14.0,
-                                        color: Colors.white,
-                                      ),
-                                      onTap: () {
-                                        onTagDelete(tag);
-                                      },
-                                    )
-                                  ],
-                                ),
-                              );
-                            }).toList()),
-                          )
+                                    onTap: () {
+                                      //print("$tag selected");
+                                    },
+                                  ),
+                                  const SizedBox(width: 4.0),
+                                  InkWell(
+                                    child: const Icon(
+                                      Icons.cancel,
+                                      size: 14.0,
+                                      color: Colors.white,
+                                    ),
+                                    onTap: () {
+                                      onTagDelete(tag);
+                                    },
+                                  )
+                                ],
+                              ),
+                            );
+                          }).toList()),
+                    )
                         : null,
                   ),
                   onChanged: onChanged,
@@ -521,8 +509,8 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
             isDense: true,
             enabledBorder: OutlineInputBorder(
                 borderSide: BorderSide(
-              color: COLOR_INDIGO_LIGHT,
-            )),
+                  color: COLOR_INDIGO_LIGHT,
+                )),
             border: OutlineInputBorder(
               borderSide: BorderSide(
                 color: COLOR_INDIGO_LIGHT,
@@ -537,8 +525,8 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
 
   Widget _buildSubmitButton() {
     return Padding(
-        padding: const EdgeInsets.only(
-            left: 10, right: 10, bottom: 10, top: 14),
+        padding:
+        const EdgeInsets.only(left: 10, right: 10, bottom: 10, top: 14),
         child: ElevatedButton(
             onPressed: () async {
               setState(() {
@@ -578,7 +566,7 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                 'currentUser': username,
                 'pictureID': imageURL,
                 'nutrition': nutritionController.text,
-                'timeSorter' : 0-timeIdent!
+                'timeSorter': 0 - timeIdent!
               };
               database
                   .child('post')
@@ -589,14 +577,15 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
               //.child(uniqueUserID).push(comment)
               setState(() {
                 _isInAsyncCall = false;
+                fieldsNumber = 1;
               });
-              dispose();
+
+              Navigator.pop(context, true); //replaces dispose()
 
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => HomeScreen()));
             },
             child: const Text('Post',
-                style: TextStyle(
-                    fontFamily: "VisbyDemiBold", fontSize: 18))));
+                style: TextStyle(fontFamily: "VisbyDemiBold", fontSize: 18))));
   }
 }

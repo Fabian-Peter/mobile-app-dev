@@ -111,21 +111,23 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    @override
-    void dispose() {
-      titleController.dispose();
-      for (TextEditingController element in ingredientsControllers) {
-        element.dispose();
-      }
-      for (TextEditingController element in ingredientsQuantityControllers) {
-        element.dispose();
-      }
-      descriptionController.dispose();
-      instructionController.dispose();
-      tagsController.dispose();
-      super.dispose();
+  void dispose() {
+    titleController.dispose();
+    for (TextEditingController element in ingredientsControllers) {
+      element.dispose();
     }
+    for (TextEditingController element in ingredientsQuantityControllers) {
+      element.dispose();
+    }
+    descriptionController.dispose();
+    instructionController.dispose();
+    tagsController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Create new Post', style: HEADLINE_BOLD_WHITE),

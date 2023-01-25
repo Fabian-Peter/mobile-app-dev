@@ -28,7 +28,9 @@ class _HomeScreenState extends State<HomeScreen> {
   final ref = FirebaseDatabase.instance.ref("post");
   final user = FirebaseAuth.instance.currentUser!;
   final database = FirebaseDatabase(
-      databaseURL:"https://diabeathis-f8ee3-default-rtdb.europe-west1.firebasedatabase.app").reference();
+          databaseURL:
+              "https://diabeathis-f8ee3-default-rtdb.europe-west1.firebasedatabase.app")
+      .reference();
   late Query query = ref.orderByChild('timeSorter');
   Key listKey = Key(DateTime.now().millisecondsSinceEpoch.toString());
 
@@ -363,6 +365,7 @@ class _HomeScreenState extends State<HomeScreen> {
       BuildContext context, DataSnapshot snapshot, int index) {
     String ref = snapshot.child('reference').value.toString();
     String ownName = FirebaseAuth.instance.currentUser!.uid;
+    var likesAmount = snapshot.child('likeAmount').value;
 
     return Row(mainAxisAlignment: MainAxisAlignment.end, children: [
       Badge(
@@ -392,15 +395,18 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             onPressed: () {
               String result = snapshot.child('likes/$ownName').value.toString();
-              if(result == 'true'){
-              database.child('post/$ref/likes/$ownName').set('false');
-              print('removed like');
-              }
-              else {
+              if (result == 'true') {
+                database.child('post/$ref/likes/$ownName').set('false');
+                print('removed like');
+                print(likesAmount);
+              } else {
                 database.child('post/$ref/likes/$ownName').set('true');
+                if (likesAmount != null) {
+                  likesAmount += 1;
+                }
                 print('added like');
+                print(likesAmount);
               }
-
             },
           ))
     ]);

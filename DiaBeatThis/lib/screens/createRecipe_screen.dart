@@ -18,12 +18,6 @@ class CreateRecipeScreen extends StatefulWidget {
 }
 
 class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
-  late TextEditingController titleController;
-  late TextEditingController ingredientsController;
-  late TextEditingController descriptionController;
-  late TextEditingController instructionController;
-  late TextfieldTagsController tagsController;
-  late TextEditingController nutritionController;
   final database = FirebaseDatabase(
       databaseURL:
       "https://diabeathis-f8ee3-default-rtdb.europe-west1.firebasedatabase.app")
@@ -33,24 +27,20 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
   final firebase_storage.FirebaseStorage storage =
       firebase_storage.FirebaseStorage.instance;
   var uuid = Uuid();
+  TextEditingController titleController = TextEditingController();
+  List<TextEditingController> ingredientsControllers = <TextEditingController>[
+    TextEditingController()
+  ];
+  List<TextEditingController> ingredientsQuantityControllers =
+  <TextEditingController>[TextEditingController()];
+  int fieldsNumber = 1;
+  TextEditingController descriptionController = TextEditingController();
+  TextEditingController instructionController = TextEditingController();
+  TextfieldTagsController tagsController = TextfieldTagsController();
+  TextEditingController nutritionController = TextEditingController();
   late String name;
   bool _isInAsyncCall = false;
   String? query = FirebaseAuth.instance.currentUser?.uid.toString();
-
-
-  @override
-  void initState() {
-    super.initState();
-     titleController = TextEditingController();
-     ingredientsController = TextEditingController();
-     descriptionController = TextEditingController();
-     instructionController = TextEditingController();
-     tagsController = TextfieldTagsController();
-     nutritionController = TextEditingController();
-  }
-
-
-
 
   Future pickImage(ImageSource source) async {
     try {
@@ -381,105 +371,48 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                 ),
               ),
             ),
-            const Padding(
-                padding: EdgeInsets.only(left: 8, top: 8),
-                child: Text("Tags", style: POST_CAPTION_INDIGO_LIGHT)),
-            TextFieldTags(
-              textfieldTagsController: tagsController,
+          ),
+        ),
+      ],
+    );
+  }
 
-              textSeparators: [' ', ','],
-              letterCase: LetterCase.normal,
-              validator: (String tag) {
-                if (tagsController.getTags!.contains(tag)) {
-                  return 'You already entered that';
-                }
-                return null;
-              },
-
-              inputfieldBuilder:
-                  (context, tec, fn, error, onChanged, onSubmitted) {
-                return ((context, sc, tags, onTagDelete) {
-                  return Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: TextField(
-                      controller: tec,
-                      focusNode: fn,
-                      decoration: InputDecoration(
-                        isDense: true,
-                        enabledBorder: const OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: COLOR_INDIGO_LIGHT,
-                            )),
-                        border: const OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: COLOR_INDIGO_LIGHT,
-                            width: 3.0,
-                          ),
-                        ),
-                        focusedBorder: const OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: COLOR_INDIGO_LIGHT,
-                            width: 3.0,
-                          ),
-                        ),
-                        helperText:
-                        'Some tags to help the hungry find your recipe',
-                        helperStyle: const TextStyle(
-                            color: COLOR_INDIGO, fontFamily: "VisbyMedium"),
-                        labelText: 'Enter tags',
-                        labelStyle: const TextStyle(
-                            fontFamily: "VisbyMedium",
-                            fontSize: 14,
-                            color: COLOR_INDIGO_LIGHT),
-                        errorText: error,
-                        prefixIcon: tags.isNotEmpty
-                            ? SingleChildScrollView(
-                          controller: sc,
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                              children: tags.map((String tag) {
-                                return Container(
-                                  decoration: const BoxDecoration(
-                                    borderRadius: BorderRadius.all(
-                                      Radius.circular(20.0),
-                                    ),
-                                    color: COLOR_INDIGO,
-                                  ),
-                                  margin: const EdgeInsets.symmetric(
-                                      horizontal: 5.0),
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10.0, vertical: 5.0),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      InkWell(
-                                        child: Text(
-                                          '#$tag',
-                                          style: const TextStyle(
-                                              color: Colors.white),
-                                        ),
-                                        onTap: () {
-                                          //print("$tag selected");
-                                        },
-                                      ),
-                                      const SizedBox(width: 4.0),
-                                      InkWell(
-                                        child: const Icon(
-                                          Icons.cancel,
-                                          size: 14.0,
-                                          color: Colors.white,
-                                        ),
-                                        onTap: () {
-                                          onTagDelete(tag);
-                                        },
-                                      )
-                                    ],
-                                  ),
-                                );
-                              }).toList()),
-                        )
-                            : null,
+  Widget _buildTags() {
+    return Column(
+      children: [
+        const Padding(
+            padding: EdgeInsets.only(right: 342, top: 8),
+            child: Text("Tags", style: POST_CAPTION_INDIGO_LIGHT)),
+        TextFieldTags(
+          textfieldTagsController: tagsController,
+          initialTags: const [
+            'Your tags',
+          ],
+          textSeparators: [' ', ','],
+          letterCase: LetterCase.normal,
+          validator: (String tag) {
+            if (tagsController.getTags!.contains(tag)) {
+              return 'You already entered that';
+            }
+            return null;
+          },
+          inputfieldBuilder: (context, tec, fn, error, onChanged, onSubmitted) {
+            return ((context, sc, tags, onTagDelete) {
+              return Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: TextField(
+                  controller: tec,
+                  focusNode: fn,
+                  decoration: InputDecoration(
+                    isDense: true,
+                    enabledBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: COLOR_INDIGO_LIGHT,
+                        )),
+                    border: const OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: COLOR_INDIGO_LIGHT,
+                        width: 3.0,
                       ),
                     ),
                     focusedBorder: const OutlineInputBorder(
@@ -584,47 +517,27 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                 width: 3.0,
               ),
             ),
-            Padding(
-                padding: const EdgeInsets.only(
-                    left: 10, right: 10, bottom: 10, top: 14),
-                child: ElevatedButton(
-                    onPressed: () async {
-                      List<String>? tagList = tagsController.getTags;
-                      setState(() {
-                        _isInAsyncCall = true;
-                      });
-                      //TODO add loading animation
-                      String imageURL = await uploadPicture(image!);
+          ),
+        ),
+      )
+    ]);
+  }
 
+  Widget _buildSubmitButton() {
+    return Padding(
+        padding:
+        const EdgeInsets.only(left: 10, right: 10, bottom: 10, top: 14),
+        child: ElevatedButton(
+            onPressed: () async {
+              setState(() {
+                _isInAsyncCall = true;
+              });
+              //TODO add loading animation
 
-
-                      List<String>? likes = [];
-                      likes.add(FirebaseAuth.instance.currentUser!.uid);
-                      List<String>? comments;
-                      String timestamp = DateTime.now().toString();
-                      var timeIdent = new DateTime.now().millisecondsSinceEpoch;
-                      var myRef = database.child('post').push();
-                      var key = myRef.key!;
-                      print(key);
-                      final newRecipe = <String, dynamic>{
-                        'title': titleController.text,
-                        'description': descriptionController.text,
-                        'ingredients': ingredientsController.text,
-                        'instructions': instructionController.text,
-                        'tags': tagList,
-                        'likes' : likes,
-                        //'comments' : comments,
-                        'timestamp': timestamp,
-                        'currentUser': FirebaseAuth.instance.currentUser?.uid,
-                        'pictureID': imageURL,
-                        'nutrition': nutritionController.text,
-                        'timeSorter' : 0-timeIdent!,
-                        'reference' : key
-                      };
-                      database
-                          .child('post/$key')
-                          .set(newRecipe)
-                          .then((_) => print("call has been made"));
+              List<String> ingredientList = [];
+              for (var element in ingredientsControllers) {
+                ingredientList.add(element.text);
+              }
 
               List<String> ingredientQuantityList = [];
               for (var element in ingredientsQuantityControllers) {

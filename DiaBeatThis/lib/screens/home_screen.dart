@@ -13,7 +13,6 @@ import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:cached_network_image/cached_network_image.dart';
 import '../classes/Post.dart';
 import '../classes/user.dart';
-import 'package:badges/badges.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, this.uid});
@@ -41,7 +40,6 @@ class _HomeScreenState extends State<HomeScreen> {
   final firebase_storage.FirebaseStorage storage =
       firebase_storage.FirebaseStorage.instance;
   late Future<String> dataFuture;
-  var counter = 0;
 
   @override
   void initState() {
@@ -356,21 +354,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildCommentsAndLikes(
       BuildContext context, DataSnapshot snapshot, int index) {
-    DataSnapshot snap = snapshot.child('likes');
-    String value = snap.value.toString();
-    print(value);
-
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-    Badge(
-      borderRadius: BorderRadius.circular(8),
-      position: BadgePosition.topEnd(top: 1, end: -3),
-      badgeColor: COLOR_INDIGO_LIGHT,
-      badgeContent: Text('0', style: TextStyle(color: Colors.white)),
-      child: IconButton(
+        IconButton(
           icon: const Icon(
-            Icons.comment_bank_sharp,
+            Icons.mode_comment_outlined,
             color: COLOR_INDIGO_LIGHT,
             size: 20,
           ),
@@ -381,46 +370,17 @@ class _HomeScreenState extends State<HomeScreen> {
             //                         :
             },
         ),
-    ),
-
-    Badge(
-        borderRadius: BorderRadius.circular(8),
-        position: BadgePosition.topEnd(top: 2, end: 1),
-    badgeContent: Text(counter.toString() ,style: TextStyle(color: Colors.white)),
-    child: IconButton(
+        IconButton(
           icon: Icon(
             _favIconOutlined,
-            color: Colors.red,
+            color: COLOR_RED,
             size: 20,
           ),
-          onPressed: () async {
-            String ownName = FirebaseAuth.instance.currentUser!.uid;
-            String path = (snapshot.child('reference').value.toString());
-              database.child('post/$path/likes/$ownName').set('true');
-
-            //print(snap.value.toString());
-            //String? resultList = snap.value.toString();
-            //print(resultList);
-            //List<String> stringlist= [];
-            //stringlist.add(resultList);
-
-            //String? userID = FirebaseAuth.instance.currentUser?.uid;
-//
-            //if(stringlist.contains(userID!)){
-            //  stringlist.remove(userID);
-            //
-            //  print(snapshot.child('likes').value.toString());
-            //  print('set ID');
-            //}
-            //else{
-            //  stringlist.add(userID);
-            //  database.child('post/$path/likes/').set(stringlist);
-            //  print(snapshot.child('likes').value.toString());
-            //  print('removeID');
-            //}
-//
-          //String path = (snapshot.child('reference').value.toString());
-            //TODO: individual likes for posts and users
+          onPressed: () {
+            //TODO: individual likes for posts and users or login screen
+            // FirebaseAuth.instance.currentUser!.isAnonymous
+            //                         ? AuthScreen()
+            //                         :
             setState(() {
               if (_favIconOutlined == Icons.favorite_outline) {
                 _favIconOutlined = Icons.favorite;
@@ -430,7 +390,7 @@ class _HomeScreenState extends State<HomeScreen> {
             });
           },
         )
-    )],
+      ],
     );
   }
 }

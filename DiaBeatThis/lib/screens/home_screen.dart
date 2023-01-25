@@ -25,7 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final ref = FirebaseDatabase.instance.ref("post");
   final user = FirebaseAuth.instance.currentUser!;
 
-  late Query query = ref.orderByChild('timestamp');
+  late Query query = ref.orderByChild('timeSorter');
   Key listKey = Key(DateTime.now().millisecondsSinceEpoch.toString());
 
   TextEditingController searchController = TextEditingController();

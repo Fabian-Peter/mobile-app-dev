@@ -529,6 +529,7 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
         const EdgeInsets.only(left: 10, right: 10, bottom: 10, top: 14),
         child: ElevatedButton(
             onPressed: () async {
+              List<String>? tagList = tagsController.getTags;
               setState(() {
                 _isInAsyncCall = true;
               });
@@ -546,12 +547,15 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
 
               String imageURL = await uploadPicture(image!);
 
-              List<String>? tagList = tagsController.getTags;
+
               List<String>? reactions;
               List<String>? comments;
               String timestamp = DateTime.now().toString();
               var timeIdent = new DateTime.now().millisecondsSinceEpoch;
               String username = await getUsername();
+              var myRef = database.child('post').push();
+              var key = myRef.key!;
+
 
               final newRecipe = <String, dynamic>{
                 'title': titleController.text,
@@ -566,13 +570,14 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                 'currentUser': username,
                 'pictureID': imageURL,
                 'nutrition': nutritionController.text,
-                'timeSorter': 0 - timeIdent!
+                'timeSorter': 0 - timeIdent!,
+                'reference': key
               };
               database
-                  .child('post')
-                  .push()
+                  .child('post/$key')
                   .set(newRecipe)
                   .then((_) => print("call has been made"));
+
 
               //.child(uniqueUserID).push(comment)
               setState(() {

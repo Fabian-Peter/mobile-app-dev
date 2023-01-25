@@ -23,13 +23,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String? query = FirebaseAuth.instance.currentUser?.uid.toString();
 
   @override
-  Widget build(BuildContext context) async {
-    String username = await getUsername();
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: Text(username, style: HEADLINE_BOLD_WHITE),
-          //actions: <Widget>[_buildSettingsIcon(context)]
-          ),
+        title: const Text('DiaBeatThis!', style: DIABEATTHIS_LOGO),
+        //actions: <Widget>[_buildSettingsIcon(context)]
+      ),
       body: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 10),
           child: Container(
@@ -39,18 +38,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   _buildProfileIcon(context),
+                  _buildUsername(context, snapshot),
                   _buildEditIcon(context),
                   _buildProfile(context),
                   _buildListOfPosts(context)
                 ],
               ))),
     );
-  }
-
-  Future<String>getUsername() async {
-    DataSnapshot snapshot1 = await FirebaseDatabase.instance.ref('Users/$query/username').get();
-    String username = await snapshot1.value.toString();
-    return username;
   }
 
   Widget _buildSettingsIcon(BuildContext context) {
@@ -81,6 +75,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
               onTap: () {
                 //TODO: open profile instead
               })),
+    );
+  }
+
+  Widget _buildUsername(BuildContext context, DataSnapshot snapshot) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: Center(
+        child: Text(
+          snapshot.child('currentUser').value.toString(),
+          style: HOME_POST_CREATOR,
+        ),
+      ),
     );
   }
 

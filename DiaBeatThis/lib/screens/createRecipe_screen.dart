@@ -437,7 +437,8 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
 
 
 
-                      List<String>? likes = ['no likes yet'];
+                      List<String>? likes = [];
+                      likes.add(FirebaseAuth.instance.currentUser!.uid);
                       List<String>? comments;
                       String timestamp = DateTime.now().toString();
                       var timeIdent = new DateTime.now().millisecondsSinceEpoch;

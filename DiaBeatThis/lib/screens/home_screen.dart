@@ -315,6 +315,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildCommentsAndLikes(
       BuildContext context, DataSnapshot snapshot, int index) {
+    DataSnapshot snap = snapshot.child('likes');
+    String value = snap.value.toString();
+    print(value);
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
@@ -344,15 +348,10 @@ class _HomeScreenState extends State<HomeScreen> {
             size: 20,
           ),
           onPressed: () async {
-            DataSnapshot snap = await snapshot.child('likes');
-            if(snap.value == null){
-              String path = (snapshot.child('reference').value.toString());
-              String? ident = FirebaseAuth.instance.currentUser?.uid;
-              print(ident);
-              database.child('post/$path/likes/$ident').push();
-              print('working as it should be');
-            }
-            else print(snap.value);
+            String ownName = FirebaseAuth.instance.currentUser!.uid;
+            String path = (snapshot.child('reference').value.toString());
+              database.child('post/$path/likes/$ownName').set('true');
+
             //print(snap.value.toString());
             //String? resultList = snap.value.toString();
             //print(resultList);

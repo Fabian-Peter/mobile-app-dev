@@ -1,5 +1,5 @@
-import 'dart:convert';
 import 'package:diabeatthis/data/dummy_data.dart';
+import 'package:diabeatthis/screens/auth_screen.dart';
 import 'package:diabeatthis/screens/createRecipe_screen.dart';
 import 'package:diabeatthis/screens/post_screen.dart';
 import 'package:diabeatthis/screens/profile_screen.dart';
@@ -25,12 +25,15 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final ref = FirebaseDatabase.instance.ref("post");
   final user = FirebaseAuth.instance.currentUser!;
-  final database = FirebaseDatabase(
-      databaseURL:
-      "https://diabeathis-f8ee3-default-rtdb.europe-west1.firebasedatabase.app")
-      .reference();
+
+  late Query query = ref.orderByChild('timestamp');
+  Key listKey = Key(DateTime.now().millisecondsSinceEpoch.toString());
+
+  TextEditingController searchController = TextEditingController();
+  FocusNode searchBarFocusNode = FocusNode();
+
   IconData _favIconOutlined = Icons.favorite_outline;
-  IconData _homeIcon = Icons.home;
+  final IconData _homeIcon = Icons.home;
   TextEditingController textController = TextEditingController();
   bool isVisible = false;
   List<Post>? posts = DummyData().returnData;
@@ -83,7 +86,10 @@ class _HomeScreenState extends State<HomeScreen> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => CreateRecipeScreen()));
+                      builder: (context) =>
+                          FirebaseAuth.instance.currentUser!.isAnonymous
+                              ? AuthScreen()
+                              : CreateRecipeScreen()));
             }
           },
         ),
@@ -104,40 +110,21 @@ class _HomeScreenState extends State<HomeScreen> {
         //    }
         //    return true;
         //  },
-        body: PageView(
-          controller: controller,
-          children: [
-            _buildScreen(context, "Home"),
-            _buildScreen(context, "Discover")
-          ],
-          onPageChanged: (page) {
-            setState(() {
-              if (_homeIcon == Icons.home) {
-                _homeIcon = Icons.explore;
-              } else {
-                _homeIcon = Icons.home;
-              }
-            });
-          },
-        ));
-  }
-
-  Widget _buildScreen(BuildContext context, String identifier) {
-    //TODO: load posts depending on identifier
-    return SafeArea(
-        child: Column(
-      children: [
-        const SizedBox(height: 1),
-        _buildSearchBar(context),
-        Flexible(
-            child: FirebaseAnimatedList(
-                query: ref.orderByChild('timeSorter'),
-                defaultChild: const Text("Loading...", style: TEXT_PLAIN),
-                itemBuilder: (context, snapshot, animation, index) {
-                  return _buildPosts(context, snapshot, index);
-                }))
-      ],
-    ));
+        body: SafeArea(
+            child: Column(
+              children: [
+                const SizedBox(height: 3),
+                _buildSearchBar(context),
+                Flexible(
+                    child: FirebaseAnimatedList(
+                        key: listKey,
+                        query: query,
+                        defaultChild: const Text("Loading...", style: TEXT_PLAIN),
+                        itemBuilder: (context, snapshot, animation, index) {
+                          return _buildPosts(context, snapshot, index);
+                        }))
+              ],
+            )));
   }
 
   Widget _buildLogButton(BuildContext context) {
@@ -178,23 +165,77 @@ class _HomeScreenState extends State<HomeScreen> {
             onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) {
-                  return const ProfileScreen();
+                  return FirebaseAuth.instance.currentUser!.isAnonymous
+                      ? AuthScreen()
+                      : const ProfileScreen();
                 }),
               );
             },
-            //TODO: open profile instead
+            //TODO: open profile instead or login screen
+            // FirebaseAuth.instance.currentUser!.isAnonymous
+            //                         ? AuthScreen()
+            //                         :
           )),
     );
   }
 
   Widget _buildSearchBar(BuildContext context) {
-    return const SizedBox(
-        width: 400,
-        height: 48,
-        child: OutlineSearchBar(
-            margin: EdgeInsets.only(top: 7, bottom: 6, left: 8, right: 8),
-            borderColor: COLOR_INDIGO,
-            textStyle: TEXT_PLAIN));
+    return Padding(
+        padding: const EdgeInsets.only(left: 10, right: 10),
+        child: Row(children: [
+          SizedBox(
+              width: 276.7,
+              height: 33,
+              child: TextFormField(
+                focusNode: searchBarFocusNode,
+                onTap: () => searchBarFocusNode.requestFocus(),
+                controller: searchController,
+                decoration: const InputDecoration(
+                  labelText: 'Search for name or ingredient...',
+                  labelStyle: TextStyle(
+                      fontFamily: "VisbyMedium",
+                      fontSize: 14,
+                      color: COLOR_INDIGO_LIGHT),
+                  isDense: true,
+                  enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: COLOR_INDIGO_LIGHT,
+                      )),
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: COLOR_INDIGO_LIGHT,
+                      width: 3.0,
+                    ),
+                  ),
+                ),
+              )),
+          IconButton(
+            icon: const Icon(Icons.search, color: COLOR_INDIGO_LIGHT),
+            iconSize: 20,
+            splashRadius: 20,
+            onPressed: () {
+              setState(() {
+                if(searchController.text != "") {
+                listKey = Key(DateTime.now().millisecondsSinceEpoch.toString());
+                query = ref.orderByChild("title").equalTo(searchController.text);
+              }});
+              searchBarFocusNode.unfocus();
+            },
+          ),
+          IconButton(
+              icon: const Icon(Icons.cancel, color: COLOR_INDIGO_LIGHT),
+              iconSize: 20,
+              splashRadius: 20,
+              onPressed: () {
+                setState(() {
+                  listKey =
+                      Key(DateTime.now().millisecondsSinceEpoch.toString());
+                  query = ref.orderByChild('timestamp');
+                });
+                searchController.clear();
+                searchBarFocusNode.unfocus();
+              })
+        ]));
   }
 
   Widget _buildPosts(BuildContext context, DataSnapshot snapshot, int index) {
@@ -262,8 +303,8 @@ class _HomeScreenState extends State<HomeScreen> {
               )),
         ),
         Text(
-          //post.child('currentUser').value.toString(), //TODO: currentUser to name
-          "User",
+          //TODO: currentUser to name
+          snapshot.child('currentUser').value.toString(),
           style: HOME_POST_CREATOR,
         )
       ],
@@ -333,7 +374,12 @@ class _HomeScreenState extends State<HomeScreen> {
             color: COLOR_INDIGO_LIGHT,
             size: 20,
           ),
-          onPressed: () {},
+          onPressed: () {
+            //login screen if guest
+            // FirebaseAuth.instance.currentUser!.isAnonymous
+            //                         ? AuthScreen()
+            //                         :
+            },
         ),
     ),
 

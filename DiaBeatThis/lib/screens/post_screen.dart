@@ -1,16 +1,20 @@
+import 'package:diabeatthis/screens/profile_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:diabeatthis/utils/constants.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
+import 'auth_screen.dart';
+
 class PostScreen extends StatelessWidget {
   final DataSnapshot post;
   FirebaseStorage storage = FirebaseStorage.instance;
 
-  IconData _favIconOutlined = Icons.favorite_outline;
+  final IconData _favIconOutlined = Icons.favorite_outline;
 
-  PostScreen({required this.post});
+  PostScreen({super.key, required this.post});
 
   Future<String> downloadURL(String imageName) async {
     String downloadURL = await storage.ref('image/$imageName').getDownloadURL();
@@ -71,12 +75,15 @@ class PostScreen extends StatelessWidget {
               width: USER_ICON_POST_SIZE,
             ),
             onTap: () {
-              //TODO: open user profile
+              //TODO: open user profile or login screen
+              // FirebaseAuth.instance.currentUser!.isAnonymous
+              //                         ? AuthScreen()
+              //                         :
             },
           ),
         ),
         const SizedBox(width: 10),
-        Text(
+        const Text(
           //post.child('currentUser').value.toString(), //TODO: currentUser to name
           "User",
           style: HOME_POST_CREATOR,
@@ -113,7 +120,13 @@ class PostScreen extends StatelessWidget {
                 width: PROFILE_ICON_BAR_SIZE,
               ),
               onTap: () {
-                //TODO: open profile instead
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) {
+                    return FirebaseAuth.instance.currentUser!.isAnonymous
+                        ? AuthScreen()
+                        : const ProfileScreen();
+                  }),
+                );
               })),
     );
   }
@@ -187,8 +200,7 @@ class PostScreen extends StatelessWidget {
           aspectRatio: 2,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10),
-            child: CachedNetworkImage(
-                imageUrl: imageID, fit: BoxFit.cover),
+            child: CachedNetworkImage(imageUrl: imageID, fit: BoxFit.cover),
           ),
         ));
   }
@@ -223,7 +235,10 @@ class PostScreen extends StatelessWidget {
                     size: 27,
                   ),
                   onPressed: () {
-                    //TODO: add state to widget?
+                    //TODO: add state to widget? and guest show login screen
+                    // FirebaseAuth.instance.currentUser!.isAnonymous
+                    //                         ? AuthScreen()
+                    //                         :
                   },
                 )),
             Padding(

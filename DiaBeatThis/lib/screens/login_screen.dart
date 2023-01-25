@@ -41,18 +41,50 @@ class _LoginScreen extends State<LoginScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const SizedBox(height: 40),
-            TextField(
-              controller: emailController,
-              cursorColor: Colors.white,
-              textInputAction: TextInputAction.next,
-              decoration: const InputDecoration(labelText: "Email Address"),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                controller: emailController,
+                cursorColor: Colors.white,
+                textInputAction: TextInputAction.next,
+                decoration: const InputDecoration(
+                  labelText: "Email Address",
+                  labelStyle: TextStyle(
+                      fontFamily: "VisbyMedium", color: COLOR_INDIGO_LIGHT),
+                  enabledBorder: OutlineInputBorder(
+                      borderSide:
+                          BorderSide(color: COLOR_INDIGO_LIGHT, width: 3.0)),
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: COLOR_INDIGO_LIGHT,
+                      width: 3.0,
+                    ),
+                  ),
+                ),
+              ),
             ),
             const SizedBox(height: 4),
-            TextField(
-              controller: passwordController,
-              textInputAction: TextInputAction.done,
-              decoration: const InputDecoration(labelText: "Password"),
-              obscureText: true,
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                controller: passwordController,
+                textInputAction: TextInputAction.done,
+                decoration: const InputDecoration(
+                  labelText: "Password",
+                  labelStyle: TextStyle(
+                      fontFamily: "VisbyMedium", color: COLOR_INDIGO_LIGHT),
+                  enabledBorder: OutlineInputBorder(
+                      borderSide:
+                          BorderSide(color: COLOR_INDIGO_LIGHT, width: 3.0)),
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: COLOR_INDIGO_LIGHT,
+                      width: 3.0,
+                    ),
+                  ),
+                ),
+                obscureText: true,
+              ),
             ),
             const SizedBox(height: 20),
             ElevatedButton.icon(
@@ -61,31 +93,36 @@ class _LoginScreen extends State<LoginScreen> {
               icon: const Icon(Icons.lock_open, size: 32),
               label: const Text(
                 "Sign In",
-                style: TextStyle(fontSize: 24),
+                style: TextStyle(fontFamily: "VisbyMedium", fontSize: 24),
               ),
               onPressed: singIn,
             ),
             const SizedBox(height: 24),
             RichText(
                 text: TextSpan(
-              style: const TextStyle(color: COLOR_INDIGO_LIGHT, fontSize: 20),
+              style: const TextStyle(
+                  fontFamily: "VisbyMedium",
+                  color: COLOR_INDIGO_LIGHT,
+                  fontSize: 20),
               text: "No account?  ",
               children: [
                 TextSpan(
                   recognizer: TapGestureRecognizer()
                     ..onTap = widget.onClickedSignUp,
                   text: "Sign Up",
-                  style: TextStyle(
+                  style: const TextStyle(
+                      fontFamily: "VisbyMedium",
                       decoration: TextDecoration.underline,
-                      color: Theme.of(context).colorScheme.secondary),
+                      color: COLOR_INDIGO_LIGHT),
                 ),
                 const TextSpan(text: " or "),
                 TextSpan(
                   recognizer: TapGestureRecognizer()..onTap = guestLogin,
                   text: "Login as Guest",
-                  style: TextStyle(
+                  style: const TextStyle(
+                      fontFamily: "VisbyMedium",
                       decoration: TextDecoration.underline,
-                      color: Theme.of(context).colorScheme.secondary),
+                      color: COLOR_INDIGO_LIGHT),
                 )
               ],
             ))

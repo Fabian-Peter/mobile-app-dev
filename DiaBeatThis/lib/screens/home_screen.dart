@@ -13,10 +13,13 @@ import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:cached_network_image/cached_network_image.dart';
 import '../classes/Post.dart';
 import '../classes/user.dart';
+import 'package:badges/badges.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, this.uid});
+
   final String? uid;
+
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
@@ -24,7 +27,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final ref = FirebaseDatabase.instance.ref("post");
   final user = FirebaseAuth.instance.currentUser!;
-
+  final database = FirebaseDatabase(
+      databaseURL:"https://diabeathis-f8ee3-default-rtdb.europe-west1.firebasedatabase.app").reference();
   late Query query = ref.orderByChild('timeSorter');
   Key listKey = Key(DateTime.now().millisecondsSinceEpoch.toString());
 
@@ -110,19 +114,19 @@ class _HomeScreenState extends State<HomeScreen> {
         //  },
         body: SafeArea(
             child: Column(
-              children: [
-                const SizedBox(height: 3),
-                _buildSearchBar(context),
-                Flexible(
-                    child: FirebaseAnimatedList(
-                        key: listKey,
-                        query: query,
-                        defaultChild: const Text("Loading...", style: TEXT_PLAIN),
-                        itemBuilder: (context, snapshot, animation, index) {
-                          return _buildPosts(context, snapshot, index);
-                        }))
-              ],
-            )));
+          children: [
+            const SizedBox(height: 3),
+            _buildSearchBar(context),
+            Flexible(
+                child: FirebaseAnimatedList(
+                    key: listKey,
+                    query: query,
+                    defaultChild: const Text("Loading...", style: TEXT_PLAIN),
+                    itemBuilder: (context, snapshot, animation, index) {
+                      return _buildPosts(context, snapshot, index);
+                    }))
+          ],
+        )));
   }
 
   Widget _buildLogButton(BuildContext context) {
@@ -197,8 +201,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   isDense: true,
                   enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(
-                        color: COLOR_INDIGO_LIGHT,
-                      )),
+                    color: COLOR_INDIGO_LIGHT,
+                  )),
                   border: OutlineInputBorder(
                     borderSide: BorderSide(
                       color: COLOR_INDIGO_LIGHT,
@@ -213,10 +217,13 @@ class _HomeScreenState extends State<HomeScreen> {
             splashRadius: 20,
             onPressed: () {
               setState(() {
-                if(searchController.text != "") {
-                listKey = Key(DateTime.now().millisecondsSinceEpoch.toString());
-                query = ref.orderByChild("title").equalTo(searchController.text);
-              }});
+                if (searchController.text != "") {
+                  listKey =
+                      Key(DateTime.now().millisecondsSinceEpoch.toString());
+                  query =
+                      ref.orderByChild("title").equalTo(searchController.text);
+                }
+              });
               searchBarFocusNode.unfocus();
             },
           ),
@@ -354,43 +361,48 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildCommentsAndLikes(
       BuildContext context, DataSnapshot snapshot, int index) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        IconButton(
+    String ref = snapshot.child('reference').value.toString();
+    String ownName = FirebaseAuth.instance.currentUser!.uid;
+
+    return Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+      Badge(
+        borderRadius: BorderRadius.circular(8),
+        position: BadgePosition.topEnd(top: 1, end: -3),
+        badgeColor: COLOR_INDIGO_LIGHT,
+        badgeContent: Text('0', style: TextStyle(color: Colors.white)),
+        child: IconButton(
           icon: const Icon(
-            Icons.mode_comment_outlined,
+            Icons.comment_bank_sharp,
             color: COLOR_INDIGO_LIGHT,
             size: 20,
           ),
-          onPressed: () {
-            //login screen if guest
-            // FirebaseAuth.instance.currentUser!.isAnonymous
-            //                         ? AuthScreen()
-            //                         :
-            },
+          onPressed: () {},
         ),
-        IconButton(
-          icon: Icon(
-            _favIconOutlined,
-            color: COLOR_RED,
-            size: 20,
-          ),
-          onPressed: () {
-            //TODO: individual likes for posts and users or login screen
-            // FirebaseAuth.instance.currentUser!.isAnonymous
-            //                         ? AuthScreen()
-            //                         :
-            setState(() {
-              if (_favIconOutlined == Icons.favorite_outline) {
-                _favIconOutlined = Icons.favorite;
-              } else {
-                _favIconOutlined = Icons.favorite_outline;
+      ),
+      Badge(
+          borderRadius: BorderRadius.circular(8),
+          position: BadgePosition.topEnd(top: 1, end: -3),
+          badgeColor: Colors.red,
+          badgeContent: Text('0', style: TextStyle(color: Colors.white)),
+          child: IconButton(
+            icon: const Icon(
+              Icons.favorite_border_outlined,
+              color: Colors.red,
+              size: 20,
+            ),
+            onPressed: () {
+              String result = snapshot.child('likes/$ownName').value.toString();
+              if(result == 'true'){
+              database.child('post/$ref/likes/$ownName').set('false');
+              print('removed like');
               }
-            });
-          },
-        )
-      ],
-    );
+              else {
+                database.child('post/$ref/likes/$ownName').set('true');
+                print('added like');
+              }
+
+            },
+          ))
+    ]);
   }
 }

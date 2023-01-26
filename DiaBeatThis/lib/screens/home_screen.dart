@@ -365,7 +365,8 @@ class _HomeScreenState extends State<HomeScreen> {
       BuildContext context, DataSnapshot snapshot, int index) {
     String ref = snapshot.child('reference').value.toString();
     String ownName = FirebaseAuth.instance.currentUser!.uid;
-    var likesAmount = snapshot.child('likeAmount').value;
+    var likesAmount = snapshot.child('likeAmount').value.toString();
+    print(likesAmount);
 
     return Row(mainAxisAlignment: MainAxisAlignment.end, children: [
       Badge(
@@ -386,7 +387,7 @@ class _HomeScreenState extends State<HomeScreen> {
           borderRadius: BorderRadius.circular(8),
           position: BadgePosition.topEnd(top: 1, end: -3),
           badgeColor: Colors.red,
-          badgeContent: Text('0', style: TextStyle(color: Colors.white)),
+          badgeContent: Text(likesAmount, style: TextStyle(color: Colors.white)),
           child: IconButton(
             icon: const Icon(
               Icons.favorite_border_outlined,
@@ -398,14 +399,13 @@ class _HomeScreenState extends State<HomeScreen> {
               if (result == 'true') {
                 database.child('post/$ref/likes/$ownName').set('false');
                 print('removed like');
-                print(likesAmount);
+                database.child('post/$ref/likeAmount').set(ServerValue.increment(-1));
+                print(snapshot.child('likeAmount').value);
               } else {
                 database.child('post/$ref/likes/$ownName').set('true');
-                if (likesAmount != null) {
-                  likesAmount += 1;
-                }
+                database.child('post/$ref/likeAmount').set(ServerValue.increment(1));
                 print('added like');
-                print(likesAmount);
+
               }
             },
           ))

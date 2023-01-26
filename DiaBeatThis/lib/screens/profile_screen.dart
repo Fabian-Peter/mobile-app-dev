@@ -21,12 +21,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final List<Post> posts = DummyData().returnData;
   IconData _favIconOutlined = Icons.favorite_outline;
   String? query = FirebaseAuth.instance.currentUser?.uid.toString();
+  DatabaseReference ref = FirebaseDatabase.instance.ref("users");
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('DiaBeatThis!', style: DIABEATTHIS_LOGO),
+        title: const Text(snapshot.child('currentUser').value.toString(), style: DIABEATTHIS_LOGO),
         //actions: <Widget>[_buildSettingsIcon(context)]
       ),
       body: SingleChildScrollView(
@@ -38,7 +39,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   _buildProfileIcon(context),
-                  _buildUsername(context, snapshot),
+                  //buildUsername(context),
                   _buildEditIcon(context),
                   _buildProfile(context),
                   _buildListOfPosts(context)
@@ -78,7 +79,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildUsername(BuildContext context, DataSnapshot snapshot) {
+  /*Widget _buildUsername(BuildContext context, DataSnapshot snapshot) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Center(
@@ -88,7 +89,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
     );
-  }
+  }*/
 
   Widget _buildEditIcon(BuildContext context) {
     return Padding(

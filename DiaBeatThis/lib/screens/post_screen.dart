@@ -95,7 +95,7 @@ class _PostScreenState extends State<PostScreen> {
         ),
         const SizedBox(width: 10),
         Text(
-          post.child('currentUser').value.toString(),
+          widget.post.child('currentUser').value.toString(),
           style: HOME_POST_CREATOR,
         ),
         const Spacer(),

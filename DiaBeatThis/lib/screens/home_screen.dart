@@ -37,6 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
   TextEditingController searchController = TextEditingController();
   FocusNode searchBarFocusNode = FocusNode();
   String searchWord = "";
+  IconData _favIconOutlinedFilter = Icons.favorite_border_outlined;
 
   final IconData _homeIcon = Icons.home;
   TextEditingController textController = TextEditingController();

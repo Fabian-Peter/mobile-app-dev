@@ -33,11 +33,10 @@ class _HomeScreenState extends State<HomeScreen> {
       .reference();
   late Query query = ref.orderByChild('timeSorter');
   Key listKey = Key(DateTime.now().millisecondsSinceEpoch.toString());
-
+  IconData icon = Icons.favorite_border_outlined;
   TextEditingController searchController = TextEditingController();
   FocusNode searchBarFocusNode = FocusNode();
 
-  IconData _favIconOutlined = Icons.favorite_outline;
   final IconData _homeIcon = Icons.home;
   TextEditingController textController = TextEditingController();
   bool isVisible = false;
@@ -49,6 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
+    IconData icon = Icons.favorite_border_outlined;
     super.initState();
   }
 
@@ -366,7 +366,15 @@ class _HomeScreenState extends State<HomeScreen> {
     String ref = snapshot.child('reference').value.toString();
     String ownName = FirebaseAuth.instance.currentUser!.uid;
     var likesAmount = snapshot.child('likeAmount').value.toString();
-    print(likesAmount);
+    print(snapshot.child('likes/$ownName').value.toString());
+    if(snapshot.child('likes/$ownName').value.toString() == 'true'){
+      print('working until here');
+    }
+    //if(snapshot.child('likes/$ownName').value.toString().contains('true')){
+    //  print(snapshot.child('likes/$ownName').value.toString());
+    //  print('working');
+    //  icon == Icons.favorite;
+    //}
 
     return Row(mainAxisAlignment: MainAxisAlignment.end, children: [
       Badge(
@@ -389,23 +397,29 @@ class _HomeScreenState extends State<HomeScreen> {
           badgeColor: Colors.red,
           badgeContent: Text(likesAmount, style: TextStyle(color: Colors.white)),
           child: IconButton(
-            icon: const Icon(
-              Icons.favorite_border_outlined,
+            icon: Icon(
+              icon,
               color: Colors.red,
               size: 20,
             ),
             onPressed: () {
               String result = snapshot.child('likes/$ownName').value.toString();
+              //print(snapshot.child('likes/$ownName').value.toString());
+              //print (result);
               if (result == 'true') {
                 database.child('post/$ref/likes/$ownName').set('false');
                 print('removed like');
                 database.child('post/$ref/likeAmount').set(ServerValue.increment(-1));
-                print(snapshot.child('likeAmount').value);
+                icon = Icons.favorite_border_outlined;
+                setState(() {
+                });
               } else {
                 database.child('post/$ref/likes/$ownName').set('true');
                 database.child('post/$ref/likeAmount').set(ServerValue.increment(1));
                 print('added like');
-
+                icon = Icons.favorite;
+                setState(() {
+                });
               }
             },
           ))

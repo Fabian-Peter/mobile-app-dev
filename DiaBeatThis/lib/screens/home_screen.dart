@@ -188,11 +188,12 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildSearchBar(BuildContext context) {
     return Padding(
         padding: const EdgeInsets.only(left: 10, right: 10),
-        child: Row(children: [
-          SizedBox(
-              width: 324,
-              height: 33,
-              child: TextFormField(
+        child: Row(
+            children: [
+              Expanded(
+              child: SizedBox(
+                  height: 33,
+                  child: TextFormField(
                 focusNode: searchBarFocusNode,
                 onTap: () => searchBarFocusNode.requestFocus(),
                 controller: searchController,
@@ -232,10 +233,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 ),
-              )),
+              ))),
           IconButton(
             icon: Icon(_favIconOutlinedFilter, color: COLOR_INDIGO_LIGHT),
-            iconSize: 20,
+            iconSize: 25,
             splashRadius: 20,
             onPressed: () {
               //TODO: show all liked posts for logged user

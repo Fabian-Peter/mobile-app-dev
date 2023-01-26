@@ -8,7 +8,7 @@ import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide User;
 import 'package:diabeatthis/utils/constants.dart';
-import 'package:outline_search_bar/outline_search_bar.dart';
+import 'package:flutter/rendering.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:cached_network_image/cached_network_image.dart';
 import '../classes/Post.dart';
@@ -36,6 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
   IconData icon = Icons.favorite_border_outlined;
   TextEditingController searchController = TextEditingController();
   FocusNode searchBarFocusNode = FocusNode();
+  String searchWord = "";
 
   final IconData _homeIcon = Icons.home;
   TextEditingController textController = TextEditingController();
@@ -54,81 +55,89 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final PageController controller = PageController();
-    return Scaffold(
-        appBar: AppBar(
-          titleSpacing: 10,
-          title: const Padding(
-            padding: EdgeInsets.only(bottom: 2),
-            child: Text('DiaBeatThis!', style: DIABEATTHIS_LOGO),
+    return GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        onPanDown: (_) => FocusScope.of(context).unfocus(),
+        child: Scaffold(
+          appBar: AppBar(
+            titleSpacing: 10,
+            title: const Padding(
+              padding: EdgeInsets.only(bottom: 2),
+              child: Text('DiaBeatThis!', style: DIABEATTHIS_LOGO),
+            ),
+            actions: <Widget>[
+              Row(
+                children: [
+                  _buildLogButton(context),
+                  _buildProfileIcon(context)
+                ],
+              )
+            ],
           ),
-          actions: <Widget>[
-            Row(
-              children: [_buildLogButton(context), _buildProfileIcon(context)],
-            )
-          ],
-        ),
-        bottomNavigationBar: BottomNavigationBar(
-          backgroundColor: COLOR_INDIGO,
-          showSelectedLabels: false,
-          showUnselectedLabels: false,
-          iconSize: 25,
-          items: [
-            const BottomNavigationBarItem(
-                icon: Icon(Icons.filter_alt_outlined, color: COLOR_WHITE),
-                label: ""),
-            BottomNavigationBarItem(
-                icon: Icon(_homeIcon, color: COLOR_WHITE), label: ""),
-            const BottomNavigationBarItem(
-                icon: Icon(Icons.add_circle_outline, color: COLOR_WHITE),
-                label: ""),
-          ],
-          onTap: (value) {
-            if (value == 0) {}
-            if (value == 1) {}
-            if (value == 2) {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          FirebaseAuth.instance.currentUser!.isAnonymous
-                              ? AuthScreen()
-                              : CreateRecipeScreen()));
-            }
-          },
-        ),
-        //body: NotificationListener<UserScrollNotification>(
-        //  onNotification: (notification) {
-        //    if (notification.direction == ScrollDirection.forward) {
-        //      if (!isVisible) {
-        //        setState(() => isVisible = true);
-        //      }
-        //    } else if (notification.direction == ScrollDirection.reverse) {
-        //      if (isVisible) {
-        //        setState(() => isVisible = false);
-        //      }
-        //    } else if (notification.direction == ScrollDirection.reverse) {
-        //      if (isVisible) {
-        //        setState(() => isVisible = false);
-        //      }
-        //    }
-        //    return true;
-        //  },
-        body: SafeArea(
-            child: Column(
-          children: [
-            const SizedBox(height: 3),
-            _buildSearchBar(context),
-            Flexible(
-                child: FirebaseAnimatedList(
-                    key: listKey,
-                    query: query,
-                    defaultChild: const Text("Loading...", style: TEXT_PLAIN),
-                    itemBuilder: (context, snapshot, animation, index) {
-                      return _buildPosts(context, snapshot, index);
-                    }))
-          ],
-        )));
+          body: NotificationListener<UserScrollNotification>(
+              onNotification: (notification) {
+                if (notification.direction == ScrollDirection.forward) {
+                  if (!isVisible) {
+                    setState(() => isVisible = true);
+                  }
+                } else if (notification.direction == ScrollDirection.reverse) {
+                  if (isVisible) {
+                    setState(() => isVisible = false);
+                  }
+                } else if (notification.direction == ScrollDirection.reverse) {
+                  if (isVisible) {
+                    setState(() => isVisible = false);
+                  }
+                }
+                return true;
+              },
+              child: SafeArea(
+                  child: Column(
+                children: [
+                  const SizedBox(height: 3),
+                  _buildSearchBar(context),
+                  Flexible(
+                      child: FirebaseAnimatedList(
+                          query: ref.orderByChild('timestamp'),
+                          defaultChild:
+                              const Text("Loading...", style: TEXT_PLAIN),
+                          itemBuilder: (context, snapshot, animation, index) {
+                            Object? ingredientsValues =
+                                snapshot.child('ingredients').value;
+                            Object? titleValue = snapshot.child('title').value;
+                            if (searchWord != "") {
+                              if (ingredientsValues
+                                      .toString()
+                                      .toLowerCase()
+                                      .contains(searchWord) ||
+                                  titleValue
+                                      .toString()
+                                      .toLowerCase()
+                                      .contains(searchWord)) {
+                                return _buildPosts(context, snapshot, index);
+                              }
+                            } else {
+                              return _buildPosts(context, snapshot, index);
+                            }
+                            return const SizedBox();
+                          })),
+                ],
+              ))),
+          floatingActionButton: isVisible
+              ? FloatingActionButton(
+                  child: const Icon(Icons.add, size: 35),
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                FirebaseAuth.instance.currentUser!.isAnonymous
+                                    ? AuthScreen()
+                                    : CreateRecipeScreen()));
+                  },
+                )
+              : null,
+        ));
   }
 
   Widget _buildLogButton(BuildContext context) {
@@ -186,38 +195,61 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildSearchBar(BuildContext context) {
     return Padding(
         padding: const EdgeInsets.only(left: 10, right: 10),
-        child: Row(children: [
-          SizedBox(
-              width: 276.7,
-              height: 33,
-              child: TextFormField(
+        child: Row(
+            children: [
+              Expanded(
+              child: SizedBox(
+                  height: 33,
+                  child: TextFormField(
                 focusNode: searchBarFocusNode,
                 onTap: () => searchBarFocusNode.requestFocus(),
                 controller: searchController,
-                decoration: const InputDecoration(
-                  labelText: 'Search for name or ingredient...',
-                  labelStyle: TextStyle(
+                onChanged: (text) {
+                  setState(() {
+                    if (searchController.text != "") {
+                      searchWord = searchController.text.toLowerCase();
+                    }
+                  });
+                },
+                decoration: InputDecoration(
+                  suffixIcon: IconButton(
+                      icon: const Icon(Icons.cancel, color: COLOR_INDIGO_LIGHT),
+                      iconSize: 15,
+                      splashRadius: 20,
+                      onPressed: () {
+                        setState(() {
+                          searchWord = "";
+                        });
+                        searchController.clear();
+                        searchBarFocusNode.unfocus();
+                      }),
+                  labelText: 'Search for recipe or ingredient...',
+                  labelStyle: const TextStyle(
                       fontFamily: "VisbyMedium",
                       fontSize: 14,
                       color: COLOR_INDIGO_LIGHT),
                   isDense: true,
-                  enabledBorder: OutlineInputBorder(
+                  enabledBorder: const OutlineInputBorder(
                       borderSide: BorderSide(
                     color: COLOR_INDIGO_LIGHT,
                   )),
-                  border: OutlineInputBorder(
+                  border: const OutlineInputBorder(
                     borderSide: BorderSide(
                       color: COLOR_INDIGO_LIGHT,
                       width: 3.0,
                     ),
                   ),
                 ),
-              )),
+              ))),
           IconButton(
-            icon: const Icon(Icons.search, color: COLOR_INDIGO_LIGHT),
-            iconSize: 20,
+            icon: Icon(_favIconOutlinedFilter, color: COLOR_INDIGO_LIGHT),
+            iconSize: 25,
             splashRadius: 20,
             onPressed: () {
+              //TODO: show all liked posts for logged user
+              // FirebaseAuth.instance.currentUser!.isAnonymous
+              //                         ? AuthScreen()
+              //                         :
               setState(() {
                 if (searchController.text != "") {
                   listKey =
@@ -229,19 +261,6 @@ class _HomeScreenState extends State<HomeScreen> {
               searchBarFocusNode.unfocus();
             },
           ),
-          IconButton(
-              icon: const Icon(Icons.cancel, color: COLOR_INDIGO_LIGHT),
-              iconSize: 20,
-              splashRadius: 20,
-              onPressed: () {
-                setState(() {
-                  listKey =
-                      Key(DateTime.now().millisecondsSinceEpoch.toString());
-                  query = ref.orderByChild('timestamp');
-                });
-                searchController.clear();
-                searchBarFocusNode.unfocus();
-              })
         ]));
   }
 
@@ -310,7 +329,6 @@ class _HomeScreenState extends State<HomeScreen> {
               )),
         ),
         Text(
-          //TODO: currentUser to name
           snapshot.child('currentUser').value.toString(),
           style: HOME_POST_CREATOR,
         )

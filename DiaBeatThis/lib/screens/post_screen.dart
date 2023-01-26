@@ -94,9 +94,8 @@ class _PostScreenState extends State<PostScreen> {
           ),
         ),
         const SizedBox(width: 10),
-        const Text(
-          //post.child('currentUser').value.toString(), //TODO: currentUser to name
-          "User",
+        Text(
+          post.child('currentUser').value.toString(),
           style: HOME_POST_CREATOR,
         ),
         const Spacer(),
@@ -160,9 +159,10 @@ class _PostScreenState extends State<PostScreen> {
   Widget _buildNutrition() {
     const double iconSize = 54;
     return Padding(
-        padding: const EdgeInsets.only(left: 62, right: 62),
-        child: Column(children: [
-          Row(
+        padding: const EdgeInsets.only(left: 0, right: 0),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+          Row( mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Column(children: [
                 ClipRRect(

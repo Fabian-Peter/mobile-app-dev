@@ -192,9 +192,10 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
 
   Widget _buildTitle() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Padding(
-            padding: EdgeInsets.only(right: 347),
+            padding: EdgeInsets.only(left: 8, top: 8),
             child: Text("Title", style: POST_CAPTION_INDIGO_LIGHT)),
         Padding(
           padding: const EdgeInsets.all(9.0),
@@ -226,9 +227,10 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
 
   Widget _buildDescription() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Padding(
-            padding: EdgeInsets.only(right: 293, top: 8),
+            padding: EdgeInsets.only(left: 8, top: 8),
             child: Text("Description", style: POST_CAPTION_INDIGO_LIGHT)),
         Padding(
           padding: const EdgeInsets.all(8.0),
@@ -249,7 +251,7 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                   )),
               border: OutlineInputBorder(
                 borderSide: BorderSide(
-                  color: Colors.blue,
+                  color: COLOR_INDIGO_LIGHT,
                   width: 3.0,
                 ),
               ),
@@ -261,7 +263,7 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
   }
 
   Widget _buildNewIngredientTile(int index) {
-    return Row(children: [
+    return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,children: [
       Padding(
         padding: const EdgeInsets.all(8.0),
         child: SizedBox(
@@ -289,9 +291,9 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
             )),
       ),
       Padding(
-        padding: const EdgeInsets.only(left: 8, bottom: 8, top: 8),
+        padding: const EdgeInsets.only(right: 8, bottom: 8, top: 8),
         child: SizedBox(
-            width: 301,
+            width: MediaQuery.of(context).size.width * 0.75,
             child: TextFormField(
               controller: ingredientsControllers[index],
               keyboardType: TextInputType.multiline,
@@ -342,9 +344,10 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
 
   Widget _buildInstructions() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Padding(
-            padding: EdgeInsets.only(right: 290, top: 8),
+            padding: EdgeInsets.only(left: 8, top: 8),
             child: Text("Instructions", style: POST_CAPTION_INDIGO_LIGHT)),
         Padding(
           padding: const EdgeInsets.all(8.0),
@@ -379,9 +382,10 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
 
   Widget _buildTags() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Padding(
-            padding: EdgeInsets.only(right: 342, top: 8),
+            padding: EdgeInsets.only(left: 8, top: 8),
             child: Text("Tags", style: POST_CAPTION_INDIGO_LIGHT)),
         TextFieldTags(
           textfieldTagsController: tagsController,
@@ -491,9 +495,11 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
   }
 
   Widget _buildNutritions() {
-    return Column(children: [
-      const Padding(
-          padding: EdgeInsets.only(top: 8, right: 244),
+    return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+              padding: EdgeInsets.only(left: 8, top: 8),
           child: Text("Nutritional Values", style: POST_CAPTION_INDIGO_LIGHT)),
       Padding(
         padding: const EdgeInsets.all(8.0),

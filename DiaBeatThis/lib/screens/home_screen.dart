@@ -99,7 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   _buildSearchBar(context),
                   Flexible(
                       child: FirebaseAnimatedList(
-                          query: ref.orderByChild('timestamp'),
+                          query: ref.orderByChild('timeSorter'),
                           defaultChild:
                               const Text("Loading...", style: TEXT_PLAIN),
                           itemBuilder: (context, snapshot, animation, index) {

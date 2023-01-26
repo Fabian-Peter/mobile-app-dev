@@ -2,6 +2,7 @@ import 'package:diabeatthis/screens/auth_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide EmailAuthProvider;
 import 'package:flutter/material.dart';
 import 'package:diabeatthis/screens/home_screen.dart';
+import 'package:diabeatthis/screens/game_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_ui_auth/firebase_ui_auth.dart';
 import 'package:diabeatthis/utils/constants.dart';
@@ -68,7 +69,7 @@ class AuthGate extends StatelessWidget {
           else if (!snapshot.hasData) {
             return AuthScreen();
           }
-          return const HomeScreen();
+          return GameScreen();
         });
   }
 }

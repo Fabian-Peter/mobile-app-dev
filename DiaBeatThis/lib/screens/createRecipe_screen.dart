@@ -390,7 +390,15 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
         TextFieldTags(
           textfieldTagsController: tagsController,
           initialTags: const [
-            'Your tags',
+            'Fish',
+            'Meat',
+            'Vegetarian',
+            'Vegan',
+            'Pasta',
+            'Rice',
+            'Gluten free',
+            'Dessert',
+            'Quick & Easy',
           ],
           textSeparators: [' ', ','],
           letterCase: LetterCase.normal,
@@ -405,6 +413,8 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
               return Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: TextField(
+                  minLines: 1,
+                  maxLines: 20,
                   controller: tec,
                   focusNode: fn,
                   decoration: InputDecoration(

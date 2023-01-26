@@ -385,7 +385,6 @@ class _HomeScreenState extends State<HomeScreen> {
     String ref = snapshot.child('reference').value.toString();
     String ownName = FirebaseAuth.instance.currentUser!.uid;
     var likesAmount = snapshot.child('likeAmount').value.toString();
-    print(snapshot.child('likes/$ownName').value.toString());
     if(snapshot.child('likes/$ownName').value.toString() == 'true'){
       print('working until here');
     }

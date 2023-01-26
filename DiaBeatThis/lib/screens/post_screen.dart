@@ -5,17 +5,28 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:diabeatthis/utils/constants.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-
+import 'package:badges/badges.dart';
 import 'auth_screen.dart';
 
-class PostScreen extends StatelessWidget {
-  final DataSnapshot post;
-  FirebaseStorage storage = FirebaseStorage.instance;
 
-  final IconData _favIconOutlined = Icons.favorite_outline;
+
+class PostScreen extends StatefulWidget {
+  final DataSnapshot post;
 
   PostScreen({super.key, required this.post});
 
+  @override
+  State<PostScreen> createState() => _PostScreenState();
+}
+
+class _PostScreenState extends State<PostScreen> {
+  FirebaseStorage storage = FirebaseStorage.instance;
+  final database = FirebaseDatabase(
+      databaseURL:
+      "https://diabeathis-f8ee3-default-rtdb.europe-west1.firebasedatabase.app")
+      .reference();
+  final IconData _favIconOutlined = Icons.favorite_outline;
+  IconData icon = Icons.favorite_border_outlined;
   Future<String> downloadURL(String imageName) async {
     String downloadURL = await storage.ref('image/$imageName').getDownloadURL();
     return downloadURL;
@@ -25,7 +36,7 @@ class PostScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-            title: Text(post.child('title').value.toString(),
+            title: Text(widget.post.child('title').value.toString(),
                 style: HEADLINE_BOLD_WHITE),
             actions: <Widget>[_buildProfileIcon(context)]),
         body: SafeArea(
@@ -94,7 +105,7 @@ class PostScreen extends StatelessWidget {
   }
 
   Widget _buildDate(BuildContext context) {
-    DateTime dt = DateTime.parse(post.child('timestamp').value.toString());
+    DateTime dt = DateTime.parse(widget.post.child('timestamp').value.toString());
     return Row(
       children: [
         const Padding(
@@ -133,7 +144,7 @@ class PostScreen extends StatelessWidget {
   Widget _buildDescription(BuildContext context) {
     return Padding(
         padding: const EdgeInsets.only(top: 20),
-        child: Text(post.child('description').value.toString(),
+        child: Text(widget.post.child('description').value.toString(),
             style: TEXT_PLAIN));
   }
 
@@ -141,7 +152,7 @@ class PostScreen extends StatelessWidget {
     return Padding(
         padding: const EdgeInsets.only(left: 5, right: 5),
         child: Text(
-            post.child('tags').value.toString(), //TODO: Liste berücksichtigen
+            widget.post.child('tags').value.toString(), //TODO: Liste berücksichtigen
             style: TEXT_PLAIN));
   }
 
@@ -188,12 +199,12 @@ class PostScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          Text(post.child("nutrition").value.toString())
+          Text(widget.post.child("nutrition").value.toString())
         ]));
   }
 
   Widget _buildImage(BuildContext context) {
-    String imageID = post.child("pictureID").value.toString();
+    String imageID = widget.post.child("pictureID").value.toString();
     return Padding(
         padding: const EdgeInsets.only(top: 20),
         child: AspectRatio(
@@ -208,44 +219,66 @@ class PostScreen extends StatelessWidget {
   Widget _buildIngredients(BuildContext context) {
     return Padding(
         padding: const EdgeInsets.only(left: 5, right: 5),
-        child: Text(post.child('ingredients').value.toString(),
+        child: Text(widget.post.child('ingredients').value.toString(),
             style: TEXT_PLAIN));
   }
 
   Widget _buildGuide(BuildContext context) {
     return Padding(
         padding: const EdgeInsets.only(left: 5, right: 5),
-        child: Text(post.child('instructions').value.toString(),
+        child: Text(widget.post.child('instructions').value.toString(),
             style: TEXT_PLAIN));
   }
 
   Widget _buildCommunity(BuildContext context) {
     //TODO: add reactions
     //TODO: add comments
+    String ref = widget.post.child('reference').value.toString();
+    var likesAmount = widget.post.child('likeAmount').value.toString();
+    String ownName = FirebaseAuth.instance.currentUser!.uid;
     return Padding(
         padding: const EdgeInsets.only(top: 20),
         child: Column(
           children: [
             Padding(
                 padding: const EdgeInsets.only(right: 310),
-                child: IconButton(
-                  icon: Icon(
-                    _favIconOutlined,
-                    color: COLOR_RED,
-                    size: 27,
-                  ),
-                  onPressed: () {
-                    //TODO: add state to widget? and guest show login screen
-                    // FirebaseAuth.instance.currentUser!.isAnonymous
-                    //                         ? AuthScreen()
-                    //                         :
-                  },
-                )),
-            Padding(
-                padding: const EdgeInsets.only(top: 20),
-                child: _buildTextRow("Comments:", "No comments yet"))
-          ],
-        ));
+                child: Badge(
+                    borderRadius: BorderRadius.circular(8),
+                    position: BadgePosition.topEnd(top: 1, end: -3),
+                    badgeColor: Colors.red,
+                    badgeContent: Text(likesAmount, style: TextStyle(color: Colors.white)),
+                    child: IconButton(
+                      icon: Icon(
+                        icon,
+                        color: Colors.red,
+                        size: 20,
+                      ),
+                      onPressed: () {
+                       // String result = widget.post.child('likes/$ownName').value.toString();
+                       // print(widget.post.child('likes/$ownName').value.toString());
+                       // //print(snapshot.child('likes/$ownName').value.toString());
+                       // //print (result);
+                       // if (result == 'true') {
+                       //   database.child('post/$ref/likes/$ownName').set('false');
+                       //   print('removed like');
+                       //   database.child('post/$ref/likeAmount').set(ServerValue.increment(-1));
+                       //   icon = Icons.favorite_border_outlined;
+                       //   setState(() {
+                       //   });
+                       // } else {
+                       //   database.child('post/$ref/likes/$ownName').set('true');
+                       //   database.child('post/$ref/likeAmount').set(ServerValue.increment(1));
+                       //   print('added like');
+                       //   icon = Icons.favorite;
+                       //   setState(() {
+                        //  });
+                       // }
+                      },
+                    )),
+        )])
+
+          ,
+        );
   }
 
   Widget _buildContainerCaption(

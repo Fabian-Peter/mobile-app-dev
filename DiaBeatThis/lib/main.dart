@@ -69,7 +69,7 @@ class AuthGate extends StatelessWidget {
           else if (!snapshot.hasData) {
             return AuthScreen();
           }
-          return GameScreen();
+          return HomeScreen();
         });
   }
 }

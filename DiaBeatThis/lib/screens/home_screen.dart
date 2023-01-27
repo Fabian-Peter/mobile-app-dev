@@ -1,6 +1,7 @@
 import 'package:diabeatthis/data/dummy_data.dart';
 import 'package:diabeatthis/screens/auth_screen.dart';
 import 'package:diabeatthis/screens/createRecipe_screen.dart';
+import 'package:diabeatthis/screens/game_screen.dart';
 import 'package:diabeatthis/screens/post_screen.dart';
 import 'package:diabeatthis/screens/profile_screen.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -123,10 +124,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) =>
-                                FirebaseAuth.instance.currentUser!.isAnonymous
-                                    ? AuthScreen()
-                                    : CreateRecipeScreen()));
+                            builder: (context) => //CreateRecipeScreen()
+                          GameScreen()
+                        ));
                   },
                 )
               : null,

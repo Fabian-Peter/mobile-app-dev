@@ -26,15 +26,18 @@ class _PostScreenState extends State<PostScreen> {
       .reference();
   final IconData _favIconOutlined = Icons.favorite_outline;
   IconData icon = Icons.favorite_border_outlined;
+  TextEditingController commentsController = TextEditingController();
 
   Future<String> downloadURL(String imageName) async {
     String downloadURL = await storage.ref('image/$imageName').getDownloadURL();
+
     return downloadURL;
+
   }
 
   @override
   Widget build(BuildContext context) {
-    if(widget.post.child('likes/$ownName').value.toString().contains('true')){
+    if (widget.post.child('likes/$ownName').value.toString().contains('true')) {
       icon = Icons.favorite;
     }
     return Scaffold(
@@ -261,9 +264,6 @@ class _PostScreenState extends State<PostScreen> {
                   size: 20,
                 ),
                 onPressed: () {
-                  print(ownName);
-
-                  print(widget.post.child('likes/$ownName').value.toString());
                   // //print(snapshot.child('likes/$ownName').value.toString());
                   // //print (result);
                   // if (result == 'true') {
@@ -283,7 +283,26 @@ class _PostScreenState extends State<PostScreen> {
                   // }
                 },
               )),
-        )
+        ),
+        Padding(
+            padding: const EdgeInsets.only(left: 5, right: 5),
+            child: TextField(
+              controller: commentsController,
+            )),
+        Padding(
+            padding: const EdgeInsets.only(left: 5, right: 5),
+            child: ElevatedButton(
+                onPressed: () async {
+                  String comment = commentsController.text;
+                  var timeIdent = new DateTime.now().millisecondsSinceEpoch;
+                  var timeSorter = timeIdent-1;
+                  database.child('post/$ref/comments/$timeSorter/$ownName').set(comment);
+
+                } ,
+                child: const Text(
+                  'Post',
+                  style: TextStyle(fontFamily: "VisbyDemiBold", fontSize: 18),
+                )))
       ]),
     );
   }
@@ -354,5 +373,9 @@ class _PostScreenState extends State<PostScreen> {
         ),
       ],
     );
+  }
+  void dispose() {
+    commentsController.dispose();
+    super.dispose();
   }
 }

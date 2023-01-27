@@ -130,15 +130,18 @@ class _HomeScreenState extends State<HomeScreen> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     FloatingActionButton(
-                      heroTag: "btn_game",
-                      child: const Icon(Icons.restaurant_menu, size: 35),
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => GameScreen()));
-                      },
-                    ),
+                        heroTag: "btn_game",
+                        child: const Icon(Icons.restaurant_menu, size: 35),
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(builder: (_) {
+                              return FirebaseAuth
+                                      .instance.currentUser!.isAnonymous
+                                  ? AuthScreen()
+                                  : GameScreen();
+                            }),
+                          );
+                        }),
                     const SizedBox(height: 15),
                     FloatingActionButton(
                       heroTag: "btn_create",
@@ -401,7 +404,7 @@ class _HomeScreenState extends State<HomeScreen> {
     String ownName = FirebaseAuth.instance.currentUser!.uid;
     var likesAmount = snapshot.child('likeAmount').value.toString();
     print(snapshot.child('likes/$ownName').value.toString());
-    if(snapshot.child('likes/$ownName').value.toString() == 'true'){
+    if (snapshot.child('likes/$ownName').value.toString() == 'true') {
       print('working until here');
     }
     //if(snapshot.child('likes/$ownName').value.toString().contains('true')){
@@ -429,7 +432,8 @@ class _HomeScreenState extends State<HomeScreen> {
           borderRadius: BorderRadius.circular(8),
           position: BadgePosition.topEnd(top: 1, end: -3),
           badgeColor: Colors.red,
-          badgeContent: Text(likesAmount, style: TextStyle(color: Colors.white)),
+          badgeContent:
+              Text(likesAmount, style: TextStyle(color: Colors.white)),
           child: IconButton(
             icon: Icon(
               icon,
@@ -443,17 +447,19 @@ class _HomeScreenState extends State<HomeScreen> {
               if (result == 'true') {
                 database.child('post/$ref/likes/$ownName').set('false');
                 print('removed like');
-                database.child('post/$ref/likeAmount').set(ServerValue.increment(-1));
+                database
+                    .child('post/$ref/likeAmount')
+                    .set(ServerValue.increment(-1));
                 icon = Icons.favorite_border_outlined;
-                setState(() {
-                });
+                setState(() {});
               } else {
                 database.child('post/$ref/likes/$ownName').set('true');
-                database.child('post/$ref/likeAmount').set(ServerValue.increment(1));
+                database
+                    .child('post/$ref/likeAmount')
+                    .set(ServerValue.increment(1));
                 print('added like');
                 icon = Icons.favorite;
-                setState(() {
-                });
+                setState(() {});
               }
             },
           ))

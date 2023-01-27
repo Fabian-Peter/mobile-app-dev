@@ -7,10 +7,8 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:firebase_core/firebase_core.dart' as firebase_core;
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:uuid/uuid.dart';
-import 'package:textfield_tags/textfield_tags.dart';
 
 class CreateRecipeScreen extends StatefulWidget {
   @override
@@ -19,8 +17,8 @@ class CreateRecipeScreen extends StatefulWidget {
 
 class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
   final database = FirebaseDatabase(
-      databaseURL:
-      "https://diabeathis-f8ee3-default-rtdb.europe-west1.firebasedatabase.app")
+          databaseURL:
+              "https://diabeathis-f8ee3-default-rtdb.europe-west1.firebasedatabase.app")
       .reference();
   final refUser = FirebaseDatabase.instance.ref('Users');
   File? image;
@@ -32,15 +30,31 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
     TextEditingController()
   ];
   List<TextEditingController> ingredientsQuantityControllers =
-  <TextEditingController>[TextEditingController()];
+      <TextEditingController>[TextEditingController()];
   int fieldsNumber = 1;
   TextEditingController descriptionController = TextEditingController();
   TextEditingController instructionController = TextEditingController();
-  TextfieldTagsController tagsController = TextfieldTagsController();
   TextEditingController nutritionController = TextEditingController();
   late String name;
   bool _isInAsyncCall = false;
   String? query = FirebaseAuth.instance.currentUser?.uid.toString();
+
+  final List<Text> _recipeTags1 = <Text>[
+    const Text('Fish', style: TAGS_TOGGLE),
+    const Text('Meat', style: TAGS_TOGGLE),
+    const Text('Veggie', style: TAGS_TOGGLE),
+    const Text('Vegan', style: TAGS_TOGGLE),
+    const Text('Pasta', style: TAGS_TOGGLE),
+  ];
+  final List<Text> _recipeTags2 = <Text>[
+    const Text('Rice', style: TAGS_TOGGLE),
+    const Text('Gluten free', style: TAGS_TOGGLE),
+    const Text('Dessert', style: TAGS_TOGGLE),
+    const Text('Asian', style: TAGS_TOGGLE),
+    const Text('Quick', style: TAGS_TOGGLE),
+  ];
+  final List<bool> _selectedTags1 = List.filled(5, false);
+  final List<bool> _selectedTags2 = List.filled(5, false);
 
   Future pickImage(ImageSource source) async {
     try {
@@ -56,7 +70,7 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
 
   Future<String> getUsername() async {
     DataSnapshot snapshot1 =
-    await FirebaseDatabase.instance.ref('Users/$query/username').get();
+        await FirebaseDatabase.instance.ref('Users/$query/username').get();
     String username = await snapshot1.value.toString();
     return username;
   }
@@ -64,7 +78,7 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
   Future<String> uploadPicture(File file) async {
     name = uuid.v1().toString();
     var storeImage =
-    firebase_storage.FirebaseStorage.instance.ref().child('image/$name');
+        firebase_storage.FirebaseStorage.instance.ref().child('image/$name');
     firebase_storage.UploadTask task1 = storeImage.putFile(file);
     String imageURL = await (await task1).ref.getDownloadURL();
 
@@ -109,7 +123,6 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
     ingredientsQuantityControllers.clear();
     descriptionController.dispose();
     instructionController.dispose();
-    tagsController.dispose();
     super.dispose();
   }
 
@@ -183,7 +196,7 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
         for (var i = 0; i < fieldsNumber; i++) _buildNewIngredientTile(i),
         _buildAddButton(),
         _buildInstructions(),
-        _buildTags(),
+        _buildTagSelector(),
         _buildNutritions(),
         _buildSubmitButton()
       ],
@@ -210,8 +223,8 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
               isDense: true,
               enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(
-                    color: COLOR_INDIGO_LIGHT,
-                  )),
+                color: COLOR_INDIGO_LIGHT,
+              )),
               border: OutlineInputBorder(
                 borderSide: BorderSide(
                   color: COLOR_INDIGO_LIGHT,
@@ -247,8 +260,8 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
               isDense: true,
               enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(
-                    color: COLOR_INDIGO_LIGHT,
-                  )),
+                color: COLOR_INDIGO_LIGHT,
+              )),
               border: OutlineInputBorder(
                 borderSide: BorderSide(
                   color: COLOR_INDIGO_LIGHT,
@@ -263,7 +276,7 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
   }
 
   Widget _buildNewIngredientTile(int index) {
-    return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,children: [
+    return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
       Padding(
         padding: const EdgeInsets.all(8.0),
         child: SizedBox(
@@ -279,8 +292,8 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                 isDense: true,
                 enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(
-                      color: COLOR_INDIGO_LIGHT,
-                    )),
+                  color: COLOR_INDIGO_LIGHT,
+                )),
                 border: OutlineInputBorder(
                   borderSide: BorderSide(
                     color: COLOR_INDIGO_LIGHT,
@@ -306,8 +319,8 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                 isDense: true,
                 enabledBorder: OutlineInputBorder(
                     borderSide: BorderSide(
-                      color: COLOR_INDIGO_LIGHT,
-                    )),
+                  color: COLOR_INDIGO_LIGHT,
+                )),
                 border: OutlineInputBorder(
                   borderSide: BorderSide(
                     color: COLOR_INDIGO_LIGHT,
@@ -365,8 +378,8 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
               isDense: true,
               enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(
-                    color: COLOR_INDIGO_LIGHT,
-                  )),
+                color: COLOR_INDIGO_LIGHT,
+              )),
               border: OutlineInputBorder(
                 borderSide: BorderSide(
                   color: COLOR_INDIGO_LIGHT,
@@ -380,136 +393,47 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
     );
   }
 
-  Widget _buildTags() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Padding(
-            padding: EdgeInsets.only(left: 8, top: 8),
-            child: Text("Tags", style: POST_CAPTION_INDIGO_LIGHT)),
-        TextFieldTags(
-          textfieldTagsController: tagsController,
-          initialTags: const [
-            'Fish',
-            'Meat',
-            'Vegetarian',
-            'Vegan',
-            'Pasta',
-            'Rice',
-            'Gluten free',
-            'Dessert',
-            'Quick & Easy',
-          ],
-          textSeparators: [' ', ','],
-          letterCase: LetterCase.normal,
-          validator: (String tag) {
-            if (tagsController.getTags!.contains(tag)) {
-              return 'You already entered that';
-            }
-            return null;
-          },
-          inputfieldBuilder: (context, tec, fn, error, onChanged, onSubmitted) {
-            return ((context, sc, tags, onTagDelete) {
-              return Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: TextField(
-                  minLines: 1,
-                  maxLines: 20,
-                  controller: tec,
-                  focusNode: fn,
-                  decoration: InputDecoration(
-                    isDense: true,
-                    enabledBorder: const OutlineInputBorder(
-                        borderSide: BorderSide(
-                          color: COLOR_INDIGO_LIGHT,
-                        )),
-                    border: const OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: COLOR_INDIGO_LIGHT,
-                        width: 3.0,
-                      ),
-                    ),
-                    focusedBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: COLOR_INDIGO_LIGHT,
-                        width: 3.0,
-                      ),
-                    ),
-                    helperText: 'Some tags to help the hungry find your recipe',
-                    helperStyle: const TextStyle(
-                        color: COLOR_INDIGO, fontFamily: "VisbyMedium"),
-                    labelText: 'Enter tags',
-                    labelStyle: const TextStyle(
-                        fontFamily: "VisbyMedium",
-                        fontSize: 14,
-                        color: COLOR_INDIGO_LIGHT),
-                    errorText: error,
-                    prefixIcon: tags.isNotEmpty
-                        ? SingleChildScrollView(
-                      controller: sc,
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                          children: tags.map((String tag) {
-                            return Container(
-                              decoration: const BoxDecoration(
-                                borderRadius: BorderRadius.all(
-                                  Radius.circular(20.0),
-                                ),
-                                color: COLOR_INDIGO,
-                              ),
-                              margin:
-                              const EdgeInsets.symmetric(horizontal: 5.0),
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 10.0, vertical: 5.0),
-                              child: Row(
-                                mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
-                                children: [
-                                  InkWell(
-                                    child: Text(
-                                      '#$tag',
-                                      style: const TextStyle(
-                                          color: Colors.white),
-                                    ),
-                                    onTap: () {
-                                      //print("$tag selected");
-                                    },
-                                  ),
-                                  const SizedBox(width: 4.0),
-                                  InkWell(
-                                    child: const Icon(
-                                      Icons.cancel,
-                                      size: 14.0,
-                                      color: Colors.white,
-                                    ),
-                                    onTap: () {
-                                      onTagDelete(tag);
-                                    },
-                                  )
-                                ],
-                              ),
-                            );
-                          }).toList()),
-                    )
-                        : null,
-                  ),
-                  onChanged: onChanged,
-                  onSubmitted: onSubmitted,
-                ),
-              );
-            });
-          },
-        ),
-      ],
+  Widget _buildTagSelector() {
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      const Padding(
+          padding: EdgeInsets.only(left: 8, top: 8),
+          child: Text("Tags", style: POST_CAPTION_INDIGO_LIGHT)),
+      Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: _buildToggleButtonRow(_selectedTags1, _recipeTags1)),
+      Padding(
+          padding: const EdgeInsets.only(left: 8, bottom: 8, right: 8),
+          child: _buildToggleButtonRow(_selectedTags2, _recipeTags2))
+    ]);
+  }
+
+  Widget _buildToggleButtonRow(List<bool> selectedTags, List<Text> recipeTags) {
+    return ToggleButtons(
+      direction: Axis.horizontal,
+      onPressed: (int index) {
+        // All buttons are selectable.
+        setState(() {
+          selectedTags[index] = !selectedTags[index];
+        });
+      },
+      borderRadius: const BorderRadius.all(Radius.circular(8)),
+      selectedBorderColor: COLOR_INDIGO,
+      selectedColor: Colors.white,
+      fillColor: COLOR_INDIGO,
+      color: COLOR_INDIGO,
+      constraints: BoxConstraints(
+        minHeight: 40.0,
+        minWidth: MediaQuery.of(context).size.width * 0.185,
+      ),
+      isSelected: selectedTags,
+      children: recipeTags,
     );
   }
 
   Widget _buildNutritions() {
-    return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Padding(
-              padding: EdgeInsets.only(left: 8, top: 8),
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      const Padding(
+          padding: EdgeInsets.only(left: 8, top: 8),
           child: Text("Nutritional Values", style: POST_CAPTION_INDIGO_LIGHT)),
       Padding(
         padding: const EdgeInsets.all(8.0),
@@ -525,8 +449,8 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
             isDense: true,
             enabledBorder: OutlineInputBorder(
                 borderSide: BorderSide(
-                  color: COLOR_INDIGO_LIGHT,
-                )),
+              color: COLOR_INDIGO_LIGHT,
+            )),
             border: OutlineInputBorder(
               borderSide: BorderSide(
                 color: COLOR_INDIGO_LIGHT,
@@ -542,10 +466,21 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
   Widget _buildSubmitButton() {
     return Padding(
         padding:
-        const EdgeInsets.only(left: 10, right: 10, bottom: 10, top: 14),
+            const EdgeInsets.only(left: 10, right: 10, bottom: 10, top: 14),
         child: ElevatedButton(
             onPressed: () async {
-              List<String>? tagList = tagsController.getTags;
+              List<String> tagList = [];
+              for (int i = 0; i < _selectedTags1.length; i++) {
+                if (_selectedTags1[i]) {
+                  tagList.add(_recipeTags1[i].data.toString());
+                }
+              }
+              for (int i = 0; i < _selectedTags2.length; i++) {
+                if (_selectedTags2[i]) {
+                  tagList.add(_recipeTags2[i].data.toString());
+                }
+              }
+
               setState(() {
                 _isInAsyncCall = true;
               });
@@ -563,7 +498,6 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
 
               String imageURL = await uploadPicture(image!);
 
-
               List<String>? reactions;
               List<String>? comments;
               String timestamp = DateTime.now().toString();
@@ -572,9 +506,8 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
               var myRef = database.child('post').push();
               var key = myRef.key!;
 
-
               final newRecipe = <String, dynamic>{
-                'likeAmount' : 0,
+                'likeAmount': 0,
                 'title': titleController.text,
                 'description': descriptionController.text,
                 'ingredients': ingredientList,
@@ -594,7 +527,6 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                   .child('post/$key')
                   .set(newRecipe)
                   .then((_) => print("call has been made"));
-
 
               //.child(uniqueUserID).push(comment)
               setState(() {

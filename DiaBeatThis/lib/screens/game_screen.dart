@@ -25,14 +25,14 @@ class _GameScreenState extends State<GameScreen> {
   final List<String> _names = [
     "Fish",
     "Meat",
-    "Vegetarian",
+    "Veggie",
     "Vegan",
     "Pasta",
     "Rice",
-    "Gluten Free",
+    "Gluten free",
     "Dessert",
     "Asian",
-    "Quick & Easy"
+    "Quick"
   ];
 
   final List<String> _images = [
@@ -136,7 +136,7 @@ class _GameScreenState extends State<GameScreen> {
                             MaterialPageRoute(
                                 builder: (context) =>
                                     GameResultScreen(swipedRight: swipedRight)),
-                            (Route<dynamic> roue) => false);
+                            (Route<dynamic> route) => false);
                       },
                       leftSwipeAllowed: true,
                       rightSwipeAllowed: true,
@@ -145,30 +145,28 @@ class _GameScreenState extends State<GameScreen> {
                     ),
                   ),
                 ])),
-            Align(
-                alignment: Alignment.bottomCenter,
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 40),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      IconButton(
-                          onPressed: () {
-                            _matchEngine!.currentItem?.nope();
-                          },
-                          icon: const Icon(Icons.cancel),
-                          iconSize: 50,
-                          color: COLOR_INDIGO),
-                      IconButton(
-                          onPressed: () {
-                            _matchEngine!.currentItem?.like();
-                          },
-                          icon: const Icon(Icons.favorite),
-                          iconSize: 50,
-                          color: COLOR_INDIGO),
-                    ],
-                  ),
-                ))
+            Padding(
+              padding: const EdgeInsets.only(top: 25),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  IconButton(
+                      onPressed: () {
+                        _matchEngine!.currentItem?.nope();
+                      },
+                      icon: const Icon(Icons.cancel),
+                      iconSize: 50,
+                      color: COLOR_INDIGO),
+                  IconButton(
+                      onPressed: () {
+                        _matchEngine!.currentItem?.like();
+                      },
+                      icon: const Icon(Icons.favorite),
+                      iconSize: 50,
+                      color: COLOR_INDIGO),
+                ],
+              ),
+            )
           ],
         )));
   }
@@ -218,7 +216,7 @@ class _GameResultScreenState extends State<GameResultScreen> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => const HomeScreen()),
-                      (Route<dynamic> roue) => false);
+                      (Route<dynamic> route) => false);
                 },
               )),
           body: SafeArea(
@@ -293,8 +291,7 @@ class _GameResultScreenState extends State<GameResultScreen> {
                   _buildTitle(context, snapshot, index),
                   _buildImage(context, snapshot, index),
                   _buildDescription(context, snapshot, index),
-                  //_buildCommentsAndLikes(context, snapshot, index),
-                  //TODO: remove community?
+                  //TODO: community?
                 ],
               ),
             ),

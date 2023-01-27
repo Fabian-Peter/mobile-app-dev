@@ -7,6 +7,7 @@ import 'package:diabeatthis/utils/constants.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:badges/badges.dart';
 import 'auth_screen.dart';
+import 'package:firebase_database/ui/firebase_animated_list.dart';
 
 class PostScreen extends StatefulWidget {
   final DataSnapshot post;
@@ -27,13 +28,22 @@ class _PostScreenState extends State<PostScreen> {
   final IconData _favIconOutlined = Icons.favorite_outline;
   IconData icon = Icons.favorite_border_outlined;
   TextEditingController commentsController = TextEditingController();
+  late DataSnapshot queryReference;
+
 
   Future<String> downloadURL(String imageName) async {
     String downloadURL = await storage.ref('image/$imageName').getDownloadURL();
-
     return downloadURL;
-
   }
+
+  @override
+  void initState(){
+    String reference = widget.post.child('reference').value.toString();
+    final queryReference = FirebaseDatabase.instance.ref('post/$reference/comments');
+    super.initState();
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -243,12 +253,44 @@ class _PostScreenState extends State<PostScreen> {
   Widget _buildCommunity(BuildContext context) {
     //TODO: add reactions
     //TODO: add comments
-    String ref = widget.post.child('reference').value.toString();
-    var likesAmount = widget.post.child('likeAmount').value.toString();
 
+    var likesAmount = widget.post.child('likeAmount').value.toString();
+    final ref = FirebaseDatabase.instance.ref("post");
     return Padding(
       padding: const EdgeInsets.only(top: 20),
-      child: Column(children: [
+      child:
+      Column(
+          children: [
+
+
+
+        Padding(
+            padding: const EdgeInsets.only(left: 5, right: 5),
+            child: TextField(
+              controller: commentsController,
+            )),
+        Padding(
+            padding: const EdgeInsets.only(left: 5, right: 5),
+            child: ElevatedButton(
+                onPressed: () async {
+                  DataSnapshot snap = await FirebaseDatabase.instance.ref('Users/$ownName').get();
+                  String username = snap.child('username').value.toString();
+                  print(username);
+                  String comment = commentsController.text;
+                  var timeIdent = new DateTime.now().millisecondsSinceEpoch;
+                  var timeSorter = timeIdent-1;
+                  final newComment = <String, dynamic>{
+                    'user' : username,
+                    'comment' : comment
+                  };
+                  database.child('post/$ref/comments/$timeSorter').set(newComment);
+                  clearText();
+
+                } ,
+                child: const Text(
+                  'Post',
+                  style: TextStyle(fontFamily: "VisbyDemiBold", fontSize: 18),
+                ))),
         Padding(
           padding: const EdgeInsets.only(right: 310),
           child: Badge(
@@ -256,7 +298,7 @@ class _PostScreenState extends State<PostScreen> {
               position: BadgePosition.topEnd(top: 1, end: -3),
               badgeColor: Colors.red,
               badgeContent:
-                  Text(likesAmount, style: TextStyle(color: Colors.white)),
+              Text(likesAmount, style: TextStyle(color: Colors.white)),
               child: IconButton(
                 icon: Icon(
                   icon,
@@ -284,26 +326,66 @@ class _PostScreenState extends State<PostScreen> {
                 },
               )),
         ),
-        Padding(
-            padding: const EdgeInsets.only(left: 5, right: 5),
-            child: TextField(
-              controller: commentsController,
-            )),
-        Padding(
-            padding: const EdgeInsets.only(left: 5, right: 5),
-            child: ElevatedButton(
-                onPressed: () async {
-                  String comment = commentsController.text;
-                  var timeIdent = new DateTime.now().millisecondsSinceEpoch;
-                  var timeSorter = timeIdent-1;
-                  database.child('post/$ref/comments/$timeSorter/$ownName').set(comment);
+            FirebaseAnimatedList(
+              query: ref,
+              defaultChild:
+              const Text("Loading...", style: TEXT_PLAIN),
+              itemBuilder:
+                  (BuildContext context,
+                  DataSnapshot snapshot,
+                  Animation<double> animation,
+                  int index) {
+                return _buildComments(context, snapshot, index);
+              },),
+          ]),
+    );
 
-                } ,
-                child: const Text(
-                  'Post',
-                  style: TextStyle(fontFamily: "VisbyDemiBold", fontSize: 18),
-                )))
-      ]),
+  }
+
+  Widget _buildComments(context, snapshot, index){
+    return Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 9,
+          vertical: 7,
+        ),
+        child: InkWell(
+          child: Container(
+            decoration: BoxDecoration(
+              color: COLOR_WHITE,
+              border: Border.all(width: 3, color: COLOR_INDIGO_LIGHT),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.5),
+                  spreadRadius: 2,
+                  blurRadius: 3,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: SafeArea(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildCommenter(context, snapshot, index),
+                  //TODO: tags icons
+                  //TODO: reactions
+                ],
+              ),
+            ),
+          ),
+
+        ));
+  }
+
+  Widget _buildCommenter(context, snapshot, index){
+    return Row(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(8),
+          child: Text(snapshot.child('comment'))
+        )
+      ],
     );
   }
 
@@ -378,4 +460,9 @@ class _PostScreenState extends State<PostScreen> {
     commentsController.dispose();
     super.dispose();
   }
+
+  void clearText() {
+    commentsController.clear();
+  }
+
 }

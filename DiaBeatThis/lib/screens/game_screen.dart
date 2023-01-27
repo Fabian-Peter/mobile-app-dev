@@ -12,7 +12,6 @@ import 'package:swipe_cards/swipe_cards.dart';
 import 'auth_screen.dart';
 
 class GameScreen extends StatefulWidget {
-  //TODO: add if's for swipe order
   GameScreen({Key? key}) : super(key: key);
 
   @override
@@ -22,7 +21,7 @@ class GameScreen extends StatefulWidget {
 class _GameScreenState extends State<GameScreen> {
   List<SwipeItem> _swipeItems = <SwipeItem>[];
   MatchEngine? _matchEngine;
-  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
+
   final List<String> _names = [
     "Fish",
     "Meat",
@@ -34,7 +33,7 @@ class _GameScreenState extends State<GameScreen> {
     "Dessert",
     "Asian",
     "Quick & Easy"
-  ]; //TODO: add ingredients?
+  ];
 
   final List<String> _images = [
     "assets/images/Fish.png",
@@ -68,7 +67,6 @@ class _GameScreenState extends State<GameScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        key: _scaffoldKey,
         appBar: AppBar(
           title: const Text("Tinder",
               style: TextStyle(fontFamily: "VisbyDemiBold")),
@@ -138,8 +136,7 @@ class _GameScreenState extends State<GameScreen> {
                             MaterialPageRoute(
                                 builder: (context) =>
                                     GameResultScreen(swipedRight: swipedRight)),
-                            (Route<dynamic> roue) =>
-                                false); //TODO: back to home screen instead tinder game
+                            (Route<dynamic> roue) => false);
                       },
                       leftSwipeAllowed: true,
                       rightSwipeAllowed: true,
@@ -188,9 +185,9 @@ class GameResultScreen extends StatefulWidget {
   final List<String> swipedRight;
 
   const GameResultScreen({super.key, required this.swipedRight});
+
   @override
   State<GameResultScreen> createState() => _GameResultScreenState();
-
 }
 
 class _GameResultScreenState extends State<GameResultScreen> {
@@ -228,22 +225,25 @@ class _GameResultScreenState extends State<GameResultScreen> {
               child: Column(
             children: [
               const SizedBox(height: 3),
-              !found ? const Padding(padding: EdgeInsets.only(top: 50), child: Text("No recipes found", style: TextStyle(fontFamily: "VisbyDemiBold", fontSize: 20))) : const SizedBox(),
+              !found
+                  ? const Padding(
+                      padding: EdgeInsets.only(top: 50),
+                      child: Text("No recipes found",
+                          style: TextStyle(
+                              fontFamily: "VisbyDemiBold", fontSize: 20)))
+                  : const SizedBox(),
               Flexible(
                   child: FirebaseAnimatedList(
                       query: ref.orderByChild('timestamp'),
                       defaultChild: const Text("Loading...", style: TEXT_PLAIN),
                       itemBuilder: (context, snapshot, animation, index) {
                         Object? tagsValues = snapshot.child('tags').value;
-                        if (widget.swipedRight.isNotEmpty &&
-                            (snapshot.child("title").value.toString() ==
-                                "tomato vegan test")) {
+                        if (widget.swipedRight.isNotEmpty) {
                           String tagString = tagsValues.toString();
                           List<String> tagsList = tagString
                               .substring(1, tagString.length - 1)
                               .split(", ");
-                          Set<String> set =
-                              Set.of(tagsList);
+                          Set<String> set = Set.of(tagsList);
                           if (set.containsAll(widget.swipedRight)) {
                             foundTemp = true;
                             return _buildPosts(context, snapshot, index);
@@ -290,14 +290,11 @@ class _GameResultScreenState extends State<GameResultScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildCreator(context, snapshot, index),
-                  //TODO: remove?
                   _buildTitle(context, snapshot, index),
                   _buildImage(context, snapshot, index),
                   _buildDescription(context, snapshot, index),
                   //_buildCommentsAndLikes(context, snapshot, index),
-                  //TODO: remove?
-                  //TODO: tags icons
-                  //TODO: reactions
+                  //TODO: remove community?
                 ],
               ),
             ),
@@ -313,7 +310,6 @@ class _GameResultScreenState extends State<GameResultScreen> {
   }
 
   Widget _buildCreator(BuildContext context, DataSnapshot snapshot, int index) {
-    //TODO: remove?
     return Row(
       children: [
         Padding(

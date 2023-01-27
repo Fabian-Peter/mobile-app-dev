@@ -118,32 +118,33 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ))),
           floatingActionButton: isVisible
-              ? Column(mainAxisAlignment: MainAxisAlignment.end, children: [
-            FloatingActionButton(
-              heroTag: "btn_game",
-              child: const Icon(Icons.fastfood, size: 35),
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => GameScreen()
-                    ));
-              },
-            ),
-            const SizedBox(height: 15),
-            FloatingActionButton(
-              heroTag: "btn_create",
-              child: const Icon(Icons.add, size: 35),
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => CreateRecipeScreen()
-                    ));
-              },
-            )
-
-          ],) : null,
+              ? Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    FloatingActionButton(
+                      heroTag: "btn_game",
+                      child: const Icon(Icons.restaurant_menu, size: 35),
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => GameScreen()));
+                      },
+                    ),
+                    const SizedBox(height: 15),
+                    FloatingActionButton(
+                      heroTag: "btn_create",
+                      child: const Icon(Icons.add, size: 35),
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => CreateRecipeScreen()));
+                      },
+                    )
+                  ],
+                )
+              : null,
         ));
   }
 
@@ -202,52 +203,52 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildSearchBar(BuildContext context) {
     return Padding(
         padding: const EdgeInsets.only(left: 10, right: 10),
-        child: Row(
-            children: [
-              Expanded(
+        child: Row(children: [
+          Expanded(
               child: SizedBox(
                   height: 33,
                   child: TextFormField(
-                focusNode: searchBarFocusNode,
-                onTap: () => searchBarFocusNode.requestFocus(),
-                controller: searchController,
-                onChanged: (text) {
-                  setState(() {
-                    if (searchController.text != "") {
-                      searchWord = searchController.text.toLowerCase();
-                    }
-                  });
-                },
-                decoration: InputDecoration(
-                  suffixIcon: IconButton(
-                      icon: const Icon(Icons.cancel, color: COLOR_INDIGO_LIGHT),
-                      iconSize: 15,
-                      splashRadius: 20,
-                      onPressed: () {
-                        setState(() {
-                          searchWord = "";
-                        });
-                        searchController.clear();
-                        searchBarFocusNode.unfocus();
-                      }),
-                  labelText: 'Search for recipe or ingredient...',
-                  labelStyle: const TextStyle(
-                      fontFamily: "VisbyMedium",
-                      fontSize: 14,
-                      color: COLOR_INDIGO_LIGHT),
-                  isDense: true,
-                  enabledBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(
-                    color: COLOR_INDIGO_LIGHT,
-                  )),
-                  border: const OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: COLOR_INDIGO_LIGHT,
-                      width: 3.0,
+                    focusNode: searchBarFocusNode,
+                    onTap: () => searchBarFocusNode.requestFocus(),
+                    controller: searchController,
+                    onChanged: (text) {
+                      setState(() {
+                        if (searchController.text != "") {
+                          searchWord = searchController.text.toLowerCase();
+                        }
+                      });
+                    },
+                    decoration: InputDecoration(
+                      suffixIcon: IconButton(
+                          icon: const Icon(Icons.cancel,
+                              color: COLOR_INDIGO_LIGHT),
+                          iconSize: 15,
+                          splashRadius: 20,
+                          onPressed: () {
+                            setState(() {
+                              searchWord = "";
+                            });
+                            searchController.clear();
+                            searchBarFocusNode.unfocus();
+                          }),
+                      labelText: 'Search for recipe or ingredient...',
+                      labelStyle: const TextStyle(
+                          fontFamily: "VisbyMedium",
+                          fontSize: 14,
+                          color: COLOR_INDIGO_LIGHT),
+                      isDense: true,
+                      enabledBorder: const OutlineInputBorder(
+                          borderSide: BorderSide(
+                        color: COLOR_INDIGO_LIGHT,
+                      )),
+                      border: const OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: COLOR_INDIGO_LIGHT,
+                          width: 3.0,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              ))),
+                  ))),
           IconButton(
             icon: Icon(_favIconOutlinedFilter, color: COLOR_INDIGO_LIGHT),
             iconSize: 25,

@@ -14,6 +14,7 @@ import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:cached_network_image/cached_network_image.dart';
 import '../classes/Post.dart';
 import '../classes/user.dart';
+import 'package:badges/badges.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, this.uid});
@@ -27,13 +28,19 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final ref = FirebaseDatabase.instance.ref("post");
   final user = FirebaseAuth.instance.currentUser!;
-
+  final database = FirebaseDatabase(
+          databaseURL:
+              "https://diabeathis-f8ee3-default-rtdb.europe-west1.firebasedatabase.app")
+      .reference();
+  late Query query = ref.orderByChild('timeSorter');
+  Key listKey = Key(DateTime.now().millisecondsSinceEpoch.toString());
+  IconData icon = Icons.favorite_border_outlined;
   TextEditingController searchController = TextEditingController();
   FocusNode searchBarFocusNode = FocusNode();
   String searchWord = "";
+  IconData _favIconOutlinedFilter = Icons.favorite_border_outlined;
 
-  IconData _favIconOutlined = Icons.favorite_outline;
-  IconData _favIconOutlinedFilter = Icons.favorite_outline;
+  final IconData _homeIcon = Icons.home;
   TextEditingController textController = TextEditingController();
   bool isVisible = false;
   List<Post>? posts = DummyData().returnData;
@@ -44,6 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
+    IconData icon = Icons.favorite_border_outlined;
     super.initState();
   }
 
@@ -92,7 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   _buildSearchBar(context),
                   Flexible(
                       child: FirebaseAnimatedList(
-                          query: ref.orderByChild('timestamp'),
+                          query: ref.orderByChild('timeSorter'),
                           defaultChild:
                               const Text("Loading...", style: TEXT_PLAIN),
                           itemBuilder: (context, snapshot, animation, index) {
@@ -259,12 +267,14 @@ class _HomeScreenState extends State<HomeScreen> {
               //                         ? AuthScreen()
               //                         :
               setState(() {
-                if (_favIconOutlinedFilter == Icons.favorite_outline) {
-                  _favIconOutlinedFilter = Icons.favorite;
-                } else {
-                  _favIconOutlinedFilter = Icons.favorite_outline;
+                if (searchController.text != "") {
+                  listKey =
+                      Key(DateTime.now().millisecondsSinceEpoch.toString());
+                  query =
+                      ref.orderByChild("title").equalTo(searchController.text);
                 }
               });
+              searchBarFocusNode.unfocus();
             },
           ),
         ]));
@@ -387,43 +397,66 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildCommentsAndLikes(
       BuildContext context, DataSnapshot snapshot, int index) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        IconButton(
+    String ref = snapshot.child('reference').value.toString();
+    String ownName = FirebaseAuth.instance.currentUser!.uid;
+    var likesAmount = snapshot.child('likeAmount').value.toString();
+    print(snapshot.child('likes/$ownName').value.toString());
+    if(snapshot.child('likes/$ownName').value.toString() == 'true'){
+      print('working until here');
+    }
+    //if(snapshot.child('likes/$ownName').value.toString().contains('true')){
+    //  print(snapshot.child('likes/$ownName').value.toString());
+    //  print('working');
+    //  icon == Icons.favorite;
+    //}
+
+    return Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+      Badge(
+        borderRadius: BorderRadius.circular(8),
+        position: BadgePosition.topEnd(top: 1, end: -3),
+        badgeColor: COLOR_INDIGO_LIGHT,
+        badgeContent: Text('0', style: TextStyle(color: Colors.white)),
+        child: IconButton(
           icon: const Icon(
-            Icons.mode_comment_outlined,
+            Icons.comment_bank_sharp,
             color: COLOR_INDIGO_LIGHT,
             size: 20,
           ),
-          onPressed: () {
-            //login screen if guest
-            // FirebaseAuth.instance.currentUser!.isAnonymous
-            //                         ? AuthScreen()
-            //                         :
-          },
+          onPressed: () {},
         ),
-        IconButton(
-          icon: Icon(
-            _favIconOutlined,
-            color: COLOR_RED,
-            size: 20,
-          ),
-          onPressed: () {
-            //TODO: individual likes for posts and users or login screen
-            // FirebaseAuth.instance.currentUser!.isAnonymous
-            //                         ? AuthScreen()
-            //                         :
-            setState(() {
-              if (_favIconOutlined == Icons.favorite_outline) {
-                _favIconOutlined = Icons.favorite;
+      ),
+      Badge(
+          borderRadius: BorderRadius.circular(8),
+          position: BadgePosition.topEnd(top: 1, end: -3),
+          badgeColor: Colors.red,
+          badgeContent: Text(likesAmount, style: TextStyle(color: Colors.white)),
+          child: IconButton(
+            icon: Icon(
+              icon,
+              color: Colors.red,
+              size: 20,
+            ),
+            onPressed: () {
+              String result = snapshot.child('likes/$ownName').value.toString();
+              //print(snapshot.child('likes/$ownName').value.toString());
+              //print (result);
+              if (result == 'true') {
+                database.child('post/$ref/likes/$ownName').set('false');
+                print('removed like');
+                database.child('post/$ref/likeAmount').set(ServerValue.increment(-1));
+                icon = Icons.favorite_border_outlined;
+                setState(() {
+                });
               } else {
-                _favIconOutlined = Icons.favorite_outline;
+                database.child('post/$ref/likes/$ownName').set('true');
+                database.child('post/$ref/likeAmount').set(ServerValue.increment(1));
+                print('added like');
+                icon = Icons.favorite;
+                setState(() {
+                });
               }
-            });
-          },
-        )
-      ],
-    );
+            },
+          ))
+    ]);
   }
 }

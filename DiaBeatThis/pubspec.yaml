@@ -49,9 +49,7 @@ dependencies:
   cached_network_image: ^3.2.3
   modal_progress_hud_nsn: ^0.1.0-nullsafety-0
   email_validator: ^2.1.17
-  appinio_swiper: ^1.1.1
-  swipe_deck: ^1.1.0
-  swipe_cards: ^2.0.0+1
+  badges: ^2.0.3
 
 dev_dependencies:
   flutter_test:

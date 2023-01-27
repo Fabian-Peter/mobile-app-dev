@@ -81,15 +81,22 @@ flutter:
   #   - images/a_dot_ham.jpeg
 
   assets:
-    - assets/images/Greek salad with feta.png
-    - assets/images/Vegan BBQ Burger.png
-    - assets/images/Grilled Alaska fish.png
     - assets/images/Avatar.png
     - assets/images/Profile.png
     - assets/images/Proteins.png
     - assets/images/Carbs.png
     - assets/images/Fats.png
     - assets/images/recipeCamera.png
+    - assets/images/Fish.png
+    - assets/images/Meat.png
+    - assets/images/Vegetarian.png
+    - assets/images/Vegan.png
+    - assets/images/Pasta.png
+    - assets/images/Rice.png
+    - assets/images/Glutenfree.png
+    - assets/images/Dessert.png
+    - assets/images/Asian.png
+    - assets/images/QuickEasy.png
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

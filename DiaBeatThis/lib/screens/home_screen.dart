@@ -118,18 +118,32 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ))),
           floatingActionButton: isVisible
-              ? FloatingActionButton(
-                  child: const Icon(Icons.add, size: 35),
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => //CreateRecipeScreen()
-                          GameScreen()
-                        ));
-                  },
-                )
-              : null,
+              ? Column(mainAxisAlignment: MainAxisAlignment.end, children: [
+            FloatingActionButton(
+              heroTag: "btn_game",
+              child: const Icon(Icons.fastfood, size: 35),
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => GameScreen()
+                    ));
+              },
+            ),
+            const SizedBox(height: 15),
+            FloatingActionButton(
+              heroTag: "btn_create",
+              child: const Icon(Icons.add, size: 35),
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => CreateRecipeScreen()
+                    ));
+              },
+            )
+
+          ],) : null,
         ));
   }
 

@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:diabeatthis/screens/home_screen.dart';
 import 'package:diabeatthis/screens/post_screen.dart';
 import 'package:diabeatthis/utils/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -10,7 +11,8 @@ import 'package:swipe_cards/swipe_cards.dart';
 
 import 'auth_screen.dart';
 
-class GameScreen extends StatefulWidget { //TODO: add if's for swipe order
+class GameScreen extends StatefulWidget {
+  //TODO: add if's for swipe order
   GameScreen({Key? key}) : super(key: key);
 
   @override
@@ -28,22 +30,24 @@ class _GameScreenState extends State<GameScreen> {
     "Vegan",
     "Pasta",
     "Rice",
-    "Gluten free",
+    "Gluten Free",
     "Dessert",
+    "Asian",
     "Quick & Easy"
   ]; //TODO: add ingredients?
 
   final List<String> _images = [
-    'assets/images/Greek salad with feta.png',
-    'assets/images/Grilled Alaska fish.png',
-    'assets/images/Vegan BBQ Burger.png',
-    'assets/images/recipeCamera.png',
-    'assets/images/Avatar.png',
-    'assets/images/Greek salad with feta.png',
-    'assets/images/Grilled Alaska fish.png',
-    'assets/images/Vegan BBQ Burger.png',
-    'assets/images/recipeCamera.png'
-  ]; //TODO: add new pictures
+    "assets/images/Fish.png",
+    "assets/images/Meat.png",
+    "assets/images/Vegetarian.png",
+    "assets/images/Vegan.png",
+    "assets/images/Pasta.png",
+    "assets/images/Rice.png",
+    "assets/images/Glutenfree.png",
+    "assets/images/Dessert.png",
+    "assets/images/Asian.png",
+    "assets/images/QuickEasy.png"
+  ];
 
   final List<String> swipedRight = [];
 
@@ -54,10 +58,6 @@ class _GameScreenState extends State<GameScreen> {
           content: Content(text: _names[i], image: _images[i]),
           likeAction: () {
             swipedRight.add(_names[i]);
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text("Liked ${_names[i]}"),
-              duration: const Duration(milliseconds: 500),
-            ));
           }));
     }
 
@@ -70,12 +70,13 @@ class _GameScreenState extends State<GameScreen> {
     return Scaffold(
         key: _scaffoldKey,
         appBar: AppBar(
-          title: const Text("Tinder"),
+          title: const Text("Tinder",
+              style: TextStyle(fontFamily: "VisbyDemiBold")),
         ),
         body: Center(
             child: Column(
           children: [
-            const SizedBox(height: 40),
+            const SizedBox(height: 50),
             SizedBox(
                 width: 300,
                 height: 500,
@@ -88,26 +89,57 @@ class _GameScreenState extends State<GameScreen> {
                         return Container(
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
-                              image: DecorationImage(
-                            image: AssetImage(_swipeItems[index].content.image),
-                            fit: BoxFit.fill,
-                          )),
-                          child: Text(
-                            _swipeItems[index].content.text,
-                            style: const TextStyle(
-                                fontSize: 50,
-                                fontFamily: 'VisbyDemiBold',
-                                color: Colors.white),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.5),
+                                spreadRadius: 6,
+                                blurRadius: 10,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
+                            borderRadius: BorderRadius.circular(15),
+                            image: DecorationImage(
+                              image:
+                                  AssetImage(_swipeItems[index].content.image),
+                              fit: BoxFit.fill,
+                            ),
+                          ),
+                          child: Stack(
+                            children: [
+                              // Implement the stroke
+                              Text(
+                                _swipeItems[index].content.text,
+                                style: TextStyle(
+                                  fontSize: 37,
+                                  letterSpacing: 5,
+                                  fontFamily: 'VisbyDemiBold',
+                                  foreground: Paint()
+                                    ..style = PaintingStyle.stroke
+                                    ..strokeWidth = 8
+                                    ..color = Colors.black26,
+                                ),
+                              ),
+                              // The text inside
+                              Text(
+                                _swipeItems[index].content.text,
+                                style: const TextStyle(
+                                    fontSize: 37,
+                                    letterSpacing: 5,
+                                    fontFamily: 'VisbyDemiBold',
+                                    color: Colors.white),
+                              ),
+                            ],
                           ),
                         );
                       },
                       onStackFinished: () {
-                        Navigator.push(
+                        Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => GameResultScreen(
-                                    swipedRight:
-                                        swipedRight))); //TODO: back to home screen instead tinder game
+                                builder: (context) =>
+                                    GameResultScreen(swipedRight: swipedRight)),
+                            (Route<dynamic> roue) =>
+                                false); //TODO: back to home screen instead tinder game
                       },
                       leftSwipeAllowed: true,
                       rightSwipeAllowed: true,
@@ -119,7 +151,7 @@ class _GameScreenState extends State<GameScreen> {
             Align(
                 alignment: Alignment.bottomCenter,
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 20),
+                  padding: const EdgeInsets.only(top: 40),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
@@ -152,65 +184,84 @@ class Content {
   Content({required this.text, required this.image});
 }
 
-class GameResultScreen extends StatelessWidget {
+class GameResultScreen extends StatefulWidget {
+  final List<String> swipedRight;
+
+  const GameResultScreen({super.key, required this.swipedRight});
+  @override
+  State<GameResultScreen> createState() => _GameResultScreenState();
+
+}
+
+class _GameResultScreenState extends State<GameResultScreen> {
   final ref = FirebaseDatabase.instance.ref("post");
   final user = FirebaseAuth.instance.currentUser!;
 
-  IconData _favIconOutlined = Icons.favorite_outline;
-
-  final List<String> swipedRight;
-
-  //HomeScreen1(List<String> swipedRight, {super.key});
-  GameResultScreen({super.key, required this.swipedRight});
+  bool found = false;
 
   @override
   Widget build(BuildContext context) {
+    bool foundTemp = false;
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       onPanDown: (_) => FocusScope.of(context).unfocus(),
       child: Scaffold(
           appBar: AppBar(
-            titleSpacing: 10,
-            title: const Padding(
-              padding: EdgeInsets.only(bottom: 2),
-              child: Text('DiaBeatThis!', style: DIABEATTHIS_LOGO),
-            ),
-          ),
+              titleSpacing: 10,
+              title: const Text("Results",
+                  style: TextStyle(fontFamily: "VisbyDemiBold")),
+              leading: IconButton(
+                icon: const Icon(
+                  Icons.arrow_back,
+                  color: COLOR_WHITE,
+                  size: 24,
+                ),
+                onPressed: () {
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const HomeScreen()),
+                      (Route<dynamic> roue) => false);
+                },
+              )),
           body: SafeArea(
               child: Column(
             children: [
               const SizedBox(height: 3),
+              !found ? const Padding(padding: EdgeInsets.only(top: 50), child: Text("No recipes found", style: TextStyle(fontFamily: "VisbyDemiBold", fontSize: 20))) : const SizedBox(),
               Flexible(
                   child: FirebaseAnimatedList(
                       query: ref.orderByChild('timestamp'),
                       defaultChild: const Text("Loading...", style: TEXT_PLAIN),
                       itemBuilder: (context, snapshot, animation, index) {
                         Object? tagsValues = snapshot.child('tags').value;
-                        if (swipedRight.isNotEmpty &&
+                        if (widget.swipedRight.isNotEmpty &&
                             (snapshot.child("title").value.toString() ==
                                 "tomato vegan test")) {
                           String tagString = tagsValues.toString();
                           List<String> tagsList = tagString
                               .substring(1, tagString.length - 1)
                               .split(", ");
-                          var set =
-                              Set.of(tagsList); //TODO: set of in one line?
-                          if (set.containsAll(swipedRight)) {
+                          Set<String> set =
+                              Set.of(tagsList);
+                          if (set.containsAll(widget.swipedRight)) {
+                            foundTemp = true;
                             return _buildPosts(context, snapshot, index);
                           }
-                          //for(String element in swipedRight) {
-                          // if (tagsValues
-                          //    .toString()
-                          //    .contains(element)) {
-                          //return _buildPosts(context, snapshot, index);
                         }
-                        //}
-                        //}
-                        return const SizedBox(); //TODO: add no results found
+                        return const SizedBox();
                       })),
+              !foundTemp ? _updateResult() : const SizedBox(),
             ],
           ))),
     );
+  }
+
+  Widget _updateResult() {
+    setState(() {
+      found = true;
+    });
+    return const SizedBox();
   }
 
   Widget _buildPosts(BuildContext context, DataSnapshot snapshot, int index) {
@@ -243,7 +294,7 @@ class GameResultScreen extends StatelessWidget {
                   _buildTitle(context, snapshot, index),
                   _buildImage(context, snapshot, index),
                   _buildDescription(context, snapshot, index),
-                  _buildCommentsAndLikes(context, snapshot, index),
+                  //_buildCommentsAndLikes(context, snapshot, index),
                   //TODO: remove?
                   //TODO: tags icons
                   //TODO: reactions
@@ -329,39 +380,5 @@ class GameResultScreen extends StatelessWidget {
         child: Center(
             child: Text(snapshot.child('description').value.toString(),
                 style: TEXT_PLAIN)));
-  }
-
-  Widget _buildCommentsAndLikes(
-      BuildContext context, DataSnapshot snapshot, int index) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        IconButton(
-          icon: const Icon(
-            Icons.mode_comment_outlined,
-            color: COLOR_INDIGO_LIGHT,
-            size: 20,
-          ),
-          onPressed: () {
-            //login screen if guest
-            // FirebaseAuth.instance.currentUser!.isAnonymous
-            //                         ? AuthScreen()
-            //                         :
-          },
-        ),
-        IconButton(
-            icon: Icon(
-              _favIconOutlined,
-              color: COLOR_RED,
-              size: 20,
-            ),
-            onPressed: () {
-              //TODO: add new changes or remove likes and create route to post screen
-              // FirebaseAuth.instance.currentUser!.isAnonymous
-              //                         ? AuthScreen()
-              //                         :
-            })
-      ],
-    );
   }
 }

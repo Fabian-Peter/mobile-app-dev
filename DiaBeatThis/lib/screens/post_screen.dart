@@ -7,8 +7,8 @@ import 'package:diabeatthis/utils/constants.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:badges/badges.dart';
 import 'auth_screen.dart';
-
-
+import 'package:diabeatthis/screens/Comments_Screen.dart';
+import 'package:firebase_database/ui/firebase_animated_list.dart';
 
 class PostScreen extends StatefulWidget {
   final DataSnapshot post;
@@ -20,20 +20,35 @@ class PostScreen extends StatefulWidget {
 }
 
 class _PostScreenState extends State<PostScreen> {
+  String ownName = FirebaseAuth.instance.currentUser!.uid;
   FirebaseStorage storage = FirebaseStorage.instance;
   final database = FirebaseDatabase(
-      databaseURL:
-      "https://diabeathis-f8ee3-default-rtdb.europe-west1.firebasedatabase.app")
+          databaseURL:
+              "https://diabeathis-f8ee3-default-rtdb.europe-west1.firebasedatabase.app")
       .reference();
   final IconData _favIconOutlined = Icons.favorite_outline;
   IconData icon = Icons.favorite_border_outlined;
+  TextEditingController commentsController = TextEditingController();
+  late DataSnapshot queryReference;
+
   Future<String> downloadURL(String imageName) async {
     String downloadURL = await storage.ref('image/$imageName').getDownloadURL();
     return downloadURL;
   }
 
   @override
+  void initState() {
+    String reference = widget.post.child('reference').value.toString();
+    final queryReference =
+        FirebaseDatabase.instance.ref('post/$reference/comments');
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (widget.post.child('likes/$ownName').value.toString().contains('true')) {
+      icon = Icons.favorite;
+    }
     return Scaffold(
         appBar: AppBar(
             title: Text(widget.post.child('title').value.toString(),
@@ -105,7 +120,8 @@ class _PostScreenState extends State<PostScreen> {
   }
 
   Widget _buildDate(BuildContext context) {
-    DateTime dt = DateTime.parse(widget.post.child('timestamp').value.toString());
+    DateTime dt =
+        DateTime.parse(widget.post.child('timestamp').value.toString());
     return Row(
       children: [
         const Padding(
@@ -152,7 +168,10 @@ class _PostScreenState extends State<PostScreen> {
     return Padding(
         padding: const EdgeInsets.only(left: 5, right: 5),
         child: Text(
-            widget.post.child('tags').value.toString(), //TODO: Liste berücksichtigen
+            widget.post
+                .child('tags')
+                .value
+                .toString(), //TODO: Liste berücksichtigen
             style: TEXT_PLAIN));
   }
 
@@ -160,9 +179,9 @@ class _PostScreenState extends State<PostScreen> {
     const double iconSize = 54;
     return Padding(
         padding: const EdgeInsets.only(left: 0, right: 0),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-          Row( mainAxisAlignment: MainAxisAlignment.center,
+        child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Column(children: [
                 ClipRRect(
@@ -233,52 +252,117 @@ class _PostScreenState extends State<PostScreen> {
   Widget _buildCommunity(BuildContext context) {
     //TODO: add reactions
     //TODO: add comments
-    String ref = widget.post.child('reference').value.toString();
-    var likesAmount = widget.post.child('likeAmount').value.toString();
-    String ownName = FirebaseAuth.instance.currentUser!.uid;
-    return Padding(
-        padding: const EdgeInsets.only(top: 20),
-        child: Column(
-          children: [
-            Padding(
-                padding: const EdgeInsets.only(right: 310),
-                child: Badge(
-                    borderRadius: BorderRadius.circular(8),
-                    position: BadgePosition.topEnd(top: 1, end: -3),
-                    badgeColor: Colors.red,
-                    badgeContent: Text(likesAmount, style: TextStyle(color: Colors.white)),
-                    child: IconButton(
-                      icon: Icon(
-                        icon,
-                        color: Colors.red,
-                        size: 20,
-                      ),
-                      onPressed: () {
-                       // String result = widget.post.child('likes/$ownName').value.toString();
-                       // print(widget.post.child('likes/$ownName').value.toString());
-                       // //print(snapshot.child('likes/$ownName').value.toString());
-                       // //print (result);
-                       // if (result == 'true') {
-                       //   database.child('post/$ref/likes/$ownName').set('false');
-                       //   print('removed like');
-                       //   database.child('post/$ref/likeAmount').set(ServerValue.increment(-1));
-                       //   icon = Icons.favorite_border_outlined;
-                       //   setState(() {
-                       //   });
-                       // } else {
-                       //   database.child('post/$ref/likes/$ownName').set('true');
-                       //   database.child('post/$ref/likeAmount').set(ServerValue.increment(1));
-                       //   print('added like');
-                       //   icon = Icons.favorite;
-                       //   setState(() {
-                        //  });
-                       // }
-                      },
-                    )),
-        )])
 
-          ,
-        );
+    var likesAmount = widget.post.child('likeAmount').value.toString();
+    final ref = FirebaseDatabase.instance.ref("post");
+    return Padding(
+      padding: const EdgeInsets.only(top: 20),
+      child: Column(children: [
+        Padding(
+            padding: const EdgeInsets.only(right: 310),
+            child: Row(children: [
+              IconButton(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_){
+                        return CommentsScreen(post: widget.post);
+                      })
+                    );
+                  },
+                  icon: Icon(Icons.comment_bank_sharp, color: COLOR_INDIGO_LIGHT,)),
+              Badge(
+                  borderRadius: BorderRadius.circular(8),
+                  position: BadgePosition.topEnd(top: 1, end: -3),
+                  badgeColor: Colors.red,
+                  badgeContent:
+                      Text(likesAmount, style: TextStyle(color: Colors.white)),
+                  child: IconButton(
+                    icon: Icon(
+                      icon,
+                      color: Colors.red,
+                      size: 20,
+                    ),
+                    onPressed: () {
+                      // //print(snapshot.child('likes/$ownName').value.toString());
+                      // //print (result);
+                      // if (result == 'true') {
+                      //   database.child('post/$ref/likes/$ownName').set('false');
+                      //   print('removed like');
+                      //   database.child('post/$ref/likeAmount').set(ServerValue.increment(-1));
+                      //   icon = Icons.favorite_border_outlined;
+                      //   setState(() {
+                      //   });
+                      // } else {
+                      //   database.child('post/$ref/likes/$ownName').set('true');
+                      //   database.child('post/$ref/likeAmount').set(ServerValue.increment(1));
+                      //   print('added like');
+                      //   icon = Icons.favorite;
+                      //   setState(() {
+                      //  });
+                      // }
+                    },
+                  )),
+
+
+            ])),
+        //FirebaseAnimatedList(
+        //  query: ref,
+        //  defaultChild:
+        //  const Text("Loading...", style: TEXT_PLAIN),
+        //  itemBuilder:
+        //      (BuildContext context,
+        //      DataSnapshot snapshot,
+        //      Animation<double> animation,
+        //      int index) {
+        //    return _buildComments(context, snapshot, index);
+        //  },),
+      ]),
+    );
+  }
+
+  Widget _buildComments(context, snapshot, index) {
+    return Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 9,
+          vertical: 7,
+        ),
+        child: InkWell(
+          child: Container(
+            decoration: BoxDecoration(
+              color: COLOR_WHITE,
+              border: Border.all(width: 3, color: COLOR_INDIGO_LIGHT),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.5),
+                  spreadRadius: 2,
+                  blurRadius: 3,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: SafeArea(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildCommenter(context, snapshot, index),
+                  //TODO: tags icons
+                  //TODO: reactions
+                ],
+              ),
+            ),
+          ),
+        ));
+  }
+
+  Widget _buildCommenter(context, snapshot, index) {
+    return Row(
+      children: [
+        Padding(
+            padding: const EdgeInsets.all(8),
+            child: Text(snapshot.child('comment')))
+      ],
+    );
   }
 
   Widget _buildContainerCaption(
@@ -347,5 +431,14 @@ class _PostScreenState extends State<PostScreen> {
         ),
       ],
     );
+  }
+
+  void dispose() {
+    commentsController.dispose();
+    super.dispose();
+  }
+
+  void clearText() {
+    commentsController.clear();
   }
 }

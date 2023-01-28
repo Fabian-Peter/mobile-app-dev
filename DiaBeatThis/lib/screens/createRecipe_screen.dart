@@ -515,7 +515,8 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
               var key = myRef.key!;
 
               final newRecipe = <String, dynamic>{
-                'likeAmount': 0,
+                'likeAmount' : 0,
+                'CommentsAmount' : 0,
                 'title': titleController.text,
                 'description': descriptionController.text,
                 'ingredients': ingredientList,

@@ -16,6 +16,8 @@ import '../classes/Post.dart';
 import '../classes/user.dart';
 import 'package:badges/badges.dart';
 
+import 'Comments_Screen.dart';
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, this.uid});
 
@@ -53,6 +55,11 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
   }
+
+  //void getComments() async{
+  //  DataSnapshot snippy = await FirebaseDatabase.instance.ref().orderByChild('comments').limitToFirst(3).get();
+  //  print(snippy.value);
+  //}
 
   @override
   Widget build(BuildContext context) {
@@ -326,7 +333,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   _buildTitle(context, snapshot, index),
                   _buildImage(context, snapshot, index),
                   _buildDescription(context, snapshot, index),
-                  _buildCommentsAndLikes(context, snapshot, index),
+                  _buildComments(context, snapshot, index),
+                  _buildLikes(context, snapshot, index),
                   //TODO: tags icons
                   //TODO: reactions
                 ],
@@ -419,12 +427,20 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: TEXT_PLAIN)));
   }
 
-  Widget _buildCommentsAndLikes(
+  Widget _buildComments(
       BuildContext context, DataSnapshot snapshot, int index) {
+    return Padding(
+        padding: const EdgeInsets.only(left: 0, right: 0),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+          //Text(snapshot.hasChild('hello world').toString())
+        ]));
+  }
+
+  Widget _buildLikes(BuildContext context, DataSnapshot snapshot, int index) {
     String ref = snapshot.child('reference').value.toString();
     String ownName = FirebaseAuth.instance.currentUser!.uid;
     var likesAmount = snapshot.child('likeAmount').value.toString();
-    print(snapshot.child('likes/$ownName').value.toString());
+    var commentsAmount = snapshot.child('CommentsAmount').value.toString();
     if (snapshot.child('likes/$ownName').value.toString() == 'true') {
       print('working until here');
     }
@@ -436,19 +452,25 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Row(mainAxisAlignment: MainAxisAlignment.end, children: [
       Badge(
-        borderRadius: BorderRadius.circular(8),
-        position: BadgePosition.topEnd(top: 1, end: -3),
-        badgeColor: COLOR_INDIGO_LIGHT,
-        badgeContent: Text('0', style: TextStyle(color: Colors.white)),
-        child: IconButton(
-          icon: const Icon(
-            Icons.comment_bank_sharp,
-            color: COLOR_INDIGO_LIGHT,
-            size: 20,
-          ),
-          onPressed: () {},
-        ),
-      ),
+          borderRadius: BorderRadius.circular(8),
+          position: BadgePosition.topEnd(top: 1, end: -3),
+          badgeColor: COLOR_INDIGO_LIGHT,
+          badgeContent: Text(commentsAmount, style: TextStyle(color: Colors.white)),
+          child: IconButton(
+              icon: const Icon(
+                Icons.comment_bank_sharp,
+                color: COLOR_INDIGO_LIGHT,
+                size: 20,
+              ),
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) {
+                      return CommentsScreen(post: snapshot);
+                    },
+                  ),
+                );
+              })),
       Badge(
           borderRadius: BorderRadius.circular(8),
           position: BadgePosition.topEnd(top: 1, end: -3),

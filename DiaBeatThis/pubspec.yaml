@@ -82,6 +82,7 @@ flutter:
   assets:
     - assets/images/Avatar.png
     - assets/images/Profile.png
+    - assets/images/DefaultIcon.png
     - assets/images/Proteins.png
     - assets/images/Carbs.png
     - assets/images/Fats.png

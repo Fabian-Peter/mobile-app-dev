@@ -16,29 +16,37 @@ class CreateRecipeScreen extends StatefulWidget {
 }
 
 class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
+  //Firebase variables
   final database = FirebaseDatabase(
           databaseURL:
               "https://diabeathis-f8ee3-default-rtdb.europe-west1.firebasedatabase.app")
       .reference();
+  String? query = FirebaseAuth.instance.currentUser?.uid.toString();
   final refUser = FirebaseDatabase.instance.ref('Users');
-  File? image;
   final firebase_storage.FirebaseStorage storage =
       firebase_storage.FirebaseStorage.instance;
-  var uuid = Uuid();
+  bool _isInAsyncCall = false;
+
+  //TextController variables
   TextEditingController titleController = TextEditingController();
   List<TextEditingController> ingredientsControllers = <TextEditingController>[
     TextEditingController()
   ];
   List<TextEditingController> ingredientsQuantityControllers =
       <TextEditingController>[TextEditingController()];
-  int fieldsNumber = 1;
   TextEditingController descriptionController = TextEditingController();
   TextEditingController instructionController = TextEditingController();
   TextEditingController nutritionController = TextEditingController();
-  late String name;
-  bool _isInAsyncCall = false;
-  String? query = FirebaseAuth.instance.currentUser?.uid.toString();
 
+  //Page variables
+  int fieldsNumber = 1;
+
+  //Image variables
+  late String name;
+  File? image;
+  var uuid = Uuid();
+
+  //Tags variables
   final List<Text> _recipeTags1 = <Text>[
     const Text('Fish', style: TAGS_TOGGLE),
     const Text('Meat', style: TAGS_TOGGLE),

@@ -255,68 +255,47 @@ class _PostScreenState extends State<PostScreen> {
 
     var likesAmount = widget.post.child('likeAmount').value.toString();
     final ref = FirebaseDatabase.instance.ref("post");
+    String commentsAmount =
+        widget.post.child('CommentsAmount').value.toString();
     return Padding(
       padding: const EdgeInsets.only(top: 20),
-      child: Column(children: [
-        Padding(
-            padding: const EdgeInsets.only(right: 310),
-            child: Row(children: [
-              IconButton(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_){
+      child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+        Badge(
+            borderRadius: BorderRadius.circular(8),
+            position: BadgePosition.topEnd(top: 1, end: -3),
+            badgeColor: COLOR_INDIGO_LIGHT,
+            badgeContent: Text(commentsAmount, style: TextStyle(color: Colors.white)),
+            child: IconButton(
+                icon: const Icon(
+                  Icons.comment_bank_sharp,
+                  color: COLOR_INDIGO_LIGHT,
+                  size: 20,
+                ),
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) {
                         return CommentsScreen(post: widget.post);
-                      })
-                    );
-                  },
-                  icon: Icon(Icons.comment_bank_sharp, color: COLOR_INDIGO_LIGHT,)),
-              Badge(
-                  borderRadius: BorderRadius.circular(8),
-                  position: BadgePosition.topEnd(top: 1, end: -3),
-                  badgeColor: Colors.red,
-                  badgeContent:
-                      Text(likesAmount, style: TextStyle(color: Colors.white)),
-                  child: IconButton(
-                    icon: Icon(
-                      icon,
-                      color: Colors.red,
-                      size: 20,
+                      },
                     ),
-                    onPressed: () {
-                      // //print(snapshot.child('likes/$ownName').value.toString());
-                      // //print (result);
-                      // if (result == 'true') {
-                      //   database.child('post/$ref/likes/$ownName').set('false');
-                      //   print('removed like');
-                      //   database.child('post/$ref/likeAmount').set(ServerValue.increment(-1));
-                      //   icon = Icons.favorite_border_outlined;
-                      //   setState(() {
-                      //   });
-                      // } else {
-                      //   database.child('post/$ref/likes/$ownName').set('true');
-                      //   database.child('post/$ref/likeAmount').set(ServerValue.increment(1));
-                      //   print('added like');
-                      //   icon = Icons.favorite;
-                      //   setState(() {
-                      //  });
-                      // }
-                    },
-                  )),
-
-
-            ])),
-        //FirebaseAnimatedList(
-        //  query: ref,
-        //  defaultChild:
-        //  const Text("Loading...", style: TEXT_PLAIN),
-        //  itemBuilder:
-        //      (BuildContext context,
-        //      DataSnapshot snapshot,
-        //      Animation<double> animation,
-        //      int index) {
-        //    return _buildComments(context, snapshot, index);
-        //  },),
-      ]),
+                  );
+                })),
+        Badge(
+            borderRadius: BorderRadius.circular(8),
+            position: BadgePosition.topEnd(top: 1, end: -3),
+            badgeColor: Colors.red,
+            badgeContent:
+            Text(likesAmount, style: TextStyle(color: Colors.white)),
+            child: IconButton(
+              icon: Icon(
+                icon,
+                color: Colors.red,
+                size: 20,
+              ),
+              onPressed: () {
+              },
+            ))
+      ])
     );
   }
 
@@ -413,25 +392,7 @@ class _PostScreenState extends State<PostScreen> {
     );
   }
 
-  Widget _buildTextRow(String key, String value) {
-    return Row(
-      children: [
-        Text(
-          key,
-          style: TEXT_BOLD,
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            value,
-            style: TEXT_PLAIN,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.end,
-          ),
-        ),
-      ],
-    );
-  }
+
 
   void dispose() {
     commentsController.dispose();

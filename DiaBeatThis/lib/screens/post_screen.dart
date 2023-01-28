@@ -39,11 +39,7 @@ class _PostScreenState extends State<PostScreen> {
           title: Text(widget.post.child('title').value.toString(),
               style: HEADLINE_BOLD_WHITE),
           actions: <Widget>[
-            Row(
-              children: [
-                _buildProfileIcon(context)
-              ],
-            ),
+            _buildProfileIcon(context),
           ],
         ),
         body: SafeArea(

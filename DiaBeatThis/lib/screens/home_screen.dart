@@ -26,6 +26,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  //Firebase variables
   final ref = FirebaseDatabase.instance.ref("post");
   final user = FirebaseAuth.instance.currentUser!;
   final database = FirebaseDatabase(
@@ -34,24 +35,22 @@ class _HomeScreenState extends State<HomeScreen> {
       .reference();
   late Query query = ref.orderByChild('timeSorter');
   Key listKey = Key(DateTime.now().millisecondsSinceEpoch.toString());
+
+  //Icon variables
   IconData icon = Icons.favorite_border_outlined;
-  TextEditingController searchController = TextEditingController();
-  FocusNode searchBarFocusNode = FocusNode();
-  String searchWord = "";
   IconData _favIconOutlinedFilter = Icons.favorite_border_outlined;
 
-  final IconData _homeIcon = Icons.home;
+  //Page variables
+  TextEditingController searchController = TextEditingController();
   TextEditingController textController = TextEditingController();
   bool isVisible = false;
-  List<Post>? posts = DummyData().returnData;
-  User userTest = DummyData().user1;
-  final firebase_storage.FirebaseStorage storage =
-      firebase_storage.FirebaseStorage.instance;
-  late Future<String> dataFuture;
+
+  //Searchbar variables
+  FocusNode searchBarFocusNode = FocusNode();
+  String searchWord = "";
 
   @override
   void initState() {
-    IconData icon = Icons.favorite_border_outlined;
     super.initState();
   }
 
@@ -147,12 +146,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       heroTag: "btn_create",
                       child: const Icon(Icons.add, size: 35),
                       onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => CreateRecipeScreen()));
-                      },
-                    )
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) {
+                            return FirebaseAuth
+                                .instance.currentUser!.isAnonymous
+                                ? AuthScreen()
+                                : CreateRecipeScreen();}),
+                        );
+                      }),
                   ],
                 )
               : null,
@@ -181,18 +182,30 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildProfileIcon(BuildContext context) {
-    final User profile = userTest;
+//TODO: get current user datas and set image url
     return ClipRRect(
       borderRadius: BorderRadius.circular(PROFILE_ICON_BAR_SIZE / 2),
       child: Padding(
           padding: const EdgeInsets.only(right: 10),
           child: InkWell(
-            child: Image.asset(
-              //TODO: if guest, then show anonymous profile icon
-              'assets/images/Profile.png',
-              //TODO: replace with user image
-              height: PROFILE_ICON_BAR_SIZE,
-              width: PROFILE_ICON_BAR_SIZE,
+            child: ClipRRect(
+              //TODO: guest icon
+              borderRadius: BorderRadius.circular(10),
+              child: FirebaseAuth.instance.currentUser!.isAnonymous
+                  ? Image.asset(
+                      'assets/images/DefaultIcon.png',
+                      height: PROFILE_ICON_BAR_SIZE,
+                      width: PROFILE_ICON_BAR_SIZE,
+                    )
+                  : CachedNetworkImage(
+                      height: PROFILE_ICON_BAR_SIZE,
+                      width: PROFILE_ICON_BAR_SIZE,
+                      imageUrl: "placeholder",
+                      //url, //TODO: replace
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) =>
+                          CircularProgressIndicator(),
+                    ),
             ),
             onTap: () {
               Navigator.of(context).push(
@@ -203,10 +216,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 }),
               );
             },
-            //TODO: open profile instead or login screen
-            // FirebaseAuth.instance.currentUser!.isAnonymous
-            //                         ? AuthScreen()
-            //                         :
           )),
     );
   }
@@ -270,6 +279,11 @@ class _HomeScreenState extends State<HomeScreen> {
               //                         ? AuthScreen()
               //                         :
               setState(() {
+                if (_favIconOutlinedFilter == Icons.favorite_border_outlined) {
+                  _favIconOutlinedFilter = Icons.favorite;
+                } else {
+                  _favIconOutlinedFilter = Icons.favorite_border_outlined;
+                }
                 if (searchController.text != "") {
                   listKey =
                       Key(DateTime.now().millisecondsSinceEpoch.toString());
@@ -330,6 +344,11 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildCreator(BuildContext context, DataSnapshot snapshot, int index) {
+    String url = snapshot
+        .child('pictureID')
+        .value
+        .toString(); //TODO: get user image based on username
+
     return Row(
       children: [
         Padding(
@@ -337,10 +356,12 @@ class _HomeScreenState extends State<HomeScreen> {
           child: ClipRRect(
               borderRadius: BorderRadius.circular(USER_ICON_POST_SIZE / 2),
               child: InkWell(
-                child: Image.asset(
-                  'assets/images/Avatar.png', //TODO: replace with user image
-                  height: USER_ICON_POST_SIZE,
-                  width: USER_ICON_POST_SIZE,
+                child: CachedNetworkImage(
+                  height: PROFILE_ICON_BAR_SIZE,
+                  width: PROFILE_ICON_BAR_SIZE,
+                  imageUrl: url,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => CircularProgressIndicator(),
                 ),
                 onTap: () {
                   //TODO: open user profile

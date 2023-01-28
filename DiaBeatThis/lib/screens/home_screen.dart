@@ -148,6 +148,20 @@ class _HomeScreenState extends State<HomeScreen> {
                           }),
                         );
                       }),
+                  const SizedBox(height: 15),
+                  FloatingActionButton(
+                    heroTag: "btn_create",
+                    child: const Icon(Icons.add, size: 35),
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) {
+                          return FirebaseAuth.instance.currentUser!.isAnonymous
+                              ? AuthScreen()
+                              : CreateRecipeScreen();
+                        }),
+                      );
+                    },
+                  ),
                 ],
               )
             : null,
@@ -508,12 +522,20 @@ class UserProfileImage extends StatefulWidget {
 }
 
 class _UserProfileImageState extends State<UserProfileImage> {
-  late final Stream<String?> userPictureID;
+  late Stream<String?> userPictureID;
 
   @override
   void initState() {
     userPictureID = getUserPictureID();
     super.initState();
+  }
+
+  @override
+  void didUpdateWidget(UserProfileImage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.userID != widget.userID) {
+      setState(() => userPictureID = getUserPictureID());
+    }
   }
 
   Stream<String?> getUserPictureID() {

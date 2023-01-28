@@ -146,12 +146,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       heroTag: "btn_create",
                       child: const Icon(Icons.add, size: 35),
                       onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => CreateRecipeScreen()));
-                      },
-                    )
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) {
+                            return FirebaseAuth
+                                .instance.currentUser!.isAnonymous
+                                ? AuthScreen()
+                                : CreateRecipeScreen();}),
+                        );
+                      }),
                   ],
                 )
               : null,

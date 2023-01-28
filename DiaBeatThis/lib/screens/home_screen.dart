@@ -1,6 +1,7 @@
 import 'package:diabeatthis/data/dummy_data.dart';
 import 'package:diabeatthis/screens/auth_screen.dart';
 import 'package:diabeatthis/screens/createRecipe_screen.dart';
+import 'package:diabeatthis/screens/game_screen.dart';
 import 'package:diabeatthis/screens/post_screen.dart';
 import 'package:diabeatthis/screens/profile_screen.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -36,7 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
   TextEditingController searchController = TextEditingController();
   FocusNode searchBarFocusNode = FocusNode();
   String searchWord = "";
-  final IconData _favIconOutlinedFilter = Icons.favorite_border_outlined;
+  IconData _favIconOutlinedFilter = Icons.favorite_border_outlined;
 
   //final IconData _homeIcon = Icons.home;
   TextEditingController textController = TextEditingController();
@@ -132,17 +133,34 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         floatingActionButton: isVisible
-            ? FloatingActionButton(
-                child: const Icon(Icons.add, size: 35),
-                onPressed: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              FirebaseAuth.instance.currentUser!.isAnonymous
-                                  ? AuthScreen()
-                                  : CreateRecipeScreen()));
-                },
+            ? Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  FloatingActionButton(
+                      heroTag: "btn_game",
+                      child: const Icon(Icons.restaurant_menu, size: 35),
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) {
+                            return FirebaseAuth
+                                    .instance.currentUser!.isAnonymous
+                                ? AuthScreen()
+                                : GameScreen();
+                          }),
+                        );
+                      }),
+                  const SizedBox(height: 15),
+                  FloatingActionButton(
+                    heroTag: "btn_create",
+                    child: const Icon(Icons.add, size: 35),
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => CreateRecipeScreen()));
+                    },
+                  ),
+                ],
               )
             : null,
       ),
@@ -172,7 +190,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildProfileIcon(BuildContext context, DataSnapshot snapshot, int index) {
+  Widget _buildProfileIcon(
+      BuildContext context, DataSnapshot snapshot, int index) {
     //final User profile = userTest;
     return ClipRRect(
       borderRadius: BorderRadius.circular(PROFILE_ICON_BAR_SIZE / 2),
@@ -205,51 +224,50 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: const EdgeInsets.only(left: 10, right: 10),
       child: Row(children: [
         Expanded(
-          child: SizedBox(
-            height: 33,
-            child: TextFormField(
-              focusNode: searchBarFocusNode,
-              onTap: () => searchBarFocusNode.requestFocus(),
-              controller: searchController,
-              onChanged: (text) {
-                setState(() {
-                  if (searchController.text != "") {
-                    searchWord = searchController.text.toLowerCase();
-                  }
-                });
-              },
-              decoration: InputDecoration(
-                suffixIcon: IconButton(
-                    icon: const Icon(Icons.cancel, color: COLOR_INDIGO_LIGHT),
-                    iconSize: 15,
-                    splashRadius: 20,
-                    onPressed: () {
-                      setState(() {
-                        searchWord = "";
-                      });
-                      searchController.clear();
-                      searchBarFocusNode.unfocus();
-                    }),
-                labelText: 'Search for recipe or ingredient...',
-                labelStyle: const TextStyle(
-                    fontFamily: "VisbyMedium",
-                    fontSize: 14,
-                    color: COLOR_INDIGO_LIGHT),
-                isDense: true,
-                enabledBorder: const OutlineInputBorder(
-                    borderSide: BorderSide(
-                  color: COLOR_INDIGO_LIGHT,
-                )),
-                border: const OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: COLOR_INDIGO_LIGHT,
-                    width: 3.0,
+            child: SizedBox(
+                height: 33,
+                child: TextFormField(
+                  focusNode: searchBarFocusNode,
+                  onTap: () => searchBarFocusNode.requestFocus(),
+                  controller: searchController,
+                  onChanged: (text) {
+                    setState(() {
+                      if (searchController.text != "") {
+                        searchWord = searchController.text.toLowerCase();
+                      }
+                    });
+                  },
+                  decoration: InputDecoration(
+                    suffixIcon: IconButton(
+                        icon:
+                            const Icon(Icons.cancel, color: COLOR_INDIGO_LIGHT),
+                        iconSize: 15,
+                        splashRadius: 20,
+                        onPressed: () {
+                          setState(() {
+                            searchWord = "";
+                          });
+                          searchController.clear();
+                          searchBarFocusNode.unfocus();
+                        }),
+                    labelText: 'Search for recipe or ingredient...',
+                    labelStyle: const TextStyle(
+                        fontFamily: "VisbyMedium",
+                        fontSize: 14,
+                        color: COLOR_INDIGO_LIGHT),
+                    isDense: true,
+                    enabledBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(
+                      color: COLOR_INDIGO_LIGHT,
+                    )),
+                    border: const OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: COLOR_INDIGO_LIGHT,
+                        width: 3.0,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-            ),
-          ),
-        ),
+                ))),
         IconButton(
           icon: Icon(_favIconOutlinedFilter, color: COLOR_INDIGO_LIGHT),
           iconSize: 25,
@@ -260,8 +278,14 @@ class _HomeScreenState extends State<HomeScreen> {
             //                         ? AuthScreen()
             //                         :
             setState(() {
+              if (_favIconOutlinedFilter == Icons.favorite_border_outlined) {
+                _favIconOutlinedFilter = Icons.favorite;
+              } else {
+                _favIconOutlinedFilter = Icons.favorite_border_outlined;
+              }
               if (searchController.text != "") {
-                listKey = Key(DateTime.now().millisecondsSinceEpoch.toString());
+                listKey =
+                    Key(DateTime.now().millisecondsSinceEpoch.toString());
                 query =
                     ref.orderByChild("title").equalTo(searchController.text);
               }
@@ -269,8 +293,8 @@ class _HomeScreenState extends State<HomeScreen> {
             searchBarFocusNode.unfocus();
           },
         ),
-      ]),
-    );
+      ]));
+
   }
 
   Widget _buildPosts(BuildContext context, DataSnapshot snapshot, int index) {
@@ -431,41 +455,40 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       Badge(
-        borderRadius: BorderRadius.circular(8),
-        position: BadgePosition.topEnd(top: 1, end: -3),
-        badgeColor: Colors.red,
-        badgeContent:
-            Text(likesAmount, style: const TextStyle(color: Colors.white)),
-        child: IconButton(
-          icon: Icon(
-            icon,
-            color: Colors.red,
-            size: 20,
-          ),
-          onPressed: () {
-            String result = snapshot.child('likes/$ownName').value.toString();
-            //print(snapshot.child('likes/$ownName').value.toString());
-            //print (result);
-            if (result == 'true') {
-              database.child('post/$ref/likes/$ownName').set('false');
-              print('removed like');
-              database
-                  .child('post/$ref/likeAmount')
-                  .set(ServerValue.increment(-1));
-              icon = Icons.favorite_border_outlined;
-              setState(() {});
-            } else {
-              database.child('post/$ref/likes/$ownName').set('true');
-              database
-                  .child('post/$ref/likeAmount')
-                  .set(ServerValue.increment(1));
-              print('added like');
-              icon = Icons.favorite;
-              setState(() {});
-            }
-          },
-        ),
-      )
+          borderRadius: BorderRadius.circular(8),
+          position: BadgePosition.topEnd(top: 1, end: -3),
+          badgeColor: Colors.red,
+          badgeContent:
+              Text(likesAmount, style: TextStyle(color: Colors.white)),
+          child: IconButton(
+            icon: Icon(
+              icon,
+              color: Colors.red,
+              size: 20,
+            ),
+            onPressed: () {
+              String result = snapshot.child('likes/$ownName').value.toString();
+              //print(snapshot.child('likes/$ownName').value.toString());
+              //print (result);
+              if (result == 'true') {
+                database.child('post/$ref/likes/$ownName').set('false');
+                print('removed like');
+                database
+                    .child('post/$ref/likeAmount')
+                    .set(ServerValue.increment(-1));
+                icon = Icons.favorite_border_outlined;
+                setState(() {});
+              } else {
+                database.child('post/$ref/likes/$ownName').set('true');
+                database
+                    .child('post/$ref/likeAmount')
+                    .set(ServerValue.increment(1));
+                print('added like');
+                icon = Icons.favorite;
+                setState(() {});
+              }
+            },
+          ))
     ]);
   }
 }

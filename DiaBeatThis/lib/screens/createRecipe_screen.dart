@@ -9,7 +9,6 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:uuid/uuid.dart';
-
 import '../classes/utils.dart';
 
 class CreateRecipeScreen extends StatefulWidget {
@@ -596,8 +595,6 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
 
                   String imageURL = await uploadPicture(image!);
 
-                  List<String>? reactions;
-                  List<String>? comments;
                   String timestamp = DateTime.now().toString();
                   var timeIdent = new DateTime.now().millisecondsSinceEpoch;
                   String username = await getUsername();
@@ -605,15 +602,14 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                   var key = myRef.key!;
 
                   final newRecipe = <String, dynamic>{
-                    'likeAmount': 0,
+                    'likeAmount' : 0,
+                    'CommentsAmount' : 0,
                     'title': titleController.text,
                     'description': descriptionController.text,
                     'ingredients': ingredientList,
                     'ingredientsQuantity': ingredientQuantityList,
                     'instructions': instructionController.text,
                     'tags': tagList,
-                    //'reactions' : reactions,
-                    //'comments' : comments,
                     'timestamp': timestamp,
                     'currentUser': username,
                     'pictureID': imageURL,

@@ -21,6 +21,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreen extends State<LoginScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  final formKey = GlobalKey<FormState>();
 
   @override
   void dispose() {
@@ -33,17 +34,29 @@ class _LoginScreen extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Login", style: HEADLINE_BOLD_WHITE),
+        title: const Padding(
+          padding: EdgeInsets.only(bottom: 2),
+          child: Text('DiaBeatThis!', style: DIABEATTHIS_LOGO),
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
+        child: Form(
+    key: formKey,
+    child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const SizedBox(height: 40),
+            const SizedBox(height: 15),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: TextField(
+              child: TextFormField(
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return "Enter Email Adress";
+                  }
+                  return null;
+                },
                 controller: emailController,
                 cursorColor: Colors.white,
                 textInputAction: TextInputAction.next,
@@ -53,7 +66,7 @@ class _LoginScreen extends State<LoginScreen> {
                       fontFamily: "VisbyMedium", color: COLOR_INDIGO_LIGHT),
                   enabledBorder: OutlineInputBorder(
                       borderSide:
-                          BorderSide(color: COLOR_INDIGO_LIGHT, width: 3.0)),
+                          BorderSide(color: COLOR_INDIGO_LIGHT)),
                   border: OutlineInputBorder(
                     borderSide: BorderSide(
                       color: COLOR_INDIGO_LIGHT,
@@ -66,7 +79,14 @@ class _LoginScreen extends State<LoginScreen> {
             const SizedBox(height: 4),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: TextField(
+              child: TextFormField(
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return "Enter Password";
+                  }
+                  return null;
+                },
                 controller: passwordController,
                 textInputAction: TextInputAction.done,
                 decoration: const InputDecoration(
@@ -75,7 +95,7 @@ class _LoginScreen extends State<LoginScreen> {
                       fontFamily: "VisbyMedium", color: COLOR_INDIGO_LIGHT),
                   enabledBorder: OutlineInputBorder(
                       borderSide:
-                          BorderSide(color: COLOR_INDIGO_LIGHT, width: 3.0)),
+                          BorderSide(color: COLOR_INDIGO_LIGHT)),
                   border: OutlineInputBorder(
                     borderSide: BorderSide(
                       color: COLOR_INDIGO_LIGHT,
@@ -89,11 +109,11 @@ class _LoginScreen extends State<LoginScreen> {
             const SizedBox(height: 20),
             ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
-                  minimumSize: const Size.fromHeight(50)),
-              icon: const Icon(Icons.lock_open, size: 32),
+                  minimumSize: const Size.fromHeight(45)),
+              icon: const Icon(Icons.lock_open, size: 20),
               label: const Text(
                 "Sign In",
-                style: TextStyle(fontFamily: "VisbyMedium", fontSize: 24),
+                style: TextStyle(fontFamily: "VisbyMedium", fontSize: 20),
               ),
               onPressed: singIn,
             ),
@@ -103,7 +123,7 @@ class _LoginScreen extends State<LoginScreen> {
               style: const TextStyle(
                   fontFamily: "VisbyMedium",
                   color: COLOR_INDIGO_LIGHT,
-                  fontSize: 20),
+                  fontSize: 15),
               text: "No account?  ",
               children: [
                 TextSpan(
@@ -129,10 +149,13 @@ class _LoginScreen extends State<LoginScreen> {
           ],
         ),
       ),
-    );
+    ));
   }
 
   Future singIn() async {
+    final isValid = formKey.currentState!.validate();
+    if (!isValid) return;
+
     showDialog(
       context: context,
       barrierDismissible: false,

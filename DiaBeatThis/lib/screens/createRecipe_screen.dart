@@ -244,6 +244,9 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
         Padding(
           padding: const EdgeInsets.all(9.0),
           child: TextFormField(
+            inputFormatters: [
+              LengthLimitingTextInputFormatter(17),
+            ],
             autovalidateMode: AutovalidateMode.onUserInteraction,
             validator: (value) {
               if (value!.isEmpty) {
@@ -286,6 +289,9 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: TextFormField(
+            inputFormatters: [
+              LengthLimitingTextInputFormatter(150),
+            ],
             autovalidateMode: AutovalidateMode.onUserInteraction,
             validator: (value) {
               if (value!.isEmpty) {

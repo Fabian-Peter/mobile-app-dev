@@ -3,6 +3,7 @@ import 'package:diabeatthis/utils/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class SettingsScreen extends StatefulWidget {
   @override
@@ -16,7 +17,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   DatabaseReference databaseReference =
       FirebaseDatabase.instance.ref().child("Users");
 
-  TextEditingController nameController = TextEditingController();
   TextEditingController usernameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
@@ -24,148 +24,127 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Settings", style: HEADLINE_BOLD_WHITE)),
-      body: ListView(children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: TextFormField(
-            controller: usernameController,
-            decoration: const InputDecoration(
-              labelText: "Enter Username",
-              labelStyle: TextStyle(
-                  fontFamily: "VisbyMedium",
-                  fontSize: 14,
-                  color: COLOR_INDIGO_LIGHT),
-              isDense: true,
-              enabledBorder: OutlineInputBorder(
-                  borderSide:
-                      BorderSide(color: COLOR_INDIGO_LIGHT, width: 3.0)),
-              border: OutlineInputBorder(
-                borderSide: BorderSide(
-                  color: COLOR_INDIGO_LIGHT,
-                  width: 3.0,
+        appBar:
+            AppBar(title: const Text("Settings", style: HEADLINE_BOLD_WHITE)),
+        body: Form(
+          key: _formKey,
+          child: ListView(children: [
+            SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextFormField(
+                inputFormatters: [
+                  LengthLimitingTextInputFormatter(15),
+                ],
+                controller: usernameController,
+                decoration: const InputDecoration(
+                  labelText: "Enter Username",
+                  labelStyle: TextStyle(
+                      fontFamily: "VisbyMedium",
+                      fontSize: 14,
+                      color: COLOR_INDIGO_LIGHT),
+                  isDense: true,
+                  enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: COLOR_INDIGO_LIGHT)),
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: COLOR_INDIGO_LIGHT,
+                      width: 3.0,
+                    ),
+                  ),
                 ),
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return "Enter Username";
+                  }
+                  return null;
+                },
               ),
             ),
-            validator: (value) {
-              if (value!.isEmpty) {
-                return "Enter Username";
-              }
-              return null;
-            },
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: TextFormField(
-            controller: nameController,
-            decoration: const InputDecoration(
-              labelText: "Enter Name",
-              labelStyle: TextStyle(
-                  fontFamily: "VisbyMedium",
-                  fontSize: 14,
-                  color: COLOR_INDIGO_LIGHT),
-              isDense: true,
-              enabledBorder: OutlineInputBorder(
-                  borderSide:
-                      BorderSide(color: COLOR_INDIGO_LIGHT, width: 3.0)),
-              border: OutlineInputBorder(
-                borderSide: BorderSide(
-                  color: COLOR_INDIGO_LIGHT,
-                  width: 3.0,
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextFormField(
+                controller: emailController,
+                decoration: const InputDecoration(
+                  labelText: "Enter Email",
+                  labelStyle: TextStyle(
+                      fontFamily: "VisbyMedium",
+                      fontSize: 14,
+                      color: COLOR_INDIGO_LIGHT),
+                  isDense: true,
+                  enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: COLOR_INDIGO_LIGHT)),
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: COLOR_INDIGO_LIGHT,
+                      width: 3.0,
+                    ),
+                  ),
                 ),
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return "Enter an Email Address";
+                  } else if (!value.contains("@")) {
+                    return "Please enter a valid email address";
+                  }
+                  return null;
+                },
               ),
             ),
-            validator: (value) {
-              if (value!.isEmpty) {
-                return "Enter Name";
-              }
-              return null;
-            },
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: TextFormField(
-            controller: emailController,
-            decoration: const InputDecoration(
-              labelText: "Enter Email",
-              labelStyle: TextStyle(
-                  fontFamily: "VisbyMedium",
-                  fontSize: 14,
-                  color: COLOR_INDIGO_LIGHT),
-              isDense: true,
-              enabledBorder: OutlineInputBorder(
-                  borderSide:
-                      BorderSide(color: COLOR_INDIGO_LIGHT, width: 3.0)),
-              border: OutlineInputBorder(
-                borderSide: BorderSide(
-                  color: COLOR_INDIGO_LIGHT,
-                  width: 3.0,
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextFormField(
+                obscureText: true,
+                controller: passwordController,
+                decoration: const InputDecoration(
+                  labelText: "Enter Password",
+                  labelStyle: TextStyle(
+                      fontFamily: "VisbyMedium",
+                      fontSize: 14,
+                      color: COLOR_INDIGO_LIGHT),
+                  isDense: true,
+                  enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: COLOR_INDIGO_LIGHT)),
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: COLOR_INDIGO_LIGHT,
+                      width: 3.0,
+                    ),
+                  ),
                 ),
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return "Enter Password";
+                  } else if (value.length < 6) {
+                    return "Password must be at least 6 characters!";
+                  }
+                  return null;
+                },
               ),
             ),
-            validator: (value) {
-              if (value!.isEmpty) {
-                return "Enter an Email Address";
-              } else if (!value.contains("@")) {
-                return "Please enter a valid email address";
-              }
-              return null;
-            },
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: TextFormField(
-            obscureText: true,
-            controller: passwordController,
-            decoration: const InputDecoration(
-              labelText: "Enter Password",
-              labelStyle: TextStyle(
-                  fontFamily: "VisbyMedium",
-                  fontSize: 14,
-                  color: COLOR_INDIGO_LIGHT),
-              isDense: true,
-              enabledBorder: OutlineInputBorder(
-                  borderSide:
-                      BorderSide(color: COLOR_INDIGO_LIGHT, width: 3.0)),
-              border: OutlineInputBorder(
-                borderSide: BorderSide(
-                  color: COLOR_INDIGO_LIGHT,
-                  width: 3.0,
-                ),
-              ),
-            ),
-            validator: (value) {
-              if (value!.isEmpty) {
-                return "Enter Password";
-              } else if (value.length < 6) {
-                return "Password must be at least 6 characters!";
-              }
-              return null;
-            },
-          ),
-        ),
-        Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: isLoading
-                ? const CircularProgressIndicator()
-                : ElevatedButton(
-                    style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all<Color>(
-                            COLOR_INDIGO_LIGHT)),
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        setState(() {
-                          isLoading = true;
-                        });
-                        registerToFb();
-                      }
-                    },
-                    child: const Text("Submit")))
-      ]),
-    );
+            Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: isLoading
+                    ? const CircularProgressIndicator()
+                    : ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                            minimumSize: const Size.fromHeight(40)),
+                        icon: const Icon(Icons.save_as, size: 20),
+                        label: const Text(
+                          "Submit",
+                          style: TextStyle(
+                              fontFamily: "VisbyMedium", fontSize: 20),
+                        ),
+                        onPressed: () {
+                          if (_formKey.currentState!.validate()) {
+                            setState(() {
+                              isLoading = true;
+                            });
+                            registerToFb();
+                          }
+                        }))
+          ]),
+        ));
   }
 
   void registerToFb() {
@@ -176,7 +155,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       databaseReference.child(result.user!.uid).set({
         "email": emailController.text,
         "username": usernameController.text,
-        "name": nameController.text
       }).then((res) {
         isLoading = false;
         Navigator.pushReplacement(
@@ -208,7 +186,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   void dispose() {
     super.dispose();
-    nameController.dispose();
     usernameController.dispose();
     emailController.dispose();
     passwordController.dispose();

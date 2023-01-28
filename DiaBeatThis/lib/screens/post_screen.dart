@@ -25,18 +25,19 @@ class _PostScreenState extends State<PostScreen> {
   final ref = FirebaseDatabase.instance.ref("Users");
 
   String ownName = FirebaseAuth.instance.currentUser!.uid;
-  FirebaseStorage storage = FirebaseStorage.instance;
+
   final database = FirebaseDatabase.instance.refFromURL(
       "https://diabeathis-f8ee3-default-rtdb.europe-west1.firebasedatabase.app");
   final IconData _favIconOutlined = Icons.favorite_outline;
   IconData icon = Icons.favorite_border_outlined;
-  String? currentUser = FirebaseAuth.instance.currentUser?.uid.toString();
+
+  String currentUser = FirebaseAuth.instance.currentUser!.uid.toString();
 
   TextEditingController commentsController = TextEditingController();
   late DataSnapshot queryReference;
 
   Future<String> downloadURL(String imageName) async {
-    String downloadURL = await storage.ref('image/$imageName').getDownloadURL();
+    String downloadURL = await FirebaseStorage.instance.ref('image/$imageName').getDownloadURL();
     return downloadURL;
   }
 
@@ -64,16 +65,10 @@ class _PostScreenState extends State<PostScreen> {
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.only(top: 7),
-            child: FirebaseAnimatedList(
-              shrinkWrap: true,
-              query: ref,
-              defaultChild: const Text("Loading...", style: TEXT_PLAIN),
-              itemBuilder: (context, snapshot, animation, index) {
-                return _buildPost(context, snapshot);
-              },
+            child: _buildPost(context, widget.post),
             ),
           ),
-        ));
+        );
   }
 
   Widget _buildPost(BuildContext context, DataSnapshot snapshot) {
@@ -108,19 +103,19 @@ class _PostScreenState extends State<PostScreen> {
       children: [
         ClipRRect(
           borderRadius: BorderRadius.circular(USER_ICON_POST_SIZE / 2),
-          child: InkWell(
-            child: Image.asset(
-              'assets/images/Avatar.png', //TODO: replace with user image
-              height: USER_ICON_POST_SIZE,
-              width: USER_ICON_POST_SIZE,
-            ),
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) {
-                  return FirebaseAuth.instance.currentUser!.isAnonymous
-                      ? AuthScreen()
-                      : ProfileScreen();
-                }),
+          child: UserNameToID(
+            username: snapshot.child('currentUser').value.toString(),
+            builder: (context, snapshot) {
+              final userID = snapshot.data;
+              return InkWell(
+                child: UserProfileImage(userID: userID),
+                onTap: userID == null ? null : () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) {
+                      return ProfileScreen(userID: userID);
+                    }),
+                  );
+                },
               );
             },
           ),
@@ -164,7 +159,7 @@ class _PostScreenState extends State<PostScreen> {
               MaterialPageRoute(builder: (_) {
                 return FirebaseAuth.instance.currentUser!.isAnonymous
                     ? AuthScreen()
-                    : ProfileScreen();
+                    : ProfileScreen(userID: currentUser,);
               }),
             );
           },

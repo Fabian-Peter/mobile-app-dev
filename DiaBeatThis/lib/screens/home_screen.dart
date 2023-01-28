@@ -26,26 +26,24 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final ref = FirebaseDatabase.instance.ref("post");
+  final ref2 = FirebaseDatabase.instance.ref("Users");
   final user = FirebaseAuth.instance.currentUser!;
-  final database = FirebaseDatabase(
-          databaseURL:
-              "https://diabeathis-f8ee3-default-rtdb.europe-west1.firebasedatabase.app")
-      .reference();
+  final database = FirebaseDatabase.instance.refFromURL(
+      "https://diabeathis-f8ee3-default-rtdb.europe-west1.firebasedatabase.app");
   late Query query = ref.orderByChild('timeSorter');
   Key listKey = Key(DateTime.now().millisecondsSinceEpoch.toString());
   IconData icon = Icons.favorite_border_outlined;
   TextEditingController searchController = TextEditingController();
   FocusNode searchBarFocusNode = FocusNode();
   String searchWord = "";
-  IconData _favIconOutlinedFilter = Icons.favorite_border_outlined;
+  final IconData _favIconOutlinedFilter = Icons.favorite_border_outlined;
 
-  final IconData _homeIcon = Icons.home;
+  //final IconData _homeIcon = Icons.home;
   TextEditingController textController = TextEditingController();
   bool isVisible = false;
-  List<Post>? posts = DummyData().returnData;
-  User userTest = DummyData().user1;
-  final firebase_storage.FirebaseStorage storage =
-      firebase_storage.FirebaseStorage.instance;
+  //List<Post>? posts = DummyData().returnData;
+  //User userTest = DummyData().user1;
+  //final firebase_storage.FirebaseStorage storage = firebase_storage.FirebaseStorage.instance;
   late Future<String> dataFuture;
 
   @override
@@ -68,8 +66,18 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           actions: <Widget>[
             Row(
-              children: [_buildLogButton(context), _buildProfileIcon(context)],
-            )
+              children: [
+                _buildLogButton(context),
+                FirebaseAnimatedList(
+                  shrinkWrap: true,
+                  query: ref2,
+                  defaultChild: const Text("Loading...", style: TEXT_PLAIN),
+                  itemBuilder: (context, snapshot, animation, index) {
+                    return _buildProfileIcon(context, snapshot, index);
+                  },
+                ),
+              ],
+            ),
           ],
         ),
         body: NotificationListener<UserScrollNotification>(
@@ -164,8 +172,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildProfileIcon(BuildContext context) {
-    final User profile = userTest;
+  Widget _buildProfileIcon(BuildContext context, DataSnapshot snapshot, int index) {
+    //final User profile = userTest;
     return ClipRRect(
       borderRadius: BorderRadius.circular(PROFILE_ICON_BAR_SIZE / 2),
       child: Padding(
@@ -183,14 +191,10 @@ class _HomeScreenState extends State<HomeScreen> {
               MaterialPageRoute(builder: (_) {
                 return FirebaseAuth.instance.currentUser!.isAnonymous
                     ? AuthScreen()
-                    : const ProfileScreen();
+                    : ProfileScreen(user: snapshot);
               }),
             );
           },
-          //TODO: open profile instead or login screen
-          // FirebaseAuth.instance.currentUser!.isAnonymous
-          //                         ? AuthScreen()
-          //                         :
         ),
       ),
     );
@@ -271,48 +275,49 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildPosts(BuildContext context, DataSnapshot snapshot, int index) {
     return Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 9,
-          vertical: 7,
-        ),
-        child: InkWell(
-          child: Container(
-            decoration: BoxDecoration(
-              color: COLOR_WHITE,
-              border: Border.all(width: 3, color: COLOR_INDIGO_LIGHT),
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
-                  spreadRadius: 2,
-                  blurRadius: 3,
-                  offset: const Offset(0, 3),
-                ),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 9,
+        vertical: 7,
+      ),
+      child: InkWell(
+        child: Container(
+          decoration: BoxDecoration(
+            color: COLOR_WHITE,
+            border: Border.all(width: 3, color: COLOR_INDIGO_LIGHT),
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                spreadRadius: 2,
+                blurRadius: 3,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildCreator(context, snapshot, index),
+                _buildTitle(context, snapshot, index),
+                _buildImage(context, snapshot, index),
+                _buildDescription(context, snapshot, index),
+                _buildCommentsAndLikes(context, snapshot, index),
+                //TODO: tags icons
+                //TODO: reactions
               ],
             ),
-            child: SafeArea(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildCreator(context, snapshot, index),
-                  _buildTitle(context, snapshot, index),
-                  _buildImage(context, snapshot, index),
-                  _buildDescription(context, snapshot, index),
-                  _buildCommentsAndLikes(context, snapshot, index),
-                  //TODO: tags icons
-                  //TODO: reactions
-                ],
-              ),
-            ),
           ),
-          onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) {
-                return PostScreen(post: snapshot);
-              }),
-            );
-          },
-        ));
+        ),
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) {
+              return PostScreen(post: snapshot);
+            }),
+          );
+        },
+      ),
+    );
   }
 
   Widget _buildCreator(BuildContext context, DataSnapshot snapshot, int index) {
@@ -333,7 +338,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   MaterialPageRoute(builder: (_) {
                     return FirebaseAuth.instance.currentUser!.isAnonymous
                         ? AuthScreen()
-                        : const ProfileScreen();
+                        : ProfileScreen(user: snapshot);
                   }),
                 );
               },
@@ -350,13 +355,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildTitle(BuildContext context, DataSnapshot snapshot, int index) {
     return Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 8,
-          vertical: 1,
-        ),
-        child: Center(
-            child: Text(snapshot.child('title').value.toString(),
-                style: HEADLINE_BOLD_BLACK)));
+      padding: const EdgeInsets.symmetric(
+        horizontal: 8,
+        vertical: 1,
+      ),
+      child: Center(
+        child: Text(snapshot.child('title').value.toString(),
+            style: HEADLINE_BOLD_BLACK),
+      ),
+    );
   }
 
   Widget _buildImage(BuildContext context, DataSnapshot snapshot, int index) {
@@ -373,7 +380,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: CachedNetworkImage(
               imageUrl: url,
               fit: BoxFit.cover,
-              placeholder: (context, url) => CircularProgressIndicator(),
+              placeholder: (context, url) => const CircularProgressIndicator(),
             ),
           ),
         ));
@@ -413,7 +420,7 @@ class _HomeScreenState extends State<HomeScreen> {
         borderRadius: BorderRadius.circular(8),
         position: BadgePosition.topEnd(top: 1, end: -3),
         badgeColor: COLOR_INDIGO_LIGHT,
-        badgeContent: Text('0', style: TextStyle(color: Colors.white)),
+        badgeContent: const Text('0', style: TextStyle(color: Colors.white)),
         child: IconButton(
           icon: const Icon(
             Icons.comment_bank_sharp,
@@ -427,7 +434,8 @@ class _HomeScreenState extends State<HomeScreen> {
         borderRadius: BorderRadius.circular(8),
         position: BadgePosition.topEnd(top: 1, end: -3),
         badgeColor: Colors.red,
-        badgeContent: Text(likesAmount, style: TextStyle(color: Colors.white)),
+        badgeContent:
+            Text(likesAmount, style: const TextStyle(color: Colors.white)),
         child: IconButton(
           icon: Icon(
             icon,

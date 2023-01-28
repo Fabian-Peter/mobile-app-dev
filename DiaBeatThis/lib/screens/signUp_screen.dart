@@ -43,8 +43,13 @@ class _SignUpScreen extends State<SignUpScreen> {
   late String name;
   File? image;
   var uuid = Uuid();
+  bool isImageMissing = false;
 
   Future pickImage(ImageSource source) async {
+    setState(() {
+      isImageMissing = false;
+      return;
+    });
     try {
       final image = await ImagePicker().pickImage(source: source);
       if (image == null) return;
@@ -118,6 +123,7 @@ class _SignUpScreen extends State<SignUpScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              SizedBox(height: 10),
               Stack(clipBehavior: Clip.none, children: [
                 Container(
                     height: 120.0,
@@ -136,18 +142,29 @@ class _SignUpScreen extends State<SignUpScreen> {
                     left: 32,
                     child: FloatingActionButton(
                       heroTag: "btn1",
-                      backgroundColor: COLOR_INDIGO,
+                      backgroundColor:
+                          isImageMissing ? Colors.red : COLOR_INDIGO,
                       foregroundColor: Colors.white,
                       onPressed: () {
                         _pictureEditBottomSheet(context);
                       },
-                      child: Icon(Icons.camera_alt),
+                      child: const Icon(Icons.camera_alt),
                     )),
               ]),
-              const SizedBox(height: 40),
+              const SizedBox(
+                height: 27,
+              ),
+              isImageMissing
+                  ? const Text("Missing image!",
+                      style: TextStyle(color: Colors.red))
+                  : SizedBox(),
+              const SizedBox(height: 15),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
+                  inputFormatters: [
+                    LengthLimitingTextInputFormatter(15),
+                  ],
                   controller: usernameController,
                   decoration: const InputDecoration(
                     labelText: "Enter Username",
@@ -155,8 +172,7 @@ class _SignUpScreen extends State<SignUpScreen> {
                         fontFamily: "VisbyMedium", color: COLOR_INDIGO_LIGHT),
                     isDense: true,
                     enabledBorder: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: COLOR_INDIGO_LIGHT, width: 3.0)),
+                        borderSide: BorderSide(color: COLOR_INDIGO_LIGHT)),
                     border: OutlineInputBorder(
                       borderSide: BorderSide(
                         color: COLOR_INDIGO_LIGHT,
@@ -184,8 +200,7 @@ class _SignUpScreen extends State<SignUpScreen> {
                     labelStyle: TextStyle(
                         fontFamily: "VisbyMedium", color: COLOR_INDIGO_LIGHT),
                     enabledBorder: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: COLOR_INDIGO_LIGHT, width: 3.0)),
+                        borderSide: BorderSide(color: COLOR_INDIGO_LIGHT)),
                     border: OutlineInputBorder(
                       borderSide: BorderSide(
                         color: COLOR_INDIGO_LIGHT,
@@ -200,7 +215,6 @@ class _SignUpScreen extends State<SignUpScreen> {
                           : null,
                 ),
               ),
-              const SizedBox(height: 4),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextFormField(
@@ -211,8 +225,7 @@ class _SignUpScreen extends State<SignUpScreen> {
                     labelStyle: TextStyle(
                         fontFamily: "VisbyMedium", color: COLOR_INDIGO_LIGHT),
                     enabledBorder: OutlineInputBorder(
-                        borderSide:
-                            BorderSide(color: COLOR_INDIGO_LIGHT, width: 3.0)),
+                        borderSide: BorderSide(color: COLOR_INDIGO_LIGHT)),
                     border: OutlineInputBorder(
                       borderSide: BorderSide(
                         color: COLOR_INDIGO_LIGHT,
@@ -230,11 +243,11 @@ class _SignUpScreen extends State<SignUpScreen> {
               const SizedBox(height: 20),
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
-                    minimumSize: const Size.fromHeight(50)),
-                icon: const Icon(Icons.arrow_forward, size: 32),
+                    minimumSize: const Size.fromHeight(45)),
+                icon: const Icon(Icons.arrow_forward, size: 20),
                 label: const Text(
                   "Sign Up",
-                  style: TextStyle(fontFamily: "VisbyMedium", fontSize: 24),
+                  style: TextStyle(fontFamily: "VisbyMedium", fontSize: 20),
                 ),
                 onPressed: signUp,
               ),
@@ -244,7 +257,7 @@ class _SignUpScreen extends State<SignUpScreen> {
                 style: const TextStyle(
                     fontFamily: "VisbyMedium",
                     color: COLOR_INDIGO_LIGHT,
-                    fontSize: 20),
+                    fontSize: 15),
                 text: "Already have an account? ",
                 children: [
                   TextSpan(
@@ -279,34 +292,43 @@ class _SignUpScreen extends State<SignUpScreen> {
   }
 
   Future signUp() async {
-    String imageURL = await uploadPicture(image!);
     final isValid = formKey.currentState!.validate();
-    if (!isValid) return;
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const Center(child: CircularProgressIndicator()),
-    );
-
-    try {
-      await firebaseAuth
-          .createUserWithEmailAndPassword(
-              email: emailController.text.trim(),
-              password: passwordController.text.trim())
-          .then((result) {
-        databaseReference.child(result.user!.uid).set({
-          "email": emailController.text,
-          "username": usernameController.text,
-          'userPictureID': imageURL,
-        });
+    if (image == null) {
+      setState(() {
+        isImageMissing = true;
+        return;
       });
-    } on FirebaseAuthException catch (e) {
-      print(e);
-
-      Utils.showSnackBar(e.message);
     }
+    if (!isValid) return;
 
-    navigatorKey.currentState!.popUntil((route) => route.isFirst);
+    if (image != null && !isImageMissing) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(child: CircularProgressIndicator()),
+      );
+
+      try {
+        String imageURL = await uploadPicture(image!);
+        await firebaseAuth
+            .createUserWithEmailAndPassword(
+                email: emailController.text.trim(),
+                password: passwordController.text.trim())
+            .then((result) {
+          databaseReference.child(result.user!.uid).set({
+            "email": emailController.text,
+            "username": usernameController.text,
+            'userPictureID': imageURL,
+          });
+        });
+      } on FirebaseAuthException catch (e) {
+        print(e);
+
+        Utils.showSnackBar(e.message);
+      }
+
+      navigatorKey.currentState!.popUntil((route) => route.isFirst);
+    }
   }
 
   Future guestLogin() async {

@@ -109,7 +109,7 @@ class _PostScreenState extends State<PostScreen> {
                 MaterialPageRoute(builder: (_) {
                   return FirebaseAuth.instance.currentUser!.isAnonymous
                       ? AuthScreen()
-                      : ProfileScreen(user: snapshot);
+                      : ProfileScreen();
                 }),
               );
             },
@@ -159,7 +159,7 @@ class _PostScreenState extends State<PostScreen> {
                 builder: (_) {
                   return FirebaseAuth.instance.currentUser!.isAnonymous
                       ? AuthScreen()
-                      : ProfileScreen(user: snapshot);
+                      : ProfileScreen();
                 },
               ),
             );

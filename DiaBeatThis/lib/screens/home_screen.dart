@@ -39,13 +39,15 @@ class _HomeScreenState extends State<HomeScreen> {
   String searchWord = "";
   IconData _favIconOutlinedFilter = Icons.favorite_border_outlined;
 
+  String? currentUser = FirebaseAuth.instance.currentUser?.uid.toString();
+
   //final IconData _homeIcon = Icons.home;
   TextEditingController textController = TextEditingController();
   bool isVisible = false;
   //List<Post>? posts = DummyData().returnData;
   //User userTest = DummyData().user1;
   //final firebase_storage.FirebaseStorage storage = firebase_storage.FirebaseStorage.instance;
-  late Future<String> dataFuture;
+  //late Future<String> dataFuture;
 
   @override
   void initState() {
@@ -67,17 +69,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           actions: <Widget>[
             Row(
-              children: [
-                _buildLogButton(context),
-                FirebaseAnimatedList(
-                  shrinkWrap: true,
-                  query: ref2,
-                  defaultChild: const Text("Loading...", style: TEXT_PLAIN),
-                  itemBuilder: (context, snapshot, animation, index) {
-                    return _buildProfileIcon(context, snapshot, index);
-                  },
-                ),
-              ],
+              children: [_buildLogButton(context), _buildProfileIcon(context)],
             ),
           ],
         ),
@@ -190,27 +182,21 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildProfileIcon(
-      BuildContext context, DataSnapshot snapshot, int index) {
-    //final User profile = userTest;
+  Widget _buildProfileIcon(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(PROFILE_ICON_BAR_SIZE / 2),
       child: Padding(
         padding: const EdgeInsets.only(right: 10),
         child: InkWell(
-          child: Image.asset(
-            //TODO: if guest, then show anonymous profile icon
-            'assets/images/Profile.png',
-            //TODO: replace with user image
-            height: PROFILE_ICON_BAR_SIZE,
-            width: PROFILE_ICON_BAR_SIZE,
+          child: UserProfileImage(
+            userID: currentUser,
           ),
           onTap: () {
             Navigator.of(context).push(
               MaterialPageRoute(builder: (_) {
                 return FirebaseAuth.instance.currentUser!.isAnonymous
                     ? AuthScreen()
-                    : ProfileScreen(user: snapshot);
+                    : ProfileScreen();
               }),
             );
           },
@@ -221,80 +207,79 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildSearchBar(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 10, right: 10),
-      child: Row(children: [
-        Expanded(
-            child: SizedBox(
-                height: 33,
-                child: TextFormField(
-                  focusNode: searchBarFocusNode,
-                  onTap: () => searchBarFocusNode.requestFocus(),
-                  controller: searchController,
-                  onChanged: (text) {
-                    setState(() {
-                      if (searchController.text != "") {
-                        searchWord = searchController.text.toLowerCase();
-                      }
-                    });
-                  },
-                  decoration: InputDecoration(
-                    suffixIcon: IconButton(
-                        icon:
-                            const Icon(Icons.cancel, color: COLOR_INDIGO_LIGHT),
-                        iconSize: 15,
-                        splashRadius: 20,
-                        onPressed: () {
-                          setState(() {
-                            searchWord = "";
-                          });
-                          searchController.clear();
-                          searchBarFocusNode.unfocus();
-                        }),
-                    labelText: 'Search for recipe or ingredient...',
-                    labelStyle: const TextStyle(
-                        fontFamily: "VisbyMedium",
-                        fontSize: 14,
-                        color: COLOR_INDIGO_LIGHT),
-                    isDense: true,
-                    enabledBorder: const OutlineInputBorder(
-                        borderSide: BorderSide(
-                      color: COLOR_INDIGO_LIGHT,
-                    )),
-                    border: const OutlineInputBorder(
-                      borderSide: BorderSide(
+        padding: const EdgeInsets.only(left: 10, right: 10),
+        child: Row(children: [
+          Expanded(
+              child: SizedBox(
+                  height: 33,
+                  child: TextFormField(
+                    focusNode: searchBarFocusNode,
+                    onTap: () => searchBarFocusNode.requestFocus(),
+                    controller: searchController,
+                    onChanged: (text) {
+                      setState(() {
+                        if (searchController.text != "") {
+                          searchWord = searchController.text.toLowerCase();
+                        }
+                      });
+                    },
+                    decoration: InputDecoration(
+                      suffixIcon: IconButton(
+                          icon: const Icon(Icons.cancel,
+                              color: COLOR_INDIGO_LIGHT),
+                          iconSize: 15,
+                          splashRadius: 20,
+                          onPressed: () {
+                            setState(() {
+                              searchWord = "";
+                            });
+                            searchController.clear();
+                            searchBarFocusNode.unfocus();
+                          }),
+                      labelText: 'Search for recipe or ingredient...',
+                      labelStyle: const TextStyle(
+                          fontFamily: "VisbyMedium",
+                          fontSize: 14,
+                          color: COLOR_INDIGO_LIGHT),
+                      isDense: true,
+                      enabledBorder: const OutlineInputBorder(
+                          borderSide: BorderSide(
                         color: COLOR_INDIGO_LIGHT,
-                        width: 3.0,
+                      )),
+                      border: const OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: COLOR_INDIGO_LIGHT,
+                          width: 3.0,
+                        ),
                       ),
                     ),
-                  ),
-                ))),
-        IconButton(
-          icon: Icon(_favIconOutlinedFilter, color: COLOR_INDIGO_LIGHT),
-          iconSize: 25,
-          splashRadius: 20,
-          onPressed: () {
-            //TODO: show all liked posts for logged user
-            // FirebaseAuth.instance.currentUser!.isAnonymous
-            //                         ? AuthScreen()
-            //                         :
-            setState(() {
-              if (_favIconOutlinedFilter == Icons.favorite_border_outlined) {
-                _favIconOutlinedFilter = Icons.favorite;
-              } else {
-                _favIconOutlinedFilter = Icons.favorite_border_outlined;
-              }
-              if (searchController.text != "") {
-                listKey =
-                    Key(DateTime.now().millisecondsSinceEpoch.toString());
-                query =
-                    ref.orderByChild("title").equalTo(searchController.text);
-              }
-            });
-            searchBarFocusNode.unfocus();
-          },
-        ),
-      ]));
-
+                  ))),
+          IconButton(
+            icon: Icon(_favIconOutlinedFilter, color: COLOR_INDIGO_LIGHT),
+            iconSize: 25,
+            splashRadius: 20,
+            onPressed: () {
+              //TODO: show all liked posts for logged user
+              // FirebaseAuth.instance.currentUser!.isAnonymous
+              //                         ? AuthScreen()
+              //                         :
+              setState(() {
+                if (_favIconOutlinedFilter == Icons.favorite_border_outlined) {
+                  _favIconOutlinedFilter = Icons.favorite;
+                } else {
+                  _favIconOutlinedFilter = Icons.favorite_border_outlined;
+                }
+                if (searchController.text != "") {
+                  listKey =
+                      Key(DateTime.now().millisecondsSinceEpoch.toString());
+                  query =
+                      ref.orderByChild("title").equalTo(searchController.text);
+                }
+              });
+              searchBarFocusNode.unfocus();
+            },
+          ),
+        ]));
   }
 
   Widget _buildPosts(BuildContext context, DataSnapshot snapshot, int index) {
@@ -362,7 +347,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   MaterialPageRoute(builder: (_) {
                     return FirebaseAuth.instance.currentUser!.isAnonymous
                         ? AuthScreen()
-                        : ProfileScreen(user: snapshot);
+                        : ProfileScreen();
                   }),
                 );
               },
@@ -490,5 +475,58 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           ))
     ]);
+  }
+}
+
+class UserProfileImage extends StatefulWidget {
+  const UserProfileImage({Key? key, required this.userID}) : super(key: key);
+  final String? userID;
+
+  @override
+  State<UserProfileImage> createState() => _UserProfileImageState();
+}
+
+class _UserProfileImageState extends State<UserProfileImage> {
+  late final Stream<String?> userPictureID;
+
+  @override
+  void initState() {
+    userPictureID = getUserPictureID();
+    super.initState();
+  }
+
+  Stream<String?> getUserPictureID() {
+    return FirebaseDatabase.instance
+        .ref('Users/${widget.userID}/userPictureID')
+        .onValue
+        .map((event) => event.snapshot.value?.toString());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return CircleAvatar(
+      child: StreamBuilder<String?>(
+        stream: userPictureID,
+        initialData: null,
+        builder: (context, snapshot) {
+          final picture = snapshot.data;
+          if (picture == null) {
+            return Image.asset(
+              //TODO: if guest, then show anonymous profile icon
+              'assets/images/Profile.png',
+              //TODO: replace with user image
+              height: PROFILE_ICON_BAR_SIZE,
+              width: PROFILE_ICON_BAR_SIZE,
+            );
+          } else {
+            return CachedNetworkImage(
+              imageUrl: picture,
+              fit: BoxFit.cover,
+              placeholder: (context, url) => const CircularProgressIndicator(),
+            );
+          }
+        },
+      ),
+    );
   }
 }

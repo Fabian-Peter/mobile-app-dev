@@ -51,6 +51,7 @@ dependencies:
   email_validator: ^2.1.17
   badges: ^2.0.3
   swipe_cards: ^2.0.0+1
+  rxdart: ^0.27.7
 
 dev_dependencies:
   flutter_test:

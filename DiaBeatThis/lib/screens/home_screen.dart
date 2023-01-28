@@ -12,9 +12,12 @@ import 'package:diabeatthis/utils/constants.dart';
 import 'package:flutter/rendering.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:rxdart/rxdart.dart';
 import '../classes/Post.dart';
 import '../classes/user.dart';
 import 'package:badges/badges.dart';
+
+import 'Comments_Screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, this.uid});
@@ -26,6 +29,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  //Firebase variables
   final ref = FirebaseDatabase.instance.ref("post");
   final ref2 = FirebaseDatabase.instance.ref("Users");
   final user = FirebaseAuth.instance.currentUser!;
@@ -33,27 +37,30 @@ class _HomeScreenState extends State<HomeScreen> {
       "https://diabeathis-f8ee3-default-rtdb.europe-west1.firebasedatabase.app");
   late Query query = ref.orderByChild('timeSorter');
   Key listKey = Key(DateTime.now().millisecondsSinceEpoch.toString());
-  IconData icon = Icons.favorite_border_outlined;
-  TextEditingController searchController = TextEditingController();
-  FocusNode searchBarFocusNode = FocusNode();
-  String searchWord = "";
-  IconData _favIconOutlinedFilter = Icons.favorite_border_outlined;
-
   String? currentUser = FirebaseAuth.instance.currentUser?.uid.toString();
 
-  //final IconData _homeIcon = Icons.home;
+  //Icon variables
+  IconData icon = Icons.favorite_border_outlined;
+  IconData _favIconOutlinedFilter = Icons.favorite_border_outlined;
+
+  //Page variables
+  TextEditingController searchController = TextEditingController();
   TextEditingController textController = TextEditingController();
   bool isVisible = false;
-  //List<Post>? posts = DummyData().returnData;
-  //User userTest = DummyData().user1;
-  //final firebase_storage.FirebaseStorage storage = firebase_storage.FirebaseStorage.instance;
-  //late Future<String> dataFuture;
+
+  //Searchbar variables
+  FocusNode searchBarFocusNode = FocusNode();
+  String searchWord = "";
 
   @override
   void initState() {
-    IconData icon = Icons.favorite_border_outlined;
     super.initState();
   }
+
+  //void getComments() async{
+  //  DataSnapshot snippy = await FirebaseDatabase.instance.ref().orderByChild('comments').limitToFirst(3).get();
+  //  print(snippy.value);
+  //}
 
   @override
   Widget build(BuildContext context) {
@@ -137,21 +144,10 @@ class _HomeScreenState extends State<HomeScreen> {
                             return FirebaseAuth
                                     .instance.currentUser!.isAnonymous
                                 ? AuthScreen()
-                                : GameScreen();
+                                : CreateRecipeScreen();
                           }),
                         );
                       }),
-                  const SizedBox(height: 15),
-                  FloatingActionButton(
-                    heroTag: "btn_create",
-                    child: const Icon(Icons.add, size: 35),
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => CreateRecipeScreen()));
-                    },
-                  ),
                 ],
               )
             : null,
@@ -311,7 +307,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 _buildTitle(context, snapshot, index),
                 _buildImage(context, snapshot, index),
                 _buildDescription(context, snapshot, index),
-                _buildCommentsAndLikes(context, snapshot, index),
+                _buildComments(context, snapshot, index),
+                _buildLikes(context, snapshot, index),
                 //TODO: tags icons
                 //TODO: reactions
               ],
@@ -330,6 +327,11 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildCreator(BuildContext context, DataSnapshot snapshot, int index) {
+    String url = snapshot
+        .child('pictureID')
+        .value
+        .toString(); //TODO: get user image based on username
+
     return Row(
       children: [
         Padding(
@@ -337,20 +339,24 @@ class _HomeScreenState extends State<HomeScreen> {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(USER_ICON_POST_SIZE / 2),
             child: InkWell(
-              child: Image.asset(
-                'assets/images/Avatar.png', //TODO: replace with user image
-                height: USER_ICON_POST_SIZE,
-                width: USER_ICON_POST_SIZE,
+              child: InkWell(
+                child: UserNameToID(
+                  username: snapshot.child('currentUser').value.toString(),
+                  builder: (context, snapshot) {
+                    final userID = snapshot.data;
+                    return UserProfileImage(userID: userID);
+                  },
+                ),
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) {
+                      return FirebaseAuth.instance.currentUser!.isAnonymous
+                          ? AuthScreen()
+                          : ProfileScreen();
+                    }),
+                  );
+                },
               ),
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) {
-                    return FirebaseAuth.instance.currentUser!.isAnonymous
-                        ? AuthScreen()
-                        : ProfileScreen();
-                  }),
-                );
-              },
             ),
           ),
         ),
@@ -409,12 +415,20 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildCommentsAndLikes(
+  Widget _buildComments(
       BuildContext context, DataSnapshot snapshot, int index) {
+    return Padding(
+        padding: const EdgeInsets.only(left: 0, right: 0),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+          //Text(snapshot.hasChild('hello world').toString())
+        ]));
+  }
+
+  Widget _buildLikes(BuildContext context, DataSnapshot snapshot, int index) {
     String ref = snapshot.child('reference').value.toString();
     String ownName = FirebaseAuth.instance.currentUser!.uid;
     var likesAmount = snapshot.child('likeAmount').value.toString();
-    print(snapshot.child('likes/$ownName').value.toString());
+    var commentsAmount = snapshot.child('CommentsAmount').value.toString();
     if (snapshot.child('likes/$ownName').value.toString() == 'true') {
       print('working until here');
     }
@@ -426,19 +440,26 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Row(mainAxisAlignment: MainAxisAlignment.end, children: [
       Badge(
-        borderRadius: BorderRadius.circular(8),
-        position: BadgePosition.topEnd(top: 1, end: -3),
-        badgeColor: COLOR_INDIGO_LIGHT,
-        badgeContent: const Text('0', style: TextStyle(color: Colors.white)),
-        child: IconButton(
-          icon: const Icon(
-            Icons.comment_bank_sharp,
-            color: COLOR_INDIGO_LIGHT,
-            size: 20,
-          ),
-          onPressed: () {},
-        ),
-      ),
+          borderRadius: BorderRadius.circular(8),
+          position: BadgePosition.topEnd(top: 1, end: -3),
+          badgeColor: COLOR_INDIGO_LIGHT,
+          badgeContent:
+              Text(commentsAmount, style: TextStyle(color: Colors.white)),
+          child: IconButton(
+              icon: const Icon(
+                Icons.comment_bank_sharp,
+                color: COLOR_INDIGO_LIGHT,
+                size: 20,
+              ),
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) {
+                      return CommentsScreen(post: snapshot);
+                    },
+                  ),
+                );
+              })),
       Badge(
           borderRadius: BorderRadius.circular(8),
           position: BadgePosition.topEnd(top: 1, end: -3),
@@ -528,5 +549,39 @@ class _UserProfileImageState extends State<UserProfileImage> {
         },
       ),
     );
+  }
+}
+
+class UserNameToID extends StatefulWidget {
+  const UserNameToID({Key? key, required this.username, required this.builder})
+      : super(key: key);
+  final String username;
+  final AsyncWidgetBuilder<String?> builder;
+
+  @override
+  State<UserNameToID> createState() => _UserNameToIDState();
+}
+
+class _UserNameToIDState extends State<UserNameToID> {
+  late final Stream<String?> userID;
+
+  @override
+  void initState() {
+    userID = getUserID(widget.username);
+    super.initState();
+  }
+
+  Stream<String> getUserID(String username) {
+    return FirebaseDatabase.instance.ref('Users').onValue.map(
+          (event) => event.snapshot.children.firstWhere((element) {
+            return element.child("username").value!.toString() == username;
+          }).key!,
+        );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<String?>(
+        stream: userID, initialData: null, builder: widget.builder);
   }
 }

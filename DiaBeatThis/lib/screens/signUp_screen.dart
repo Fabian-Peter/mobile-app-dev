@@ -1,12 +1,17 @@
+import 'dart:io';
+import 'package:diabeatthis/utils/constants.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:uuid/uuid.dart';
 
 import '../classes/utils.dart';
 import '../main.dart';
-import '../utils/constants.dart';
 
 class SignUpScreen extends StatefulWidget {
   final Function() onClickedSignIn;
@@ -21,14 +26,76 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreen extends State<SignUpScreen> {
+  //Firebase variables
+  FirebaseAuth firebaseAuth = FirebaseAuth.instance;
+  DatabaseReference databaseReference =
+      FirebaseDatabase.instance.ref().child("Users");
+  final firebase_storage.FirebaseStorage storage =
+      firebase_storage.FirebaseStorage.instance;
+
+  //Page variables
   final formKey = GlobalKey<FormState>();
   final usernameController = TextEditingController();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
-  FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-  DatabaseReference databaseReference =
-      FirebaseDatabase.instance.ref().child("Users");
+  //Image variables
+  late String name;
+  File? image;
+  var uuid = Uuid();
+
+  Future pickImage(ImageSource source) async {
+    try {
+      final image = await ImagePicker().pickImage(source: source);
+      if (image == null) return;
+
+      final imageTemporary = File(image.path);
+      setState(() => this.image = imageTemporary);
+    } on PlatformException catch (e) {
+      print('Failed to pick image: $e');
+    }
+  }
+
+  Future<String> uploadPicture(File file) async {
+    name = uuid.v1().toString();
+    var storeImage =
+        firebase_storage.FirebaseStorage.instance.ref().child('image/$name');
+    firebase_storage.UploadTask task1 = storeImage.putFile(file);
+    String imageURL = await (await task1).ref.getDownloadURL();
+
+    return imageURL;
+  }
+
+  void _pictureEditBottomSheet(context) {
+    showModalBottomSheet(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        context: context,
+        builder: (BuildContext bc) {
+          return Container(
+              height: 110,
+              padding: const EdgeInsets.only(left: 10, right: 10),
+              child: ListView(children: [
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.black),
+                  icon: const Icon(Icons.image),
+                  onPressed: () => pickImage(ImageSource.gallery),
+                  label: const Text('Gallery'),
+                ),
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.black),
+                  onPressed: () => pickImage(ImageSource.camera),
+                  icon: const Icon(Icons.camera_alt),
+                  label: const Text('Camera'),
+                )
+              ]));
+        });
+  }
 
   @override
   void dispose() {
@@ -51,6 +118,32 @@ class _SignUpScreen extends State<SignUpScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Stack(clipBehavior: Clip.none, children: [
+                Container(
+                    height: 120.0,
+                    width: 120.0,
+                    decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: (image != null)
+                              ? FileImage(image!) as ImageProvider
+                              : const AssetImage(
+                                  "assets/images/DefaultIcon.png"),
+                          fit: BoxFit.cover,
+                        ),
+                        shape: BoxShape.circle)),
+                Positioned(
+                    top: 85,
+                    left: 32,
+                    child: FloatingActionButton(
+                      heroTag: "btn1",
+                      backgroundColor: COLOR_INDIGO,
+                      foregroundColor: Colors.white,
+                      onPressed: () {
+                        _pictureEditBottomSheet(context);
+                      },
+                      child: Icon(Icons.camera_alt),
+                    )),
+              ]),
               const SizedBox(height: 40),
               Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -186,6 +279,7 @@ class _SignUpScreen extends State<SignUpScreen> {
   }
 
   Future signUp() async {
+    String imageURL = await uploadPicture(image!);
     final isValid = formKey.currentState!.validate();
     if (!isValid) return;
     showDialog(
@@ -202,7 +296,8 @@ class _SignUpScreen extends State<SignUpScreen> {
           .then((result) {
         databaseReference.child(result.user!.uid).set({
           "email": emailController.text,
-          "username": usernameController.text
+          "username": usernameController.text,
+          'userPictureID': imageURL,
         });
       });
     } on FirebaseAuthException catch (e) {

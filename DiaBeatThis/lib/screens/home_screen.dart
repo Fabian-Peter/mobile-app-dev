@@ -12,9 +12,6 @@ import 'package:diabeatthis/utils/constants.dart';
 import 'package:flutter/rendering.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:rxdart/rxdart.dart';
-import '../classes/Post.dart';
-import '../classes/user.dart';
 import 'package:badges/badges.dart';
 
 import 'Comments_Screen.dart';
@@ -37,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
       "https://diabeathis-f8ee3-default-rtdb.europe-west1.firebasedatabase.app");
   late Query query = ref.orderByChild('timeSorter');
   Key listKey = Key(DateTime.now().millisecondsSinceEpoch.toString());
-  String? currentUser = FirebaseAuth.instance.currentUser?.uid.toString();
+  String currentUser = FirebaseAuth.instance.currentUser!.uid.toString();
 
   //Icon variables
   IconData icon = Icons.favorite_border_outlined;
@@ -206,7 +203,7 @@ class _HomeScreenState extends State<HomeScreen> {
               MaterialPageRoute(builder: (_) {
                 return FirebaseAuth.instance.currentUser!.isAnonymous
                     ? AuthScreen()
-                    : ProfileScreen();
+                    : ProfileScreen(userID: currentUser);
               }),
             );
           },
@@ -352,25 +349,21 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.all(8),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(USER_ICON_POST_SIZE / 2),
-            child: InkWell(
-              child: InkWell(
-                child: UserNameToID(
-                  username: snapshot.child('currentUser').value.toString(),
-                  builder: (context, snapshot) {
-                    final userID = snapshot.data;
-                    return UserProfileImage(userID: userID);
+            child: UserNameToID(
+              username: snapshot.child('currentUser').value.toString(),
+              builder: (context, snapshot) {
+                final userID = snapshot.data;
+                return InkWell(
+                  child: UserProfileImage(userID: userID),
+                  onTap: userID == null ? null : () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) {
+                        return ProfileScreen(userID: userID);
+                      }),
+                    );
                   },
-                ),
-                onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) {
-                      return FirebaseAuth.instance.currentUser!.isAnonymous
-                          ? AuthScreen()
-                          : ProfileScreen();
-                    }),
-                  );
-                },
-              ),
+                );
+              },
             ),
           ),
         ),
@@ -585,12 +578,20 @@ class UserNameToID extends StatefulWidget {
 }
 
 class _UserNameToIDState extends State<UserNameToID> {
-  late final Stream<String?> userID;
+  late Stream<String?> userID;
 
   @override
   void initState() {
     userID = getUserID(widget.username);
     super.initState();
+  }
+
+  @override
+  void didUpdateWidget(UserNameToID oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.username != widget.username) {
+      setState(() => userID = getUserID(widget.username));
+    }
   }
 
   Stream<String> getUserID(String username) {

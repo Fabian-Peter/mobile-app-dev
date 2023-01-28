@@ -7,14 +7,11 @@ import 'package:diabeatthis/screens/post_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:rxdart/rxdart.dart';
 
-import '../classes/Post.dart';
-import '../classes/user.dart';
-
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  const ProfileScreen({Key? key, required this.userID}) : super(key: key);
+  final String userID;
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -23,7 +20,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   final ref = FirebaseDatabase.instance.ref("post");
 
-  String? currentUser = FirebaseAuth.instance.currentUser?.uid.toString();
+  //String? currentUser = FirebaseAuth.instance.currentUser?.uid.toString();
 
   Key listKey = Key(DateTime.now().millisecondsSinceEpoch.toString());
 
@@ -41,7 +38,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         titleSpacing: 10,
         title: Padding(
             padding: const EdgeInsets.only(bottom: 2),
-            child: Username(userID: currentUser)),
+            child: Username(userID: widget.userID)),
       ),
       body: SafeArea(
         child: Column(
@@ -55,10 +52,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    UserProfileImage(userID: currentUser),
+                    UserProfileImage(userID: widget.userID),
                     _buildEditIcon(context),
-                    //_buildProfile(context),
-                    Userposts(userID: currentUser)
+                    Userposts(userID: widget.userID)
                   ],
                 ),
               ),

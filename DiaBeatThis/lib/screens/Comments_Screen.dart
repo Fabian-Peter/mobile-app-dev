@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import '../utils/constants.dart';
 import 'auth_screen.dart';
+import 'home_screen.dart';
 
 class CommentsScreen extends StatefulWidget {
   final DataSnapshot post;
@@ -17,11 +18,10 @@ class CommentsScreen extends StatefulWidget {
 }
 
 class _CommentsScreenState extends State<CommentsScreen> {
-  final database = FirebaseDatabase(
-          databaseURL:
-              "https://diabeathis-f8ee3-default-rtdb.europe-west1.firebasedatabase.app")
-      .reference();
+  final database = FirebaseDatabase.instance.refFromURL(
+      "https://diabeathis-f8ee3-default-rtdb.europe-west1.firebasedatabase.app");
   TextEditingController commentsController = TextEditingController();
+  String currentUser = FirebaseAuth.instance.currentUser!.uid.toString();
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +47,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
           Padding(
               padding: const EdgeInsets.only(left: 5, right: 5),
               child: TextField(
-                controller: commentsController,
+                  controller: commentsController,
                   decoration: const InputDecoration(
                     labelText: 'Your Comment goes here',
                     labelStyle: TextStyle(
@@ -57,16 +57,15 @@ class _CommentsScreenState extends State<CommentsScreen> {
                     isDense: true,
                     enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(
-                          color: COLOR_INDIGO_LIGHT,
-                        )),
+                      color: COLOR_INDIGO_LIGHT,
+                    )),
                     border: OutlineInputBorder(
                       borderSide: BorderSide(
                         color: COLOR_INDIGO_LIGHT,
                         width: 3.0,
                       ),
                     ),
-                  )
-              )),
+                  ))),
           Padding(
               padding: const EdgeInsets.only(left: 5, right: 5),
               child: ElevatedButton(
@@ -104,23 +103,22 @@ class _CommentsScreenState extends State<CommentsScreen> {
     return ClipRRect(
       borderRadius: BorderRadius.circular(PROFILE_ICON_BAR_SIZE / 2),
       child: Padding(
-          padding: const EdgeInsets.only(right: 10),
-          child: InkWell(
-              child: Image.asset(
-                //TODO: if guest, then show anonymous profile icon
-                'assets/images/Profile.png', //TODO: replace with user image
-                height: PROFILE_ICON_BAR_SIZE,
-                width: PROFILE_ICON_BAR_SIZE,
-              ),
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) {
-                    return FirebaseAuth.instance.currentUser!.isAnonymous
-                        ? AuthScreen()
-                        : const ProfileScreen();
-                  }),
-                );
-              })),
+        padding: const EdgeInsets.only(right: 10),
+        child: InkWell(
+          child: UserProfileImage(
+            userID: currentUser,
+          ),
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) {
+                return FirebaseAuth.instance.currentUser!.isAnonymous
+                    ? AuthScreen()
+                    : ProfileScreen(userID: currentUser);
+              }),
+            );
+          },
+        ),
+      ),
     );
   }
 
@@ -149,25 +147,32 @@ class _CommentsScreenState extends State<CommentsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Padding(padding: EdgeInsets.all(3),
-                  child: Row(children: [
-                    InkWell( child: Image.asset(
-                      'assets/images/Avatar.png', //TODO: replace with user image
-                      height: USER_ICON_POST_SIZE,
-                      width: USER_ICON_POST_SIZE,
+                  Padding(
+                    padding: EdgeInsets.all(3),
+                    child: Row(
+                      children: [
+                        InkWell(
+                          child: Image.asset(
+                            'assets/images/Avatar.png', //TODO: replace with user image
+                            height: USER_ICON_POST_SIZE,
+                            width: USER_ICON_POST_SIZE,
+                          ),
+                          onTap: () {
+                            //TODO: OPEN PROFILE
+                          },
+                        ),
+                        SizedBox(width: 10),
+                        Text(snapshot.child('user').value.toString(),
+                            style: TextStyle(
+                                color: COLOR_INDIGO_LIGHT,
+                                fontWeight: FontWeight.bold)),
+                      ],
                     ),
-                      onTap: (){
-                      //TODO: OPEN PROFILE
-                      },
-                    ),
-                    SizedBox(width: 10),
-                    Text(snapshot.child('user').value.toString(), style: TextStyle(color: COLOR_INDIGO_LIGHT, fontWeight: FontWeight.bold)),
-
-                  ],),
-            ),
-            Padding(padding: EdgeInsets.all(3),child: Text(snapshot.child('comment').value.toString())
-
-            )],
+                  ),
+                  Padding(
+                      padding: EdgeInsets.all(3),
+                      child: Text(snapshot.child('comment').value.toString()))
+                ],
               ),
             ),
           ),

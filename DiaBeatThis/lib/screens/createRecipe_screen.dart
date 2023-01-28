@@ -10,6 +10,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 import 'package:uuid/uuid.dart';
 
+import '../classes/utils.dart';
+
 class CreateRecipeScreen extends StatefulWidget {
   @override
   State<CreateRecipeScreen> createState() => _CreateRecipeScreenState();
@@ -40,11 +42,13 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
 
   //Page variables
   int fieldsNumber = 1;
+  final formKey = GlobalKey<FormState>();
 
   //Image variables
   late String name;
   File? image;
   var uuid = Uuid();
+  bool isImageMissing = false;
 
   //Tags variables
   final List<Text> _recipeTags1 = <Text>[
@@ -63,8 +67,13 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
   ];
   final List<bool> _selectedTags1 = List.filled(5, false);
   final List<bool> _selectedTags2 = List.filled(5, false);
+  bool isTagsMissing = false;
 
   Future pickImage(ImageSource source) async {
+    setState(() {
+      isImageMissing = false;
+      return;
+    });
     try {
       final image = await ImagePicker().pickImage(source: source);
       if (image == null) return;
@@ -152,63 +161,77 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
   }
 
   Widget _buildForm(BuildContext context) {
-    return ListView(
-      children: [
-        if (image != null)
-          Stack(clipBehavior: Clip.none, children: [
-            Image.file(image!, height: 160, width: 400, fit: BoxFit.cover),
-            Positioned(
-                top: 120,
-                left: 165,
-                child: FloatingActionButton(
-                  heroTag: "btn1",
-                  child: Icon(Icons.camera_alt),
-                  backgroundColor: COLOR_INDIGO,
-                  foregroundColor: Colors.white,
-                  onPressed: () {
-                    _pictureEditBottomSheet(context);
-                  },
-                )),
-          ])
-        else
-          Stack(clipBehavior: Clip.none, children: [
-            Image.asset('assets/images/recipeCamera.png',
-                height: 160, width: 400, fit: BoxFit.cover),
-            Positioned(
-                top: 120,
-                left: 165,
-                child: FloatingActionButton(
-                  heroTag: "btn1",
-                  backgroundColor: COLOR_INDIGO,
-                  foregroundColor: Colors.white,
-                  onPressed: () {
-                    _pictureEditBottomSheet(context);
-                  },
-                  child: const Icon(Icons.camera_alt),
-                )),
-          ]),
-        //Hier könnte Ihr Logo stehen!
-        const SizedBox(
-          height: 30,
-        ),
-        _buildTitle(),
-        _buildDescription(),
-        Row(children: const [
-          Padding(
-              padding: EdgeInsets.only(left: 8, top: 8),
-              child: Text("Amount", style: POST_CAPTION_INDIGO_LIGHT)),
-          Padding(
-              padding: EdgeInsets.only(left: 17, top: 8),
-              child: Text("Ingredients", style: POST_CAPTION_INDIGO_LIGHT))
-        ]),
-        for (var i = 0; i < fieldsNumber; i++) _buildNewIngredientTile(i),
-        _buildAddButton(),
-        _buildInstructions(),
-        _buildTagSelector(),
-        _buildNutritions(),
-        _buildSubmitButton()
-      ],
-    );
+    return Form(
+        key: formKey,
+        child: ListView(
+          children: [
+            if (image != null)
+              Stack(clipBehavior: Clip.none, children: [
+                Image.file(image!, height: 160, width: 400, fit: BoxFit.cover),
+                Positioned(
+                    top: 120,
+                    left: 165,
+                    child: FloatingActionButton(
+                      heroTag: "btn1",
+                      child: Icon(Icons.camera_alt),
+                      backgroundColor: COLOR_INDIGO,
+                      foregroundColor: Colors.white,
+                      onPressed: () {
+                        _pictureEditBottomSheet(context);
+                      },
+                    )),
+              ])
+            else
+              Stack(clipBehavior: Clip.none, children: [
+                Image.asset('assets/images/recipeCamera.png',
+                    height: 160, width: 400, fit: BoxFit.cover),
+                Positioned(
+                    top: 120,
+                    left: 165,
+                    child: FloatingActionButton(
+                      heroTag: "btn1",
+                      backgroundColor:
+                          isImageMissing ? Colors.red : COLOR_INDIGO,
+                      foregroundColor: Colors.white,
+                      onPressed: () {
+                        _pictureEditBottomSheet(context);
+                      },
+                      child: const Icon(Icons.camera_alt),
+                    )),
+              ]),
+            const SizedBox(
+              height: 27,
+            ),
+            isImageMissing
+                ? const Padding(
+                    padding: EdgeInsets.only(left: 145.5),
+                    child: Text("Missing image!",
+                        style: TextStyle(color: Colors.red)))
+                : SizedBox(),
+            _buildTitle(),
+            _buildDescription(),
+            Row(children: const [
+              Padding(
+                  padding: EdgeInsets.only(left: 8, top: 8),
+                  child: Text("Amount", style: POST_CAPTION_INDIGO_LIGHT)),
+              Padding(
+                  padding: EdgeInsets.only(left: 17, top: 8),
+                  child: Text("Ingredients", style: POST_CAPTION_INDIGO_LIGHT))
+            ]),
+            for (var i = 0; i < fieldsNumber; i++) _buildNewIngredientTile(i),
+            _buildAddButton(),
+            _buildInstructions(),
+            _buildTagSelector(),
+            isTagsMissing
+                ? const Padding(
+                    padding: EdgeInsets.only(left: 20, bottom: 8),
+                    child: Text("Select at least one tag",
+                        style: TextStyle(color: Colors.red, fontSize: 12)))
+                : SizedBox(),
+            _buildNutritions(),
+            _buildSubmitButton()
+          ],
+        ));
   }
 
   Widget _buildTitle() {
@@ -221,6 +244,13 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
         Padding(
           padding: const EdgeInsets.all(9.0),
           child: TextFormField(
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            validator: (value) {
+              if (value!.isEmpty) {
+                return "Enter Title";
+              }
+              return null;
+            },
             controller: titleController,
             decoration: const InputDecoration(
               labelText: 'The title of your recipe',
@@ -256,6 +286,13 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: TextFormField(
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            validator: (value) {
+              if (value!.isEmpty) {
+                return "Enter Username";
+              }
+              return null;
+            },
             controller: descriptionController,
             keyboardType: TextInputType.multiline,
             maxLines: null,
@@ -290,8 +327,15 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
         child: SizedBox(
             width: 60,
             child: TextFormField(
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return "";
+                }
+                return null;
+              },
               controller: ingredientsQuantityControllers[index],
-              keyboardType: TextInputType.multiline,
+              keyboardType: TextInputType.number,
               decoration: const InputDecoration(
                 labelStyle: TextStyle(
                     fontFamily: "VisbyMedium",
@@ -316,6 +360,13 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
         child: SizedBox(
             width: MediaQuery.of(context).size.width * 0.75,
             child: TextFormField(
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: (value) {
+                if (value!.isEmpty) {
+                  return "Enter amount and ingredient";
+                }
+                return null;
+              },
               controller: ingredientsControllers[index],
               keyboardType: TextInputType.multiline,
               decoration: const InputDecoration(
@@ -373,6 +424,13 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: TextFormField(
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            validator: (value) {
+              if (value!.isEmpty) {
+                return "Enter instructions";
+              }
+              return null;
+            },
             controller: instructionController,
             keyboardType: TextInputType.multiline,
             minLines: 3,
@@ -419,12 +477,16 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
     return ToggleButtons(
       direction: Axis.horizontal,
       onPressed: (int index) {
+        setState(() {
+          isTagsMissing = false;
+        });
         // All buttons are selectable.
         setState(() {
           selectedTags[index] = !selectedTags[index];
         });
       },
       borderRadius: const BorderRadius.all(Radius.circular(8)),
+      borderColor: isTagsMissing ? Colors.red : COLOR_INDIGO_LIGHT,
       selectedBorderColor: COLOR_INDIGO,
       selectedColor: Colors.white,
       fillColor: COLOR_INDIGO,
@@ -446,6 +508,13 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
       Padding(
         padding: const EdgeInsets.all(8.0),
         child: TextFormField(
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          validator: (value) {
+            if (value!.isEmpty) {
+              return "Enter nutritions";
+            }
+            return null;
+          },
           controller: nutritionController,
           keyboardType: TextInputType.multiline,
           decoration: const InputDecoration(
@@ -489,63 +558,83 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                 }
               }
 
-              setState(() {
-                _isInAsyncCall = true;
-              });
-              //TODO add loading animation
-
-              List<String> ingredientList = [];
-              for (var element in ingredientsControllers) {
-                ingredientList.add(element.text);
+              final isValid = formKey.currentState!.validate();
+              if (image == null) {
+                setState(() {
+                  isImageMissing = true;
+                  return;
+                });
               }
-
-              List<String> ingredientQuantityList = [];
-              for (var element in ingredientsQuantityControllers) {
-                ingredientQuantityList.add(element.text);
+              if (tagList.isEmpty) {
+                setState(() {
+                  isTagsMissing = true;
+                });
               }
+              if (!isValid) return;
 
-              String imageURL = await uploadPicture(image!);
+              if (image != null && !isTagsMissing && !isImageMissing) {
+                try {
+                  setState(() {
+                    _isInAsyncCall = true;
+                  });
 
-              List<String>? reactions;
-              List<String>? comments;
-              String timestamp = DateTime.now().toString();
-              var timeIdent = new DateTime.now().millisecondsSinceEpoch;
-              String username = await getUsername();
-              var myRef = database.child('post').push();
-              var key = myRef.key!;
+                  List<String> ingredientList = [];
+                  for (var element in ingredientsControllers) {
+                    ingredientList.add(element.text);
+                  }
 
-              final newRecipe = <String, dynamic>{
-                'likeAmount': 0,
-                'title': titleController.text,
-                'description': descriptionController.text,
-                'ingredients': ingredientList,
-                'ingredientsQuantity': ingredientQuantityList,
-                'instructions': instructionController.text,
-                'tags': tagList,
-                //'reactions' : reactions,
-                //'comments' : comments,
-                'timestamp': timestamp,
-                'currentUser': username,
-                'pictureID': imageURL,
-                'nutrition': nutritionController.text,
-                'timeSorter': 0 - timeIdent!,
-                'reference': key
-              };
-              database
-                  .child('post/$key')
-                  .set(newRecipe)
-                  .then((_) => print("call has been made"));
+                  List<String> ingredientQuantityList = [];
+                  for (var element in ingredientsQuantityControllers) {
+                    ingredientQuantityList.add(element.text);
+                  }
 
-              //.child(uniqueUserID).push(comment)
-              setState(() {
-                _isInAsyncCall = false;
-                fieldsNumber = 1;
-              });
+                  String imageURL = await uploadPicture(image!);
 
-              Navigator.pop(context, true); //replaces dispose()
+                  List<String>? reactions;
+                  List<String>? comments;
+                  String timestamp = DateTime.now().toString();
+                  var timeIdent = new DateTime.now().millisecondsSinceEpoch;
+                  String username = await getUsername();
+                  var myRef = database.child('post').push();
+                  var key = myRef.key!;
 
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => HomeScreen()));
+                  final newRecipe = <String, dynamic>{
+                    'likeAmount': 0,
+                    'title': titleController.text,
+                    'description': descriptionController.text,
+                    'ingredients': ingredientList,
+                    'ingredientsQuantity': ingredientQuantityList,
+                    'instructions': instructionController.text,
+                    'tags': tagList,
+                    //'reactions' : reactions,
+                    //'comments' : comments,
+                    'timestamp': timestamp,
+                    'currentUser': username,
+                    'pictureID': imageURL,
+                    'nutrition': nutritionController.text,
+                    'timeSorter': 0 - timeIdent!,
+                    'reference': key
+                  };
+                  database
+                      .child('post/$key')
+                      .set(newRecipe)
+                      .then((_) => print("call has been made"));
+
+                  setState(() {
+                    _isInAsyncCall = false;
+                    fieldsNumber = 1;
+                  });
+
+                  Navigator.pop(context, true); //replaces dispose()
+
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => HomeScreen()));
+                } on FirebaseAuthException catch (e) {
+                  print(e);
+
+                  Utils.showSnackBar(e.message);
+                }
+              }
             },
             child: const Text('Post',
                 style: TextStyle(fontFamily: "VisbyDemiBold", fontSize: 18))));

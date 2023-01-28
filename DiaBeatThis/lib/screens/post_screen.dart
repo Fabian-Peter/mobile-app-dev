@@ -1,33 +1,37 @@
 import 'package:diabeatthis/screens/profile_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:diabeatthis/utils/constants.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:badges/badges.dart';
 import 'auth_screen.dart';
+import 'home_screen.dart';
 import 'package:diabeatthis/screens/Comments_Screen.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 
 class PostScreen extends StatefulWidget {
   final DataSnapshot post;
 
-  PostScreen({super.key, required this.post});
+  const PostScreen({super.key, required this.post});
 
   @override
   State<PostScreen> createState() => _PostScreenState();
 }
 
 class _PostScreenState extends State<PostScreen> {
+  final ref = FirebaseDatabase.instance.ref("Users");
+
   String ownName = FirebaseAuth.instance.currentUser!.uid;
   FirebaseStorage storage = FirebaseStorage.instance;
-  final database = FirebaseDatabase(
-          databaseURL:
-              "https://diabeathis-f8ee3-default-rtdb.europe-west1.firebasedatabase.app")
-      .reference();
+  final database = FirebaseDatabase.instance.refFromURL(
+      "https://diabeathis-f8ee3-default-rtdb.europe-west1.firebasedatabase.app");
   final IconData _favIconOutlined = Icons.favorite_outline;
   IconData icon = Icons.favorite_border_outlined;
+  String? currentUser = FirebaseAuth.instance.currentUser?.uid.toString();
+
   TextEditingController commentsController = TextEditingController();
   late DataSnapshot queryReference;
 
@@ -51,18 +55,28 @@ class _PostScreenState extends State<PostScreen> {
     }
     return Scaffold(
         appBar: AppBar(
-            title: Text(widget.post.child('title').value.toString(),
-                style: HEADLINE_BOLD_WHITE),
-            actions: <Widget>[_buildProfileIcon(context)]),
+          title: Text(widget.post.child('title').value.toString(),
+              style: HEADLINE_BOLD_WHITE),
+          actions: <Widget>[
+            _buildProfileIcon(context),
+          ],
+        ),
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.only(top: 7),
-            child: _buildPost(context),
+            child: FirebaseAnimatedList(
+              shrinkWrap: true,
+              query: ref,
+              defaultChild: const Text("Loading...", style: TEXT_PLAIN),
+              itemBuilder: (context, snapshot, animation, index) {
+                return _buildPost(context, snapshot);
+              },
+            ),
           ),
         ));
   }
 
-  Widget _buildPost(BuildContext context) {
+  Widget _buildPost(BuildContext context, DataSnapshot snapshot) {
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: 15,
@@ -72,7 +86,7 @@ class _PostScreenState extends State<PostScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildCreatorRow(context),
+            _buildCreatorRow(context, snapshot),
             _buildDescription(context),
             _buildContainerCaption(context, _buildTags(), 'Tags'),
             _buildContainerCaption(
@@ -89,7 +103,7 @@ class _PostScreenState extends State<PostScreen> {
     );
   }
 
-  Widget _buildCreatorRow(BuildContext context) {
+  Widget _buildCreatorRow(BuildContext context, DataSnapshot snapshot) {
     return Row(
       children: [
         ClipRRect(
@@ -101,10 +115,13 @@ class _PostScreenState extends State<PostScreen> {
               width: USER_ICON_POST_SIZE,
             ),
             onTap: () {
-              //TODO: open user profile or login screen
-              // FirebaseAuth.instance.currentUser!.isAnonymous
-              //                         ? AuthScreen()
-              //                         :
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) {
+                  return FirebaseAuth.instance.currentUser!.isAnonymous
+                      ? AuthScreen()
+                      : ProfileScreen();
+                }),
+              );
             },
           ),
         ),
@@ -137,23 +154,22 @@ class _PostScreenState extends State<PostScreen> {
     return ClipRRect(
       borderRadius: BorderRadius.circular(PROFILE_ICON_BAR_SIZE / 2),
       child: Padding(
-          padding: const EdgeInsets.only(right: 10),
-          child: InkWell(
-              child: Image.asset(
-                //TODO: if guest, then show anonymous profile icon
-                'assets/images/Profile.png', //TODO: replace with user image
-                height: PROFILE_ICON_BAR_SIZE,
-                width: PROFILE_ICON_BAR_SIZE,
-              ),
-              onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) {
-                    return FirebaseAuth.instance.currentUser!.isAnonymous
-                        ? AuthScreen()
-                        : const ProfileScreen();
-                  }),
-                );
-              })),
+        padding: const EdgeInsets.only(right: 10),
+        child: InkWell(
+          child: UserProfileImage(
+            userID: currentUser,
+          ),
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) {
+                return FirebaseAuth.instance.currentUser!.isAnonymous
+                    ? AuthScreen()
+                    : ProfileScreen();
+              }),
+            );
+          },
+        ),
+      ),
     );
   }
 
@@ -264,7 +280,8 @@ class _PostScreenState extends State<PostScreen> {
             borderRadius: BorderRadius.circular(8),
             position: BadgePosition.topEnd(top: 1, end: -3),
             badgeColor: COLOR_INDIGO_LIGHT,
-            badgeContent: Text(commentsAmount, style: TextStyle(color: Colors.white)),
+            badgeContent:
+                Text(commentsAmount, style: TextStyle(color: Colors.white)),
             child: IconButton(
                 icon: const Icon(
                   Icons.comment_bank_sharp,
@@ -281,57 +298,58 @@ class _PostScreenState extends State<PostScreen> {
                   );
                 })),
         Badge(
-            borderRadius: BorderRadius.circular(8),
-            position: BadgePosition.topEnd(top: 1, end: -3),
-            badgeColor: Colors.red,
-            badgeContent:
-            Text(likesAmount, style: TextStyle(color: Colors.white)),
-            child: IconButton(
-              icon: Icon(
-                icon,
-                color: Colors.red,
-                size: 20,
-              ),
-              onPressed: () {
-              },
-            ))
-      ])
+          borderRadius: BorderRadius.circular(8),
+          position: BadgePosition.topEnd(top: 1, end: -3),
+          badgeColor: Colors.red,
+          badgeContent:
+              Text(likesAmount, style: TextStyle(color: Colors.white)),
+          child: IconButton(
+            icon: Icon(
+              icon,
+              color: Colors.red,
+              size: 20,
+            ),
+            onPressed: () {},
+          ),
+        )
+      ]),
     );
   }
 
   Widget _buildComments(context, snapshot, index) {
     return Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 9,
-          vertical: 7,
-        ),
-        child: InkWell(
-          child: Container(
-            decoration: BoxDecoration(
-              color: COLOR_WHITE,
-              border: Border.all(width: 3, color: COLOR_INDIGO_LIGHT),
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
-                  spreadRadius: 2,
-                  blurRadius: 3,
-                  offset: const Offset(0, 3),
-                ),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 9,
+        vertical: 7,
+      ),
+      child: InkWell(
+        child: Container(
+          decoration: BoxDecoration(
+            color: COLOR_WHITE,
+            border: Border.all(width: 3, color: COLOR_INDIGO_LIGHT),
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                spreadRadius: 2,
+                blurRadius: 3,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildCommenter(context, snapshot, index),
+                //TODO: tags icons
+                //TODO: reactions
               ],
             ),
-            child: SafeArea(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildCommenter(context, snapshot, index),
-                  //TODO: tags icons
-                  //TODO: reactions
-                ],
-              ),
-            ),
           ),
-        ));
+        ),
+      ),
+    );
   }
 
   Widget _buildCommenter(context, snapshot, index) {
@@ -391,8 +409,6 @@ class _PostScreenState extends State<PostScreen> {
       ),
     );
   }
-
-
 
   void dispose() {
     commentsController.dispose();

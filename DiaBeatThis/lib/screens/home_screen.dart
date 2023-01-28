@@ -15,6 +15,8 @@ import '../classes/Post.dart';
 import '../classes/user.dart';
 import 'package:badges/badges.dart';
 
+import 'Comments_Screen.dart';
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, this.uid});
 
@@ -390,16 +392,16 @@ class _HomeScreenState extends State<HomeScreen> {
       BuildContext context, DataSnapshot snapshot, int index) {
     return Padding(
         padding: const EdgeInsets.only(left: 0, right: 0),
-        child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center, children: [
-              //Text(snapshot.hasChild('hello world').toString())
-              ]));
+        child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+          //Text(snapshot.hasChild('hello world').toString())
+        ]));
   }
 
   Widget _buildLikes(BuildContext context, DataSnapshot snapshot, int index) {
     String ref = snapshot.child('reference').value.toString();
     String ownName = FirebaseAuth.instance.currentUser!.uid;
     var likesAmount = snapshot.child('likeAmount').value.toString();
+    var commentsAmount = snapshot.child('CommentsAmount').value.toString();
     if (snapshot.child('likes/$ownName').value.toString() == 'true') {
       print('working until here');
     }
@@ -411,19 +413,25 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Row(mainAxisAlignment: MainAxisAlignment.end, children: [
       Badge(
-        borderRadius: BorderRadius.circular(8),
-        position: BadgePosition.topEnd(top: 1, end: -3),
-        badgeColor: COLOR_INDIGO_LIGHT,
-        badgeContent: Text('0', style: TextStyle(color: Colors.white)),
-        child: IconButton(
-          icon: const Icon(
-            Icons.comment_bank_sharp,
-            color: COLOR_INDIGO_LIGHT,
-            size: 20,
-          ),
-          onPressed: () {},
-        ),
-      ),
+          borderRadius: BorderRadius.circular(8),
+          position: BadgePosition.topEnd(top: 1, end: -3),
+          badgeColor: COLOR_INDIGO_LIGHT,
+          badgeContent: Text(commentsAmount, style: TextStyle(color: Colors.white)),
+          child: IconButton(
+              icon: const Icon(
+                Icons.comment_bank_sharp,
+                color: COLOR_INDIGO_LIGHT,
+                size: 20,
+              ),
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) {
+                      return CommentsScreen(post: snapshot);
+                    },
+                  ),
+                );
+              })),
       Badge(
           borderRadius: BorderRadius.circular(8),
           position: BadgePosition.topEnd(top: 1, end: -3),

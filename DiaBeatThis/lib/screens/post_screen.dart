@@ -259,36 +259,6 @@ class _PostScreenState extends State<PostScreen> {
       padding: const EdgeInsets.only(top: 20),
       child: Column(children: [
         Padding(
-            padding: const EdgeInsets.only(left: 5, right: 5),
-            child: TextField(
-              controller: commentsController,
-            )),
-        Padding(
-            padding: const EdgeInsets.only(left: 5, right: 5),
-            child: ElevatedButton(
-                onPressed: () async {
-                  DataSnapshot snap = await FirebaseDatabase.instance
-                      .ref('Users/$ownName')
-                      .get();
-                  String username = snap.child('username').value.toString();
-                  print(username);
-                  String comment = commentsController.text;
-                  var timeIdent = new DateTime.now().millisecondsSinceEpoch;
-                  var timeSorter = timeIdent - 1;
-                  final newComment = <String, dynamic>{
-                    'user': username,
-                    'comment': comment
-                  };
-                  database
-                      .child('post/$ref/comments/$timeSorter')
-                      .set(newComment);
-                  clearText();
-                },
-                child: const Text(
-                  'Post',
-                  style: TextStyle(fontFamily: "VisbyDemiBold", fontSize: 18),
-                ))),
-        Padding(
             padding: const EdgeInsets.only(right: 310),
             child: Row(children: [
               IconButton(

@@ -172,12 +172,12 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                     left: 165,
                     child: FloatingActionButton(
                       heroTag: "btn1",
-                      child: Icon(Icons.camera_alt),
                       backgroundColor: COLOR_INDIGO,
                       foregroundColor: Colors.white,
                       onPressed: () {
                         _pictureEditBottomSheet(context);
                       },
+                      child: const Icon(Icons.camera_alt),
                     )),
               ])
             else
@@ -206,7 +206,7 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                     padding: EdgeInsets.only(left: 145.5),
                     child: Text("Missing image!",
                         style: TextStyle(color: Colors.red)))
-                : SizedBox(),
+                : const SizedBox(),
             _buildTitle(),
             _buildDescription(),
             Row(children: const [
@@ -226,7 +226,7 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                     padding: EdgeInsets.only(left: 20, bottom: 8),
                     child: Text("Select at least one tag",
                         style: TextStyle(color: Colors.red, fontSize: 12)))
-                : SizedBox(),
+                : const SizedBox(),
             _buildNutritions(),
             _buildSubmitButton()
           ],
@@ -602,8 +602,8 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                   var key = myRef.key!;
 
                   final newRecipe = <String, dynamic>{
-                    'likeAmount' : 0,
-                    'CommentsAmount' : 0,
+                    'likeAmount': 0,
+                    'CommentsAmount': 0,
                     'title': titleController.text,
                     'description': descriptionController.text,
                     'ingredients': ingredientList,

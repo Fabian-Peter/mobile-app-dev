@@ -34,5 +34,5 @@ const TextStyle TAGS_TOGGLE =
     TextStyle(fontFamily: "VisbyDemiBold", fontSize: 13);
 
 //ICON SIZE
-const double PROFILE_ICON_BAR_SIZE = 43;
-const double USER_ICON_POST_SIZE = 38;
+const double PROFILE_ICON_BAR_SIZE = 40;
+const double USER_ICON_POST_SIZE = 40;

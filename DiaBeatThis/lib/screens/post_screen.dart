@@ -35,7 +35,8 @@ class _PostScreenState extends State<PostScreen> {
   late DataSnapshot queryReference;
 
   Future<String> downloadURL(String imageName) async {
-    String downloadURL = await FirebaseStorage.instance.ref('image/$imageName').getDownloadURL();
+    String downloadURL =
+        await FirebaseStorage.instance.ref('image/$imageName').getDownloadURL();
     return downloadURL;
   }
 
@@ -53,20 +54,22 @@ class _PostScreenState extends State<PostScreen> {
       icon = Icons.favorite;
     }
     return Scaffold(
-        appBar: AppBar(
-          title: Text(widget.post.child('title').value.toString(),
-              style: HEADLINE_BOLD_WHITE),
-          actions: <Widget>[
-            _buildProfileIcon(context),
-          ],
-        ),
-        body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.only(top: 7),
-            child: _buildPost(context, widget.post),
-            ),
+      appBar: AppBar(
+        title: Text(widget.post.child('title').value.toString(),
+            style: HEADLINE_BOLD_WHITE),
+        actions: <Widget>[
+          Row(
+            children: [_buildProfileIcon(context)],
           ),
-        );
+        ],
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.only(top: 7),
+          child: _buildPost(context, widget.post),
+        ),
+      ),
+    );
   }
 
   Widget _buildPost(BuildContext context, DataSnapshot snapshot) {
@@ -99,24 +102,23 @@ class _PostScreenState extends State<PostScreen> {
   Widget _buildCreatorRow(BuildContext context, DataSnapshot snapshot) {
     return Row(
       children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(USER_ICON_POST_SIZE / 2),
-          child: UserNameToID(
-            username: snapshot.child('currentUser').value.toString(),
-            builder: (context, snapshot) {
-              final userID = snapshot.data;
-              return InkWell(
-                child: UserProfileImage(userID: userID),
-                onTap: userID == null ? null : () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) {
-                      return ProfileScreen(userID: userID);
-                    }),
-                  );
-                },
-              );
-            },
-          ),
+        UserNameToID(
+          username: snapshot.child('currentUser').value.toString(),
+          builder: (context, snapshot) {
+            final userID = snapshot.data;
+            return InkWell(
+              onTap: userID == null
+                  ? null
+                  : () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) {
+                          return ProfileScreen(userID: userID);
+                        }),
+                      );
+                    },
+              child: UserProfileImage(userID: userID),
+            );
+          },
         ),
         const SizedBox(width: 10),
         Text(
@@ -144,24 +146,21 @@ class _PostScreenState extends State<PostScreen> {
   }
 
   Widget _buildProfileIcon(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(PROFILE_ICON_BAR_SIZE / 2),
-      child: Padding(
-        padding: const EdgeInsets.only(right: 10),
-        child: InkWell(
-          child: UserProfileImage(
-            userID: currentUser,
-          ),
-          onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) {
-                return FirebaseAuth.instance.currentUser!.isAnonymous
-                    ? AuthScreen()
-                    : ProfileScreen(userID: currentUser,);
-              }),
-            );
-          },
+    return Padding(
+      padding: const EdgeInsets.only(right: 10),
+      child: InkWell(
+        child: UserProfileImage(
+          userID: currentUser,
         ),
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) {
+              return FirebaseAuth.instance.currentUser!.isAnonymous
+                  ? AuthScreen()
+                  : ProfileScreen(userID: currentUser);
+            }),
+          );
+        },
       ),
     );
   }

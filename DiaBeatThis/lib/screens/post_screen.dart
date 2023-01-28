@@ -8,6 +8,7 @@ import 'package:diabeatthis/utils/constants.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:badges/badges.dart';
 import 'auth_screen.dart';
+import 'home_screen.dart';
 
 class PostScreen extends StatefulWidget {
   final DataSnapshot post;
@@ -25,6 +26,7 @@ class _PostScreenState extends State<PostScreen> {
   final IconData _favIconOutlined = Icons.favorite_outline;
   IconData icon = Icons.favorite_border_outlined;
   final ref = FirebaseDatabase.instance.ref("Users");
+  String? currentUser = FirebaseAuth.instance.currentUser?.uid.toString();
   Future<String> downloadURL(String imageName) async {
     String downloadURL = await storage.ref('image/$imageName').getDownloadURL();
     return downloadURL;
@@ -39,14 +41,7 @@ class _PostScreenState extends State<PostScreen> {
           actions: <Widget>[
             Row(
               children: [
-                FirebaseAnimatedList(
-                  shrinkWrap: true,
-                  query: ref,
-                  defaultChild: const Text("Loading...", style: TEXT_PLAIN),
-                  itemBuilder: (context, snapshot, animation, index) {
-                    return _buildProfileIcon(context, snapshot, index);
-                  },
-                ),
+                _buildProfileIcon(context)
               ],
             ),
           ],
@@ -140,28 +135,22 @@ class _PostScreenState extends State<PostScreen> {
     );
   }
 
-  Widget _buildProfileIcon(
-      BuildContext context, DataSnapshot snapshot, int index) {
+  Widget _buildProfileIcon(BuildContext context) {
     return ClipRRect(
       borderRadius: BorderRadius.circular(PROFILE_ICON_BAR_SIZE / 2),
       child: Padding(
         padding: const EdgeInsets.only(right: 10),
         child: InkWell(
-          child: Image.asset(
-            //TODO: if guest, then show anonymous profile icon
-            'assets/images/Profile.png', //TODO: replace with user image
-            height: PROFILE_ICON_BAR_SIZE,
-            width: PROFILE_ICON_BAR_SIZE,
+          child: UserProfileImage(
+            userID: currentUser,
           ),
           onTap: () {
             Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) {
-                  return FirebaseAuth.instance.currentUser!.isAnonymous
-                      ? AuthScreen()
-                      : ProfileScreen();
-                },
-              ),
+              MaterialPageRoute(builder: (_) {
+                return FirebaseAuth.instance.currentUser!.isAnonymous
+                    ? AuthScreen()
+                    : ProfileScreen();
+              }),
             );
           },
         ),

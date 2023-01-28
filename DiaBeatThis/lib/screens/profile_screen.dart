@@ -22,14 +22,12 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   final ref = FirebaseDatabase.instance.ref("post");
-  final database = FirebaseDatabase.instance.refFromURL(
-      "https://diabeathis-f8ee3-default-rtdb.europe-west1.firebasedatabase.app");
+
   String? currentUser = FirebaseAuth.instance.currentUser?.uid.toString();
 
   Key listKey = Key(DateTime.now().millisecondsSinceEpoch.toString());
 
   IconData _favIconOutlined = Icons.favorite_outline;
-  IconData icon = Icons.favorite_border_outlined;
 
   @override
   void initState() {
@@ -71,20 +69,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-/*  Widget _buildProfile(BuildContext context, DataSnapshot snapshot, int index) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 5),
-      child: Column(children: [
-        Row(
-          children: [
-            //_buildNumberOfPosts(context)
-          ],
-        ),
-        _buildPosts(context, snapshot, index)
-      ]),
-    );
-  }*/
-
   Widget _buildEditIcon(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 5),
@@ -105,198 +89,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ]),
     );
   }
-
-/*  Widget _buildNumberOfPosts(
-      BuildContext context, DataSnapshot snapshot, int index) {
-    //Todo return len of list and create new screen with Posts list
-    return Expanded(
-      child: Column(children: [
-        Text(posts.length.toString(), style: TEXT_BOLD),
-        const SizedBox(height: 4),
-        const Text("Posts", style: TEXT_PLAIN)
-      ]),
-    );
-  }*/
-
 }
-
-Widget _buildPosts(BuildContext context, DataSnapshot snapshot) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(
-      horizontal: 9,
-      vertical: 7,
-    ),
-    child: InkWell(
-      child: Container(
-        decoration: BoxDecoration(
-          color: COLOR_WHITE,
-          border: Border.all(width: 3, color: COLOR_INDIGO_LIGHT),
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.5),
-              spreadRadius: 2,
-              blurRadius: 3,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildTitle(context, snapshot),
-              _buildImage(context, snapshot),
-              //_buildCommentsAndLikes(context, snapshot),
-              //TODO: tags icons
-              //TODO: reactions
-            ],
-          ),
-        ),
-      ),
-      onTap: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) {
-            return PostScreen(post: snapshot);
-          }),
-        );
-      },
-    ),
-  );
-}
-
-Widget _buildTitle(BuildContext context, DataSnapshot snapshot) {
-  return Padding(
-    padding: const EdgeInsets.symmetric(
-      horizontal: 8,
-      vertical: 1,
-    ),
-    child: Center(
-      child: Text(snapshot.child('title').value.toString(),
-          style: HEADLINE_BOLD_BLACK),
-    ),
-  );
-}
-
-Widget _buildImage(BuildContext context, DataSnapshot snapshot) {
-  String url = snapshot.child('pictureID').value.toString();
-  return Padding(
-    padding: const EdgeInsets.symmetric(
-      horizontal: 9,
-      vertical: 8,
-    ),
-    child: AspectRatio(
-      aspectRatio: 2,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(10),
-        child: CachedNetworkImage(
-          imageUrl: url,
-          fit: BoxFit.cover,
-          placeholder: (context, url) => const CircularProgressIndicator(),
-        ),
-      ),
-    ),
-  );
-}
-
-/*Widget _buildCommentsAndLikes(
-      BuildContext context, DataSnapshot snapshot) {
-    String ref = snapshot.child('reference').value.toString();
-    String ownName = FirebaseAuth.instance.currentUser!.uid;
-    var likesAmount = snapshot.child('likeAmount').value.toString();
-    print(snapshot.child('likes/$ownName').value.toString());
-    if (snapshot.child('likes/$ownName').value.toString() == 'true') {
-      print('working until here');
-    }
-    return Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-      Badge(
-        borderRadius: BorderRadius.circular(8),
-        position: BadgePosition.topEnd(top: 1, end: -3),
-        badgeColor: COLOR_INDIGO_LIGHT,
-        badgeContent: const Text('0', style: TextStyle(color: Colors.white)),
-        child: IconButton(
-          icon: const Icon(
-            Icons.comment_bank_sharp,
-            color: COLOR_INDIGO_LIGHT,
-            size: 20,
-          ),
-          onPressed: () {},
-        ),
-      ),
-      Badge(
-        borderRadius: BorderRadius.circular(8),
-        position: BadgePosition.topEnd(top: 1, end: -3),
-        badgeColor: Colors.red,
-        badgeContent:
-            Text(likesAmount, style: const TextStyle(color: Colors.white)),
-        child: IconButton(
-          icon: Icon(
-            icon,
-            color: Colors.red,
-            size: 20,
-          ),
-          onPressed: () {
-            String result = snapshot.child('likes/$ownName').value.toString();
-            //print(snapshot.child('likes/$ownName').value.toString());
-            //print (result);
-            if (result == 'true') {
-              database.child('post/$ref/likes/$ownName').set('false');
-              print('removed like');
-              database
-                  .child('post/$ref/likeAmount')
-                  .set(ServerValue.increment(-1));
-              icon = Icons.favorite_border_outlined;
-              setState(() {});
-            } else {
-              database.child('post/$ref/likes/$ownName').set('true');
-              database
-                  .child('post/$ref/likeAmount')
-                  .set(ServerValue.increment(1));
-              print('added like');
-              icon = Icons.favorite;
-              setState(() {});
-            }
-          },
-        ),
-      )
-    ]);*/
-
-/*final Post post = posts[index];
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 9),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            InkWell(
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 5),
-                child: Icon(
-                  Icons.mode_comment_outlined,
-                  color: COLOR_INDIGO_LIGHT,
-                  size: 15,
-                ),
-              ),
-              onTap: () {},
-            ),
-            InkWell(
-              child: Icon(_favIconOutlined, color: COLOR_RED, size: 15),
-              onTap: () {
-                //TODO: individual likes for posts and users
-                setState(() {
-                  if (_favIconOutlined == Icons.favorite_outline) {
-                    _favIconOutlined = Icons.favorite;
-                  } else {
-                    _favIconOutlined = Icons.favorite_outline;
-                  }
-                });
-              },
-            )
-          ],
-        ),
-      ),
-    );}*/
 
 class Username extends StatefulWidget {
   const Username({Key? key, required this.userID}) : super(key: key);
@@ -348,6 +141,9 @@ class Userposts extends StatefulWidget {
 
 class _UserpostsState extends State<Userposts> {
   late final Stream<List<DataSnapshot>> userposts;
+  IconData icon = Icons.favorite_border_outlined;
+  final database = FirebaseDatabase.instance.refFromURL(
+      "https://diabeathis-f8ee3-default-rtdb.europe-west1.firebasedatabase.app");
 
   @override
   void initState() {
@@ -364,13 +160,11 @@ class _UserpostsState extends State<Userposts> {
 
     final username = getUsername();
 
-    return CombineLatestStream.combine2(
-        posts,
-        username,
-        (posts, username) => posts
-            .where((element) =>
-                element.child("username").value!.toString() == username)
-            .toList());
+    return CombineLatestStream.combine2(posts, username, (posts, username) {
+      return posts.where((element) {
+        return element.child("currentUser").value!.toString() == username;
+      }).toList();
+    });
   }
 
   Stream<String?> getUsername() {
@@ -406,5 +200,147 @@ class _UserpostsState extends State<Userposts> {
         );
       },
     );
+  }
+
+  Widget _buildPosts(BuildContext context, DataSnapshot snapshot) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 9,
+        vertical: 7,
+      ),
+      child: InkWell(
+        child: Container(
+          decoration: BoxDecoration(
+            color: COLOR_WHITE,
+            border: Border.all(width: 3, color: COLOR_INDIGO_LIGHT),
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5),
+                spreadRadius: 2,
+                blurRadius: 3,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildTitle(context, snapshot),
+                _buildImage(context, snapshot),
+                _buildCommentsAndLikes(context, snapshot),
+                //TODO: tags icons
+                //TODO: reactions
+              ],
+            ),
+          ),
+        ),
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) {
+              return PostScreen(post: snapshot);
+            }),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildTitle(BuildContext context, DataSnapshot snapshot) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 8,
+        vertical: 1,
+      ),
+      child: Center(
+        child: Text(
+          snapshot.child('title').value.toString(),
+          style: HEADLINE_BOLD_BLACK,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildImage(BuildContext context, DataSnapshot snapshot) {
+    String url = snapshot.child('pictureID').value.toString();
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 9,
+        vertical: 8,
+      ),
+      child: AspectRatio(
+        aspectRatio: 2,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: CachedNetworkImage(
+            imageUrl: url,
+            fit: BoxFit.cover,
+            placeholder: (context, url) => const CircularProgressIndicator(),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCommentsAndLikes(BuildContext context, DataSnapshot snapshot) {
+    String ref = snapshot.child('reference').value.toString();
+    String ownName = FirebaseAuth.instance.currentUser!.uid;
+    var likesAmount = snapshot.child('likeAmount').value.toString();
+    print(snapshot.child('likes/$ownName').value.toString());
+    if (snapshot.child('likes/$ownName').value.toString() == 'true') {
+      print('working until here');
+    }
+    return Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+      Badge(
+        borderRadius: BorderRadius.circular(8),
+        position: BadgePosition.topEnd(top: 1, end: -3),
+        badgeColor: COLOR_INDIGO_LIGHT,
+        badgeContent: const Text('0', style: TextStyle(color: Colors.white)),
+        child: IconButton(
+          icon: const Icon(
+            Icons.comment_bank_sharp,
+            color: COLOR_INDIGO_LIGHT,
+            size: 20,
+          ),
+          onPressed: () {},
+        ),
+      ),
+      Badge(
+        borderRadius: BorderRadius.circular(8),
+        position: BadgePosition.topEnd(top: 1, end: -3),
+        badgeColor: Colors.red,
+        badgeContent:
+            Text(likesAmount, style: const TextStyle(color: Colors.white)),
+        child: IconButton(
+          icon: Icon(
+            icon,
+            color: Colors.red,
+            size: 20,
+          ),
+          onPressed: () {
+            String result = snapshot.child('likes/$ownName').value.toString();
+            if (result == 'true') {
+              database.child('post/$ref/likes/$ownName').set('false');
+              print('removed like');
+              database
+                  .child('post/$ref/likeAmount')
+                  .set(ServerValue.increment(-1));
+              icon = Icons.favorite_border_outlined;
+              setState(() {});
+            } else {
+              database.child('post/$ref/likes/$ownName').set('true');
+              database
+                  .child('post/$ref/likeAmount')
+                  .set(ServerValue.increment(1));
+              print('added like');
+              icon = Icons.favorite;
+              setState(() {});
+            }
+          },
+        ),
+      )
+    ]);
   }
 }

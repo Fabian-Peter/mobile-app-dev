@@ -7,10 +7,6 @@ import 'package:diabeatthis/screens/post_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
-import 'package:rxdart/rxdart.dart';
-import '../classes/Post.dart';
-import '../classes/user.dart';
 import 'package:rxdart/rxdart.dart';
 
 class ProfileScreen extends StatefulWidget {

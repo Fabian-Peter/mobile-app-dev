@@ -10,11 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart' hide User;
 import 'package:diabeatthis/utils/constants.dart';
 import 'package:flutter/rendering.dart';
-import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:rxdart/rxdart.dart';
-import '../classes/Post.dart';
-import '../classes/user.dart';
 
 import 'package:badges/badges.dart';
 

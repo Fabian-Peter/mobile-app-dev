@@ -12,7 +12,10 @@ import 'classes/utils.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  await FirebaseAuth.instance.signInAnonymously();
+  final user = await FirebaseAuth.instance.authStateChanges().first;
+  if (user == null) {
+    await FirebaseAuth.instance.signInAnonymously();
+  }
   runApp(MyApp());
 }
 
@@ -65,8 +68,7 @@ class AuthGate extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return const Center(child: Text("Something went wrong!"));
-          }
-          else if (!snapshot.hasData) {
+          } else if (!snapshot.hasData) {
             return AuthScreen();
           }
           return HomeScreen();

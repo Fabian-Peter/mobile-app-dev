@@ -7,6 +7,7 @@ import 'package:diabeatthis/utils/constants.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:badges/badges.dart';
 import 'auth_screen.dart';
+import 'package:diabeatthis/screens/Comments_Screen.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 
 class PostScreen extends StatefulWidget {
@@ -30,20 +31,18 @@ class _PostScreenState extends State<PostScreen> {
   TextEditingController commentsController = TextEditingController();
   late DataSnapshot queryReference;
 
-
   Future<String> downloadURL(String imageName) async {
     String downloadURL = await storage.ref('image/$imageName').getDownloadURL();
     return downloadURL;
   }
 
   @override
-  void initState(){
+  void initState() {
     String reference = widget.post.child('reference').value.toString();
-    final queryReference = FirebaseDatabase.instance.ref('post/$reference/comments');
+    final queryReference =
+        FirebaseDatabase.instance.ref('post/$reference/comments');
     super.initState();
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -258,12 +257,7 @@ class _PostScreenState extends State<PostScreen> {
     final ref = FirebaseDatabase.instance.ref("post");
     return Padding(
       padding: const EdgeInsets.only(top: 20),
-      child:
-      Column(
-          children: [
-
-
-
+      child: Column(children: [
         Padding(
             padding: const EdgeInsets.only(left: 5, right: 5),
             child: TextField(
@@ -273,76 +267,90 @@ class _PostScreenState extends State<PostScreen> {
             padding: const EdgeInsets.only(left: 5, right: 5),
             child: ElevatedButton(
                 onPressed: () async {
-                  DataSnapshot snap = await FirebaseDatabase.instance.ref('Users/$ownName').get();
+                  DataSnapshot snap = await FirebaseDatabase.instance
+                      .ref('Users/$ownName')
+                      .get();
                   String username = snap.child('username').value.toString();
                   print(username);
                   String comment = commentsController.text;
                   var timeIdent = new DateTime.now().millisecondsSinceEpoch;
-                  var timeSorter = timeIdent-1;
+                  var timeSorter = timeIdent - 1;
                   final newComment = <String, dynamic>{
-                    'user' : username,
-                    'comment' : comment
+                    'user': username,
+                    'comment': comment
                   };
-                  database.child('post/$ref/comments/$timeSorter').set(newComment);
+                  database
+                      .child('post/$ref/comments/$timeSorter')
+                      .set(newComment);
                   clearText();
-
-                } ,
+                },
                 child: const Text(
                   'Post',
                   style: TextStyle(fontFamily: "VisbyDemiBold", fontSize: 18),
                 ))),
         Padding(
-          padding: const EdgeInsets.only(right: 310),
-          child: Badge(
-              borderRadius: BorderRadius.circular(8),
-              position: BadgePosition.topEnd(top: 1, end: -3),
-              badgeColor: Colors.red,
-              badgeContent:
-              Text(likesAmount, style: TextStyle(color: Colors.white)),
-              child: IconButton(
-                icon: Icon(
-                  icon,
-                  color: Colors.red,
-                  size: 20,
-                ),
-                onPressed: () {
-                  // //print(snapshot.child('likes/$ownName').value.toString());
-                  // //print (result);
-                  // if (result == 'true') {
-                  //   database.child('post/$ref/likes/$ownName').set('false');
-                  //   print('removed like');
-                  //   database.child('post/$ref/likeAmount').set(ServerValue.increment(-1));
-                  //   icon = Icons.favorite_border_outlined;
-                  //   setState(() {
-                  //   });
-                  // } else {
-                  //   database.child('post/$ref/likes/$ownName').set('true');
-                  //   database.child('post/$ref/likeAmount').set(ServerValue.increment(1));
-                  //   print('added like');
-                  //   icon = Icons.favorite;
-                  //   setState(() {
-                  //  });
-                  // }
-                },
-              )),
-        ),
-            FirebaseAnimatedList(
-              query: ref,
-              defaultChild:
-              const Text("Loading...", style: TEXT_PLAIN),
-              itemBuilder:
-                  (BuildContext context,
-                  DataSnapshot snapshot,
-                  Animation<double> animation,
-                  int index) {
-                return _buildComments(context, snapshot, index);
-              },),
-          ]),
-    );
+            padding: const EdgeInsets.only(right: 310),
+            child: Row(children: [
+              IconButton(
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_){
+                        return CommentsScreen(post: widget.post);
+                      })
+                    );
+                  },
+                  icon: Icon(Icons.comment_bank_sharp, color: COLOR_INDIGO_LIGHT,)),
+              Badge(
+                  borderRadius: BorderRadius.circular(8),
+                  position: BadgePosition.topEnd(top: 1, end: -3),
+                  badgeColor: Colors.red,
+                  badgeContent:
+                      Text(likesAmount, style: TextStyle(color: Colors.white)),
+                  child: IconButton(
+                    icon: Icon(
+                      icon,
+                      color: Colors.red,
+                      size: 20,
+                    ),
+                    onPressed: () {
+                      // //print(snapshot.child('likes/$ownName').value.toString());
+                      // //print (result);
+                      // if (result == 'true') {
+                      //   database.child('post/$ref/likes/$ownName').set('false');
+                      //   print('removed like');
+                      //   database.child('post/$ref/likeAmount').set(ServerValue.increment(-1));
+                      //   icon = Icons.favorite_border_outlined;
+                      //   setState(() {
+                      //   });
+                      // } else {
+                      //   database.child('post/$ref/likes/$ownName').set('true');
+                      //   database.child('post/$ref/likeAmount').set(ServerValue.increment(1));
+                      //   print('added like');
+                      //   icon = Icons.favorite;
+                      //   setState(() {
+                      //  });
+                      // }
+                    },
+                  )),
 
+
+            ])),
+        //FirebaseAnimatedList(
+        //  query: ref,
+        //  defaultChild:
+        //  const Text("Loading...", style: TEXT_PLAIN),
+        //  itemBuilder:
+        //      (BuildContext context,
+        //      DataSnapshot snapshot,
+        //      Animation<double> animation,
+        //      int index) {
+        //    return _buildComments(context, snapshot, index);
+        //  },),
+      ]),
+    );
   }
 
-  Widget _buildComments(context, snapshot, index){
+  Widget _buildComments(context, snapshot, index) {
     return Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: 9,
@@ -374,17 +382,15 @@ class _PostScreenState extends State<PostScreen> {
               ),
             ),
           ),
-
         ));
   }
 
-  Widget _buildCommenter(context, snapshot, index){
+  Widget _buildCommenter(context, snapshot, index) {
     return Row(
       children: [
         Padding(
-          padding: const EdgeInsets.all(8),
-          child: Text(snapshot.child('comment'))
-        )
+            padding: const EdgeInsets.all(8),
+            child: Text(snapshot.child('comment')))
       ],
     );
   }
@@ -456,6 +462,7 @@ class _PostScreenState extends State<PostScreen> {
       ],
     );
   }
+
   void dispose() {
     commentsController.dispose();
     super.dispose();
@@ -464,5 +471,4 @@ class _PostScreenState extends State<PostScreen> {
   void clearText() {
     commentsController.clear();
   }
-
 }

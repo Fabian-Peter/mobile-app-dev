@@ -54,6 +54,11 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
   }
 
+  //void getComments() async{
+  //  DataSnapshot snippy = await FirebaseDatabase.instance.ref().orderByChild('comments').limitToFirst(3).get();
+  //  print(snippy.value);
+  //}
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -196,52 +201,52 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildSearchBar(BuildContext context) {
     return Padding(
         padding: const EdgeInsets.only(left: 10, right: 10),
-        child: Row(
-            children: [
-              Expanded(
+        child: Row(children: [
+          Expanded(
               child: SizedBox(
                   height: 33,
                   child: TextFormField(
-                focusNode: searchBarFocusNode,
-                onTap: () => searchBarFocusNode.requestFocus(),
-                controller: searchController,
-                onChanged: (text) {
-                  setState(() {
-                    if (searchController.text != "") {
-                      searchWord = searchController.text.toLowerCase();
-                    }
-                  });
-                },
-                decoration: InputDecoration(
-                  suffixIcon: IconButton(
-                      icon: const Icon(Icons.cancel, color: COLOR_INDIGO_LIGHT),
-                      iconSize: 15,
-                      splashRadius: 20,
-                      onPressed: () {
-                        setState(() {
-                          searchWord = "";
-                        });
-                        searchController.clear();
-                        searchBarFocusNode.unfocus();
-                      }),
-                  labelText: 'Search for recipe or ingredient...',
-                  labelStyle: const TextStyle(
-                      fontFamily: "VisbyMedium",
-                      fontSize: 14,
-                      color: COLOR_INDIGO_LIGHT),
-                  isDense: true,
-                  enabledBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(
-                    color: COLOR_INDIGO_LIGHT,
-                  )),
-                  border: const OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: COLOR_INDIGO_LIGHT,
-                      width: 3.0,
+                    focusNode: searchBarFocusNode,
+                    onTap: () => searchBarFocusNode.requestFocus(),
+                    controller: searchController,
+                    onChanged: (text) {
+                      setState(() {
+                        if (searchController.text != "") {
+                          searchWord = searchController.text.toLowerCase();
+                        }
+                      });
+                    },
+                    decoration: InputDecoration(
+                      suffixIcon: IconButton(
+                          icon: const Icon(Icons.cancel,
+                              color: COLOR_INDIGO_LIGHT),
+                          iconSize: 15,
+                          splashRadius: 20,
+                          onPressed: () {
+                            setState(() {
+                              searchWord = "";
+                            });
+                            searchController.clear();
+                            searchBarFocusNode.unfocus();
+                          }),
+                      labelText: 'Search for recipe or ingredient...',
+                      labelStyle: const TextStyle(
+                          fontFamily: "VisbyMedium",
+                          fontSize: 14,
+                          color: COLOR_INDIGO_LIGHT),
+                      isDense: true,
+                      enabledBorder: const OutlineInputBorder(
+                          borderSide: BorderSide(
+                        color: COLOR_INDIGO_LIGHT,
+                      )),
+                      border: const OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: COLOR_INDIGO_LIGHT,
+                          width: 3.0,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              ))),
+                  ))),
           IconButton(
             icon: Icon(_favIconOutlinedFilter, color: COLOR_INDIGO_LIGHT),
             iconSize: 25,
@@ -294,7 +299,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   _buildTitle(context, snapshot, index),
                   _buildImage(context, snapshot, index),
                   _buildDescription(context, snapshot, index),
-                  _buildCommentsAndLikes(context, snapshot, index),
+                  _buildComments(context, snapshot, index),
+                  _buildLikes(context, snapshot, index),
                   //TODO: tags icons
                   //TODO: reactions
                 ],
@@ -380,12 +386,21 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: TEXT_PLAIN)));
   }
 
-  Widget _buildCommentsAndLikes(
+  Widget _buildComments(
       BuildContext context, DataSnapshot snapshot, int index) {
+    return Padding(
+        padding: const EdgeInsets.only(left: 0, right: 0),
+        child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center, children: [
+              //Text(snapshot.hasChild('hello world').toString())
+              ]));
+  }
+
+  Widget _buildLikes(BuildContext context, DataSnapshot snapshot, int index) {
     String ref = snapshot.child('reference').value.toString();
     String ownName = FirebaseAuth.instance.currentUser!.uid;
     var likesAmount = snapshot.child('likeAmount').value.toString();
-    if(snapshot.child('likes/$ownName').value.toString() == 'true'){
+    if (snapshot.child('likes/$ownName').value.toString() == 'true') {
       print('working until here');
     }
     //if(snapshot.child('likes/$ownName').value.toString().contains('true')){
@@ -413,7 +428,8 @@ class _HomeScreenState extends State<HomeScreen> {
           borderRadius: BorderRadius.circular(8),
           position: BadgePosition.topEnd(top: 1, end: -3),
           badgeColor: Colors.red,
-          badgeContent: Text(likesAmount, style: TextStyle(color: Colors.white)),
+          badgeContent:
+              Text(likesAmount, style: TextStyle(color: Colors.white)),
           child: IconButton(
             icon: Icon(
               icon,
@@ -427,17 +443,19 @@ class _HomeScreenState extends State<HomeScreen> {
               if (result == 'true') {
                 database.child('post/$ref/likes/$ownName').set('false');
                 print('removed like');
-                database.child('post/$ref/likeAmount').set(ServerValue.increment(-1));
+                database
+                    .child('post/$ref/likeAmount')
+                    .set(ServerValue.increment(-1));
                 icon = Icons.favorite_border_outlined;
-                setState(() {
-                });
+                setState(() {});
               } else {
                 database.child('post/$ref/likes/$ownName').set('true');
-                database.child('post/$ref/likeAmount').set(ServerValue.increment(1));
+                database
+                    .child('post/$ref/likeAmount')
+                    .set(ServerValue.increment(1));
                 print('added like');
                 icon = Icons.favorite;
-                setState(() {
-                });
+                setState(() {});
               }
             },
           ))

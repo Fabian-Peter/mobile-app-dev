@@ -71,7 +71,7 @@ class _GameScreenState extends State<GameScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text("Meat your Meal",
+          title: const Text("Meet your Meal",
               style: TextStyle(fontFamily: "VisbyDemiBold")),
         ),
         body: Center(

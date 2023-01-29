@@ -18,6 +18,8 @@ const TextStyle HEADLINE_BOLD_WHITE =
     TextStyle(color: COLOR_WHITE, fontSize: 21, fontFamily: 'VisbyDemiBold');
 const TextStyle TEXT_PLAIN =
     TextStyle(color: COLOR_BLACK, fontSize: 14, fontFamily: 'VisbyMedium');
+const TextStyle TEXT_PLAIN_INDIGO =
+    TextStyle(color: COLOR_INDIGO, fontSize: 14, fontFamily: 'VisbyMedium');
 const TextStyle TEXT_BOLD =
     TextStyle(color: COLOR_BLACK, fontSize: 14, fontFamily: 'VisbyDemiBold');
 const TextStyle HOME_POST_CREATOR =

@@ -30,92 +30,98 @@ class _CommentsScreenState extends State<CommentsScreen> {
     String path = widget.post.child('reference').value.toString();
     String ownName = FirebaseAuth.instance.currentUser!.uid;
     final ref = FirebaseDatabase.instance.ref("post/$path/comments");
-    return Scaffold(
-        appBar: AppBar(
-          title: Text('${widget.post.child('title').value} Comments',
-              style: HEADLINE_BOLD_WHITE),
-          actions: <Widget>[
-            Row(
-              children: [_buildProfileIcon(context)],
+    return GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: Scaffold(
+            appBar: AppBar(
+              title: Text('${widget.post.child('title').value} Comments',
+                  style: HEADLINE_BOLD_WHITE),
+              actions: <Widget>[
+                Row(
+                  children: [_buildProfileIcon(context)],
+                ),
+              ],
             ),
-          ],
-        ),
-        body: SafeArea(
-            child: Column(children: [
-          Flexible(
-              child: FirebaseAnimatedList(
-                  query: ref.orderByKey(),
-                  defaultChild: const Text("Loading...", style: TEXT_PLAIN),
-                  itemBuilder: (context, snapshot, animation, index) {
-                    return _buildComments(context, snapshot, index);
-                  })),
-          Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-              child: Form(
-                  key: formKey,
-                  child: TextFormField(
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return "";
-                        }
-                        return null;
-                      },
-                      focusNode: commentFocusNode,
-                      onTap: () => commentFocusNode.requestFocus(),
-                      controller: commentsController,
-                      decoration: InputDecoration(
-                        errorStyle: const TextStyle(height: 0),
-                        suffixIcon: IconButton(
-                          icon: const Icon(Icons.send, color: COLOR_INDIGO),
-                          iconSize: 25,
-                          splashRadius: 20,
-                          onPressed: () async {
-                            final isValid = formKey.currentState!.validate();
-                            if (!isValid) return;
-                            DataSnapshot snap = await FirebaseDatabase.instance
-                                .ref('Users/$ownName')
-                                .get();
-                            String username =
-                                snap.child('username').value.toString();
-                            String postID =
-                                widget.post.child('reference').value.toString();
-                            String comment = commentsController.text;
-                            var timeIdent =
-                                new DateTime.now().millisecondsSinceEpoch;
-                            var timeSorter = 0 - timeIdent;
-                            final newComment = <String, dynamic>{
-                              'user': username,
-                              'comment': comment
-                            };
-                            database
-                                .child('post/$postID/comments/$timeSorter')
-                                .set(newComment);
-                            database
-                                .child('post/$postID/CommentsAmount')
-                                .set(ServerValue.increment(1));
-                            clearText();
-                            commentFocusNode.unfocus();
-                          },
-                        ),
-                        labelText: 'Enter your comment...',
-                        labelStyle: const TextStyle(
-                            fontFamily: "VisbyMedium",
-                            fontSize: 14,
-                            color: COLOR_INDIGO_LIGHT),
-                        isDense: true,
-                        enabledBorder: const OutlineInputBorder(
-                            borderSide: BorderSide(
-                          color: COLOR_INDIGO_LIGHT,
-                        )),
-                        border: const OutlineInputBorder(
-                          borderSide: BorderSide(
-                            color: COLOR_INDIGO_LIGHT,
-                            width: 3.0,
-                          ),
-                        ),
-                      ))))
-        ])));
+            body: SafeArea(
+                child: Column(children: [
+              Flexible(
+                  child: FirebaseAnimatedList(
+                      query: ref.orderByKey(),
+                      defaultChild: const Text("Loading...", style: TEXT_PLAIN),
+                      itemBuilder: (context, snapshot, animation, index) {
+                        return _buildComments(context, snapshot, index);
+                      })),
+              if (!FirebaseAuth.instance.currentUser!.isAnonymous)
+                _buildCommentTextField(context)
+            ]))));
+  }
+
+  Widget _buildCommentTextField(BuildContext context) {
+    String ownName = FirebaseAuth.instance.currentUser!.uid;
+    return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+        child: Form(
+            key: formKey,
+            child: TextFormField(
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return "";
+                  }
+                  return null;
+                },
+                focusNode: commentFocusNode,
+                onTap: () => commentFocusNode.requestFocus(),
+                controller: commentsController,
+                decoration: InputDecoration(
+                  errorStyle: const TextStyle(height: 0),
+                  suffixIcon: IconButton(
+                    icon: const Icon(Icons.send, color: COLOR_INDIGO),
+                    iconSize: 25,
+                    splashRadius: 20,
+                    onPressed: () async {
+                      final isValid = formKey.currentState!.validate();
+                      if (!isValid) return;
+                      DataSnapshot snap = await FirebaseDatabase.instance
+                          .ref('Users/$ownName')
+                          .get();
+                      String username = snap.child('username').value.toString();
+                      String postID =
+                          widget.post.child('reference').value.toString();
+                      String comment = commentsController.text;
+                      var timeIdent = new DateTime.now().millisecondsSinceEpoch;
+                      var timeSorter = 0 - timeIdent;
+                      final newComment = <String, dynamic>{
+                        'user': username,
+                        'comment': comment
+                      };
+                      database
+                          .child('post/$postID/comments/$timeSorter')
+                          .set(newComment);
+                      database
+                          .child('post/$postID/CommentsAmount')
+                          .set(ServerValue.increment(1));
+                      clearText();
+                      commentFocusNode.unfocus();
+                    },
+                  ),
+                  labelText: 'Enter your comment...',
+                  labelStyle: const TextStyle(
+                      fontFamily: "VisbyMedium",
+                      fontSize: 14,
+                      color: COLOR_INDIGO_LIGHT),
+                  isDense: true,
+                  enabledBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(
+                    color: COLOR_INDIGO_LIGHT,
+                  )),
+                  border: const OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: COLOR_INDIGO_LIGHT,
+                      width: 3.0,
+                    ),
+                  ),
+                ))));
   }
 
   Widget _buildProfileIcon(BuildContext context) {
@@ -151,7 +157,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
           child: Container(
             decoration: BoxDecoration(
               color: COLOR_WHITE,
-              border: Border.all(width: 3, color: COLOR_INDIGO_LIGHT),
+              border: Border.all(width: 1.5, color: COLOR_INDIGO_LIGHT),
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(

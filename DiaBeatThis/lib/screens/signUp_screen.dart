@@ -112,183 +112,188 @@ class _SignUpScreen extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Sign Up", style: HEADLINE_BOLD_WHITE),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(height: 10),
-              Stack(clipBehavior: Clip.none, children: [
-                Container(
-                    height: 120.0,
-                    width: 120.0,
-                    decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: (image != null)
-                              ? FileImage(image!) as ImageProvider
-                              : const AssetImage(
-                                  "assets/images/DefaultIcon.png"),
-                          fit: BoxFit.cover,
-                        ),
-                        shape: BoxShape.circle)),
-                Positioned(
-                    top: 85,
-                    left: 32,
-                    child: FloatingActionButton(
-                      heroTag: "btn1",
-                      backgroundColor:
-                          isImageMissing ? Colors.red : COLOR_INDIGO,
-                      foregroundColor: Colors.white,
-                      onPressed: () {
-                        _pictureEditBottomSheet(context);
-                      },
-                      child: const Icon(Icons.camera_alt),
-                    )),
-              ]),
-              const SizedBox(
-                height: 27,
-              ),
-              isImageMissing
-                  ? const Text("Missing image!",
-                      style: TextStyle(color: Colors.red))
-                  : SizedBox(),
-              const SizedBox(height: 15),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  inputFormatters: [
-                    LengthLimitingTextInputFormatter(15),
-                  ],
-                  controller: usernameController,
-                  decoration: const InputDecoration(
-                    labelText: "Enter Username",
-                    labelStyle: TextStyle(
-                        fontFamily: "VisbyMedium", color: COLOR_INDIGO_LIGHT),
-                    isDense: true,
-                    enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: COLOR_INDIGO_LIGHT)),
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: COLOR_INDIGO_LIGHT,
-                        width: 3.0,
-                      ),
-                    ),
-                  ),
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return "Enter Username";
-                    }
-                    return null;
-                  },
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  controller: emailController,
-                  cursorColor: Colors.white,
-                  textInputAction: TextInputAction.next,
-                  decoration: const InputDecoration(
-                    labelText: "Enter Email Address",
-                    labelStyle: TextStyle(
-                        fontFamily: "VisbyMedium", color: COLOR_INDIGO_LIGHT),
-                    enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: COLOR_INDIGO_LIGHT)),
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: COLOR_INDIGO_LIGHT,
-                        width: 3.0,
-                      ),
-                    ),
-                  ),
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (email) =>
-                      email != null && !EmailValidator.validate(email)
-                          ? "Enter a valid email"
-                          : null,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextFormField(
-                  controller: passwordController,
-                  textInputAction: TextInputAction.done,
-                  decoration: const InputDecoration(
-                    labelText: "Enter Password",
-                    labelStyle: TextStyle(
-                        fontFamily: "VisbyMedium", color: COLOR_INDIGO_LIGHT),
-                    enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: COLOR_INDIGO_LIGHT)),
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: COLOR_INDIGO_LIGHT,
-                        width: 3.0,
-                      ),
-                    ),
-                  ),
-                  obscureText: true,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (value) => value != null && value.length < 6
-                      ? "Password must be at least 6 characters!"
-                      : null,
-                ),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                    minimumSize: const Size.fromHeight(45)),
-                icon: const Icon(Icons.arrow_forward, size: 20),
-                label: const Text(
-                  "Sign Up",
-                  style: TextStyle(fontFamily: "VisbyMedium", fontSize: 20),
-                ),
-                onPressed: signUp,
-              ),
-              const SizedBox(height: 20),
-              RichText(
-                  text: TextSpan(
-                style: const TextStyle(
-                    fontFamily: "VisbyMedium",
-                    color: COLOR_INDIGO_LIGHT,
-                    fontSize: 15),
-                text: "Already have an account? ",
-                children: [
-                  TextSpan(
-                    recognizer: TapGestureRecognizer()
-                      ..onTap = widget.onClickedSignIn,
-                    text: "Log In",
-                    style: const TextStyle(
-                        fontFamily: "VisbyMedium",
-                        decoration: TextDecoration.underline,
-                        color: COLOR_INDIGO_LIGHT),
-                  ),
-                  const TextSpan(
-                      text: " or ",
-                      style: TextStyle(
-                          fontFamily: "VisbyMedium",
-                          color: COLOR_INDIGO_LIGHT)),
-                  TextSpan(
-                    recognizer: TapGestureRecognizer()..onTap = guestLogin,
-                    text: "Login as Guest",
-                    style: const TextStyle(
-                        fontFamily: "VisbyMedium",
-                        decoration: TextDecoration.underline,
-                        color: COLOR_INDIGO_LIGHT),
-                  )
-                ],
-              ))
-            ],
+    return GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text("Sign Up", style: HEADLINE_BOLD_WHITE),
           ),
-        ),
-      ),
-    );
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.all(16.0),
+            child: Form(
+              key: formKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(height: 10),
+                  Stack(clipBehavior: Clip.none, children: [
+                    Container(
+                        height: 120.0,
+                        width: 120.0,
+                        decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: (image != null)
+                                  ? FileImage(image!) as ImageProvider
+                                  : const AssetImage(
+                                      "assets/images/DefaultIcon.png"),
+                              fit: BoxFit.cover,
+                            ),
+                            shape: BoxShape.circle)),
+                    Positioned(
+                        top: 85,
+                        left: 32,
+                        child: FloatingActionButton(
+                          heroTag: "btn1",
+                          backgroundColor:
+                              isImageMissing ? Colors.red : COLOR_INDIGO,
+                          foregroundColor: Colors.white,
+                          onPressed: () {
+                            _pictureEditBottomSheet(context);
+                          },
+                          child: const Icon(Icons.camera_alt),
+                        )),
+                  ]),
+                  const SizedBox(
+                    height: 27,
+                  ),
+                  isImageMissing
+                      ? const Text("Missing image!",
+                          style: TextStyle(color: Colors.red))
+                      : SizedBox(),
+                  const SizedBox(height: 15),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextFormField(
+                      inputFormatters: [
+                        LengthLimitingTextInputFormatter(15),
+                      ],
+                      controller: usernameController,
+                      decoration: const InputDecoration(
+                        labelText: "Enter Username",
+                        labelStyle: TextStyle(
+                            fontFamily: "VisbyMedium",
+                            color: COLOR_INDIGO_LIGHT),
+                        isDense: true,
+                        enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: COLOR_INDIGO_LIGHT)),
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: COLOR_INDIGO_LIGHT,
+                            width: 3.0,
+                          ),
+                        ),
+                      ),
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return "Enter Username";
+                        }
+                        return null;
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextFormField(
+                      controller: emailController,
+                      cursorColor: Colors.white,
+                      textInputAction: TextInputAction.next,
+                      decoration: const InputDecoration(
+                        labelText: "Enter Email Address",
+                        labelStyle: TextStyle(
+                            fontFamily: "VisbyMedium",
+                            color: COLOR_INDIGO_LIGHT),
+                        enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: COLOR_INDIGO_LIGHT)),
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: COLOR_INDIGO_LIGHT,
+                            width: 3.0,
+                          ),
+                        ),
+                      ),
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (email) =>
+                          email != null && !EmailValidator.validate(email)
+                              ? "Enter a valid email"
+                              : null,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: TextFormField(
+                      controller: passwordController,
+                      textInputAction: TextInputAction.done,
+                      decoration: const InputDecoration(
+                        labelText: "Enter Password",
+                        labelStyle: TextStyle(
+                            fontFamily: "VisbyMedium",
+                            color: COLOR_INDIGO_LIGHT),
+                        enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: COLOR_INDIGO_LIGHT)),
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: COLOR_INDIGO_LIGHT,
+                            width: 3.0,
+                          ),
+                        ),
+                      ),
+                      obscureText: true,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (value) => value != null && value.length < 6
+                          ? "Password must be at least 6 characters!"
+                          : null,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                        minimumSize: const Size.fromHeight(45)),
+                    icon: const Icon(Icons.arrow_forward, size: 20),
+                    label: const Text(
+                      "Sign Up",
+                      style: TextStyle(fontFamily: "VisbyMedium", fontSize: 20),
+                    ),
+                    onPressed: signUp,
+                  ),
+                  const SizedBox(height: 20),
+                  RichText(
+                      text: TextSpan(
+                    style: const TextStyle(
+                        fontFamily: "VisbyMedium",
+                        color: COLOR_INDIGO_LIGHT,
+                        fontSize: 15),
+                    text: "Already have an account? ",
+                    children: [
+                      TextSpan(
+                        recognizer: TapGestureRecognizer()
+                          ..onTap = widget.onClickedSignIn,
+                        text: "Log In",
+                        style: const TextStyle(
+                            fontFamily: "VisbyMedium",
+                            decoration: TextDecoration.underline,
+                            color: COLOR_INDIGO_LIGHT),
+                      ),
+                      const TextSpan(
+                          text: " or ",
+                          style: TextStyle(
+                              fontFamily: "VisbyMedium",
+                              color: COLOR_INDIGO_LIGHT)),
+                      TextSpan(
+                        recognizer: TapGestureRecognizer()..onTap = guestLogin,
+                        text: "Login as Guest",
+                        style: const TextStyle(
+                            fontFamily: "VisbyMedium",
+                            decoration: TextDecoration.underline,
+                            color: COLOR_INDIGO_LIGHT),
+                      )
+                    ],
+                  ))
+                ],
+              ),
+            ),
+          ),
+        ));
   }
 
   Future signUp() async {

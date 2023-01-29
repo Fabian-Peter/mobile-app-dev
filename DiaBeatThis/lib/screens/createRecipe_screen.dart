@@ -116,17 +116,17 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                   style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
                       foregroundColor: Colors.black),
-                  icon: const Icon(Icons.image),
+                  icon: const Icon(Icons.image, color: COLOR_INDIGO),
+                  label: const Text('Gallery', style: TEXT_PLAIN_INDIGO),
                   onPressed: () => pickImage(ImageSource.gallery),
-                  label: const Text('Gallery'),
                 ),
                 ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
                       foregroundColor: Colors.black),
+                  icon: const Icon(Icons.camera_alt, color: COLOR_INDIGO),
+                  label: const Text('Camera', style: TEXT_PLAIN_INDIGO),
                   onPressed: () => pickImage(ImageSource.camera),
-                  icon: const Icon(Icons.camera_alt),
-                  label: const Text('Camera'),
                 )
               ]));
         });
@@ -144,19 +144,21 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Create new Post', style: HEADLINE_BOLD_WHITE),
-      ),
-      body: ModalProgressHUD(
-        inAsyncCall: _isInAsyncCall,
-        // demo of some additional parameters
-        opacity: 0.5,
-        progressIndicator: CircularProgressIndicator(),
+    return GestureDetector(
+        onTap: () => FocusScope.of(context).unfocus(),
+        child: Scaffold(
+          appBar: AppBar(
+            title: const Text('Create new Post', style: HEADLINE_BOLD_WHITE),
+          ),
+          body: ModalProgressHUD(
+            inAsyncCall: _isInAsyncCall,
+            // demo of some additional parameters
+            opacity: 0.5,
+            progressIndicator: CircularProgressIndicator(),
 
-        child: _buildForm(context),
-      ),
-    );
+            child: _buildForm(context),
+          ),
+        ));
   }
 
   Widget _buildForm(BuildContext context) {
@@ -604,9 +606,9 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                   final newRecipe = <String, dynamic>{
                     'likeAmount': 0,
                     'CommentsAmount': 0,
-                    'happyAmount' : 0,
-                    'unhappyAmount' : 0,
-                    'bloodSugarAmount' : 0,
+                    'happyAmount': 0,
+                    'unhappyAmount': 0,
+                    'bloodSugarAmount': 0,
                     'title': titleController.text,
                     'description': descriptionController.text,
                     'ingredients': ingredientList,

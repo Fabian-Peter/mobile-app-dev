@@ -98,7 +98,6 @@ flutter:
     - assets/images/Dessert.png
     - assets/images/Asian.png
     - assets/images/QuickEasy.png
-    - assets/images/Nutrition.png
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

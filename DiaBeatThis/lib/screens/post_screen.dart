@@ -82,9 +82,9 @@ class _PostScreenState extends State<PostScreen> {
             _buildCreatorRow(context, snapshot),
             _buildDescription(context),
             _buildContainerCaption(context, _buildTags(), 'Tags'),
+            _buildImage(context),
             _buildContainerCaption(
                 context, _buildNutrition(), 'Nutritional Values'),
-            _buildImage(context),
             _buildContainerCaption(
                 context, _buildIngredients(context), 'Ingredients'),
             _buildContainerCaption(
@@ -179,50 +179,10 @@ class _PostScreenState extends State<PostScreen> {
   }
 
   Widget _buildNutrition() {
-    const double iconSize = 54;
+    const double iconSize = 30;
     return Padding(
-        padding: const EdgeInsets.only(left: 0, right: 0),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Column(children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(iconSize / 2),
-                  child: Image.asset(
-                    'assets/images/Fats.png',
-                    height: iconSize,
-                    width: iconSize,
-                  ),
-                ),
-              ]),
-              const SizedBox(width: 30),
-              Column(children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(iconSize / 2),
-                  child: Image.asset(
-                    'assets/images/Carbs.png',
-                    height: iconSize,
-                    width: iconSize,
-                  ),
-                ),
-              ]),
-              const SizedBox(width: 30),
-              Column(children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(iconSize / 2),
-                  child: Image.asset(
-                    'assets/images/Proteins.png',
-                    height: iconSize,
-                    width: iconSize,
-                  ),
-                ),
-              ])
-            ],
-          ),
-          const SizedBox(height: 12),
-          Text(widget.post.child("nutrition").value.toString())
-        ]));
+        padding: const EdgeInsets.only(left: 5, right: 5),
+        child: Text(widget.post.child("nutrition").value.toString()));
   }
 
   Widget _buildImage(BuildContext context) {
@@ -230,7 +190,7 @@ class _PostScreenState extends State<PostScreen> {
     return Padding(
         padding: const EdgeInsets.only(top: 20),
         child: AspectRatio(
-          aspectRatio: 2,
+          aspectRatio: 1,
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10),
             child: CachedNetworkImage(imageUrl: imageID, fit: BoxFit.cover),

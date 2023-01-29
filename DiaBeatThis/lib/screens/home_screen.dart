@@ -517,7 +517,7 @@ class _HomeScreenState extends State<HomeScreen> {
               badgeContent:
                   Text(bloodSugarAmount, style: TextStyle(color: Colors.white)),
               child: IconButton(
-                icon: Icon(
+                icon: const Icon(
                   Icons.format_color_reset,
                   color: Colors.red,
                   size: 20,
@@ -560,7 +560,7 @@ class _HomeScreenState extends State<HomeScreen> {
               badgeContent:
                   Text(happyAmount, style: TextStyle(color: Colors.white)),
               child: IconButton(
-                icon: Icon(
+                icon: const Icon(
                   Icons.sentiment_very_satisfied_outlined,
                   color: Colors.green,
                   size: 20,
@@ -599,7 +599,7 @@ class _HomeScreenState extends State<HomeScreen> {
               badgeContent:
                   Text(unhappyAmount, style: TextStyle(color: Colors.white)),
               child: IconButton(
-                icon: Icon(
+                icon: const Icon(
                   Icons.sentiment_very_dissatisfied,
                   color: COLOR_INDIGO_LIGHT,
                   size: 20,

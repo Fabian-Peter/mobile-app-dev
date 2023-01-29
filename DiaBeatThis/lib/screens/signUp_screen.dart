@@ -125,7 +125,7 @@ class _SignUpScreen extends State<SignUpScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  SizedBox(height: 10),
+                  const SizedBox(height: 10),
                   Stack(clipBehavior: Clip.none, children: [
                     Container(
                         height: 120.0,
@@ -159,7 +159,7 @@ class _SignUpScreen extends State<SignUpScreen> {
                   isImageMissing
                       ? const Text("Missing image!",
                           style: TextStyle(color: Colors.red))
-                      : SizedBox(),
+                      : const SizedBox(),
                   const SizedBox(height: 15),
                   Padding(
                     padding: const EdgeInsets.all(8.0),

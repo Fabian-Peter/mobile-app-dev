@@ -11,12 +11,14 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  bool isLoading = false;
-  final _formKey = GlobalKey<FormState>();
+  //Firebase variables
   FirebaseAuth firebaseAuth = FirebaseAuth.instance;
   DatabaseReference databaseReference =
       FirebaseDatabase.instance.ref().child("Users");
 
+  //Page variables
+  bool isLoading = false;
+  final _formKey = GlobalKey<FormState>();
   TextEditingController usernameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
@@ -31,7 +33,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             body: Form(
               key: _formKey,
               child: ListView(children: [
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TextFormField(

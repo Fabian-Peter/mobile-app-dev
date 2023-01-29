@@ -28,7 +28,6 @@ class _CommentsScreenState extends State<CommentsScreen> {
   @override
   Widget build(BuildContext context) {
     String path = widget.post.child('reference').value.toString();
-    String ownName = FirebaseAuth.instance.currentUser!.uid;
     final ref = FirebaseDatabase.instance.ref("post/$path/comments");
     return GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),

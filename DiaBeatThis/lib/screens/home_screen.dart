@@ -274,7 +274,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         _favIconOutlinedFilter = Icons.favorite;
                         listKey = Key(
                             DateTime.now().millisecondsSinceEpoch.toString());
-                        query = ref.orderByChild('likes/$ownName').equalTo("true");
+                        query =
+                            ref.orderByChild('likes/$ownName').equalTo("true");
                       } else {
                         _favIconOutlinedFilter = Icons.favorite_border_outlined;
                         listKey = Key(

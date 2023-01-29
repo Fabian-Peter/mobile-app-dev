@@ -604,6 +604,9 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                   final newRecipe = <String, dynamic>{
                     'likeAmount': 0,
                     'CommentsAmount': 0,
+                    'happyAmount' : 0,
+                    'unhappyAmount' : 0,
+                    'bloodSugarAmount' : 0,
                     'title': titleController.text,
                     'description': descriptionController.text,
                     'ingredients': ingredientList,

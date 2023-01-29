@@ -42,9 +42,6 @@ class _PostScreenState extends State<PostScreen> {
 
   @override
   void initState() {
-    String reference = widget.post.child('reference').value.toString();
-    final queryReference =
-        FirebaseDatabase.instance.ref('post/$reference/comments');
     super.initState();
   }
 
@@ -173,14 +170,10 @@ class _PostScreenState extends State<PostScreen> {
   }
 
   Widget _buildTags() {
+    String tags = widget.post.child('tags').value.toString();
     return Padding(
         padding: const EdgeInsets.only(left: 5, right: 5),
-        child: Text(
-            widget.post
-                .child('tags')
-                .value
-                .toString(), //TODO: Liste berücksichtigen
-            style: TEXT_PLAIN));
+        child: Text(tags.substring(1, tags.length - 1), style: TEXT_PLAIN));
   }
 
   Widget _buildNutrition() {
@@ -244,10 +237,20 @@ class _PostScreenState extends State<PostScreen> {
   }
 
   Widget _buildIngredients(BuildContext context) {
+    int length = widget.post.child('ingredients').children.length;
+    String ingredientString = "";
+
+    for (int i = 0; i < length; i++) {
+      if (i != 0) {
+        ingredientString += ", ";
+      }
+      ingredientString +=
+          "${widget.post.child('ingredientsQuantity').child(i.toString()).value} ${widget.post.child('ingredients').child(i.toString()).value}";
+    }
+
     return Padding(
         padding: const EdgeInsets.only(left: 5, right: 5),
-        child: Text(widget.post.child('ingredients').value.toString(),
-            style: TEXT_PLAIN));
+        child: Text(ingredientString, style: TEXT_PLAIN));
   }
 
   Widget _buildGuide(BuildContext context) {

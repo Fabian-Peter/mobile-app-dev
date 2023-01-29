@@ -1,6 +1,8 @@
+import 'package:badges/badges.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:diabeatthis/screens/home_screen.dart';
 import 'package:diabeatthis/screens/post_screen.dart';
+import 'package:diabeatthis/screens/profile_screen.dart';
 import 'package:diabeatthis/utils/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -9,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:swipe_cards/swipe_cards.dart';
 
+import 'Comments_Screen.dart';
 import 'auth_screen.dart';
 
 class GameScreen extends StatefulWidget {
@@ -189,14 +192,16 @@ class GameResultScreen extends StatefulWidget {
 }
 
 class _GameResultScreenState extends State<GameResultScreen> {
+  //Firebase variables
   final ref = FirebaseDatabase.instance.ref("post");
   final user = FirebaseAuth.instance.currentUser!;
+  final database = FirebaseDatabase.instance.refFromURL(
+      "https://diabeathis-f8ee3-default-rtdb.europe-west1.firebasedatabase.app");
 
-  bool found = false;
+  IconData icon = Icons.favorite_border_outlined;
 
   @override
   Widget build(BuildContext context) {
-    bool foundTemp = false;
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       onPanDown: (_) => FocusScope.of(context).unfocus(),
@@ -223,43 +228,32 @@ class _GameResultScreenState extends State<GameResultScreen> {
               child: Column(
             children: [
               const SizedBox(height: 3),
-              !found
-                  ? const Padding(
-                      padding: EdgeInsets.only(top: 50),
-                      child: Text("No recipes found",
-                          style: TextStyle(
-                              fontFamily: "VisbyDemiBold", fontSize: 20)))
-                  : const SizedBox(),
               Flexible(
                   child: FirebaseAnimatedList(
                       query: ref.orderByChild('timestamp'),
                       defaultChild: const Text("Loading...", style: TEXT_PLAIN),
                       itemBuilder: (context, snapshot, animation, index) {
-                        Object? tagsValues = snapshot.child('tags').value;
                         if (widget.swipedRight.isNotEmpty) {
-                          String tagString = tagsValues.toString();
-                          List<String> tagsList = tagString
-                              .substring(1, tagString.length - 1)
-                              .split(", ");
+                          List<String> tagsList = [];
+                          int tagsLength =
+                              snapshot.child('tags').children.length;
+                          for (int i = 0; i < tagsLength; i++) {
+                            tagsList.add(snapshot
+                                .child('tags')
+                                .child(i.toString())
+                                .value
+                                .toString());
+                          }
                           Set<String> set = Set.of(tagsList);
                           if (set.containsAll(widget.swipedRight)) {
-                            foundTemp = true;
                             return _buildPosts(context, snapshot, index);
                           }
                         }
                         return const SizedBox();
                       })),
-              !foundTemp ? _updateResult() : const SizedBox(),
             ],
           ))),
     );
-  }
-
-  Widget _updateResult() {
-    setState(() {
-      found = true;
-    });
-    return const SizedBox();
   }
 
   Widget _buildPosts(BuildContext context, DataSnapshot snapshot, int index) {
@@ -291,7 +285,8 @@ class _GameResultScreenState extends State<GameResultScreen> {
                   _buildTitle(context, snapshot, index),
                   _buildImage(context, snapshot, index),
                   _buildDescription(context, snapshot, index),
-                  //TODO: community?
+                  _buildComments(context, snapshot, index),
+                  _buildLikes(context, snapshot, index),
                 ],
               ),
             ),
@@ -311,18 +306,24 @@ class _GameResultScreenState extends State<GameResultScreen> {
       children: [
         Padding(
           padding: const EdgeInsets.all(8),
-          child: ClipRRect(
-              borderRadius: BorderRadius.circular(USER_ICON_POST_SIZE / 2),
-              child: InkWell(
-                child: Image.asset(
-                  'assets/images/Avatar.png', //TODO: replace with user image
-                  height: USER_ICON_POST_SIZE,
-                  width: USER_ICON_POST_SIZE,
-                ),
-                onTap: () {
-                  //TODO: open user profile
-                },
-              )),
+          child: UserNameToID(
+            username: snapshot.child('currentUser').value.toString(),
+            builder: (context, snapshot) {
+              final userID = snapshot.data;
+              return InkWell(
+                onTap: userID == null
+                    ? null
+                    : () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) {
+                            return ProfileScreen(userID: userID);
+                          }),
+                        );
+                      },
+                child: UserProfileImage(userID: userID),
+              );
+            },
+          ),
         ),
         Text(
           snapshot.child('currentUser').value.toString(),
@@ -334,13 +335,15 @@ class _GameResultScreenState extends State<GameResultScreen> {
 
   Widget _buildTitle(BuildContext context, DataSnapshot snapshot, int index) {
     return Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 8,
-          vertical: 1,
-        ),
-        child: Center(
-            child: Text(snapshot.child('title').value.toString(),
-                style: HEADLINE_BOLD_BLACK)));
+      padding: const EdgeInsets.symmetric(
+        horizontal: 8,
+        vertical: 1,
+      ),
+      child: Center(
+        child: Text(snapshot.child('title').value.toString(),
+            style: HEADLINE_BOLD_BLACK),
+      ),
+    );
   }
 
   Widget _buildImage(BuildContext context, DataSnapshot snapshot, int index) {
@@ -357,7 +360,7 @@ class _GameResultScreenState extends State<GameResultScreen> {
             child: CachedNetworkImage(
               imageUrl: url,
               fit: BoxFit.cover,
-              placeholder: (context, url) => CircularProgressIndicator(),
+              placeholder: (context, url) => const CircularProgressIndicator(),
             ),
           ),
         ));
@@ -366,12 +369,97 @@ class _GameResultScreenState extends State<GameResultScreen> {
   Widget _buildDescription(
       BuildContext context, DataSnapshot snapshot, int index) {
     return Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 8,
-          vertical: 4,
-        ),
-        child: Center(
-            child: Text(snapshot.child('description').value.toString(),
-                style: TEXT_PLAIN)));
+      padding: const EdgeInsets.symmetric(
+        horizontal: 8,
+        vertical: 4,
+      ),
+      child: Center(
+        child: Text(snapshot.child('description').value.toString(),
+            style: TEXT_PLAIN),
+      ),
+    );
+  }
+
+  Widget _buildComments(
+      BuildContext context, DataSnapshot snapshot, int index) {
+    return Padding(
+        padding: const EdgeInsets.only(left: 0, right: 0),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+          //Text(snapshot.hasChild('hello world').toString())
+        ]));
+  }
+
+  Widget _buildLikes(BuildContext context, DataSnapshot snapshot, int index) {
+    String ref = snapshot.child('reference').value.toString();
+    String ownName = FirebaseAuth.instance.currentUser!.uid;
+    var likesAmount = snapshot.child('likeAmount').value.toString();
+    var commentsAmount = snapshot.child('CommentsAmount').value.toString();
+    if (snapshot.child('likes/$ownName').value.toString() == 'true') {
+      print('working until here');
+    }
+    //if(snapshot.child('likes/$ownName').value.toString().contains('true')){
+    //  print(snapshot.child('likes/$ownName').value.toString());
+    //  print('working');
+    //  icon == Icons.favorite;
+    //}
+
+    return Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+      Badge(
+          borderRadius: BorderRadius.circular(8),
+          position: BadgePosition.topEnd(top: 1, end: -3),
+          badgeColor: COLOR_INDIGO_LIGHT,
+          badgeContent:
+              Text(commentsAmount, style: const TextStyle(color: Colors.white)),
+          child: IconButton(
+              icon: const Icon(
+                Icons.comment_bank_sharp,
+                color: COLOR_INDIGO_LIGHT,
+                size: 20,
+              ),
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) {
+                      return CommentsScreen(post: snapshot);
+                    },
+                  ),
+                );
+              })),
+      Badge(
+          borderRadius: BorderRadius.circular(8),
+          position: BadgePosition.topEnd(top: 1, end: -3),
+          badgeColor: Colors.red,
+          badgeContent:
+              Text(likesAmount, style: const TextStyle(color: Colors.white)),
+          child: IconButton(
+            icon: Icon(
+              icon,
+              color: Colors.red,
+              size: 20,
+            ),
+            onPressed: () {
+              String result = snapshot.child('likes/$ownName').value.toString();
+              //print(snapshot.child('likes/$ownName').value.toString());
+              //print (result);
+              if (result == 'true') {
+                database.child('post/$ref/likes/$ownName').set('false');
+                print('removed like');
+                database
+                    .child('post/$ref/likeAmount')
+                    .set(ServerValue.increment(-1));
+                icon = Icons.favorite_border_outlined;
+                setState(() {});
+              } else {
+                database.child('post/$ref/likes/$ownName').set('true');
+                database
+                    .child('post/$ref/likeAmount')
+                    .set(ServerValue.increment(1));
+                print('added like');
+                icon = Icons.favorite;
+                setState(() {});
+              }
+            },
+          ))
+    ]);
   }
 }

@@ -22,19 +22,24 @@ class _CommentsScreenState extends State<CommentsScreen> {
       "https://diabeathis-f8ee3-default-rtdb.europe-west1.firebasedatabase.app");
   TextEditingController commentsController = TextEditingController();
   String currentUser = FirebaseAuth.instance.currentUser!.uid.toString();
+  FocusNode commentFocusNode = FocusNode();
+  final formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
     String path = widget.post.child('reference').value.toString();
-    print(path);
     String ownName = FirebaseAuth.instance.currentUser!.uid;
     final ref = FirebaseDatabase.instance.ref("post/$path/comments");
     return Scaffold(
         appBar: AppBar(
-            title: Text(
-                widget.post.child('title').value.toString() + ' Comments',
-                style: HEADLINE_BOLD_WHITE),
-            actions: <Widget>[_buildProfileIcon(context)]),
+          title: Text('${widget.post.child('title').value} Comments',
+              style: HEADLINE_BOLD_WHITE),
+          actions: <Widget>[
+            Row(
+              children: [_buildProfileIcon(context)],
+            ),
+          ],
+        ),
         body: SafeArea(
             child: Column(children: [
           Flexible(
@@ -45,57 +50,71 @@ class _CommentsScreenState extends State<CommentsScreen> {
                     return _buildComments(context, snapshot, index);
                   })),
           Padding(
-              padding: const EdgeInsets.only(left: 5, right: 5),
-              child: TextField(
-                  controller: commentsController,
-                  decoration: const InputDecoration(
-                    labelText: 'Your Comment goes here',
-                    labelStyle: TextStyle(
-                        fontFamily: "VisbyMedium",
-                        fontSize: 14,
-                        color: COLOR_INDIGO_LIGHT),
-                    isDense: true,
-                    enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(
-                      color: COLOR_INDIGO_LIGHT,
-                    )),
-                    border: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: COLOR_INDIGO_LIGHT,
-                        width: 3.0,
-                      ),
-                    ),
-                  ))),
-          Padding(
-              padding: const EdgeInsets.only(left: 5, right: 5),
-              child: ElevatedButton(
-                  onPressed: () async {
-                    DataSnapshot snap = await FirebaseDatabase.instance
-                        .ref('Users/$ownName')
-                        .get();
-                    String username = snap.child('username').value.toString();
-                    print(username);
-                    String postID =
-                        widget.post.child('reference').value.toString();
-                    String comment = commentsController.text;
-                    var timeIdent = new DateTime.now().millisecondsSinceEpoch;
-                    var timeSorter = 0 - timeIdent;
-                    final newComment = <String, dynamic>{
-                      'user': username,
-                      'comment': comment
-                    };
-                    database
-                        .child('post/$postID/comments/$timeSorter')
-                        .set(newComment);
-                    database
-                        .child('post/$postID/CommentsAmount')
-                        .set(ServerValue.increment(1));
-                    clearText();
-                  },
-                  child: const Text(
-                    'Submit',
-                    style: TextStyle(fontFamily: "VisbyDemiBold", fontSize: 18),
-                  ))),
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+              child: Form(
+                  key: formKey,
+                  child: TextFormField(
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return "";
+                        }
+                        return null;
+                      },
+                      focusNode: commentFocusNode,
+                      onTap: () => commentFocusNode.requestFocus(),
+                      controller: commentsController,
+                      decoration: InputDecoration(
+                        errorStyle: const TextStyle(height: 0),
+                        suffixIcon: IconButton(
+                          icon: const Icon(Icons.send, color: COLOR_INDIGO),
+                          iconSize: 25,
+                          splashRadius: 20,
+                          onPressed: () async {
+                            final isValid = formKey.currentState!.validate();
+                            if (!isValid) return;
+                            DataSnapshot snap = await FirebaseDatabase.instance
+                                .ref('Users/$ownName')
+                                .get();
+                            String username =
+                                snap.child('username').value.toString();
+                            String postID =
+                                widget.post.child('reference').value.toString();
+                            String comment = commentsController.text;
+                            var timeIdent =
+                                new DateTime.now().millisecondsSinceEpoch;
+                            var timeSorter = 0 - timeIdent;
+                            final newComment = <String, dynamic>{
+                              'user': username,
+                              'comment': comment
+                            };
+                            database
+                                .child('post/$postID/comments/$timeSorter')
+                                .set(newComment);
+                            database
+                                .child('post/$postID/CommentsAmount')
+                                .set(ServerValue.increment(1));
+                            clearText();
+                            commentFocusNode.unfocus();
+                          },
+                        ),
+                        labelText: 'Enter your comment...',
+                        labelStyle: const TextStyle(
+                            fontFamily: "VisbyMedium",
+                            fontSize: 14,
+                            color: COLOR_INDIGO_LIGHT),
+                        isDense: true,
+                        enabledBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(
+                          color: COLOR_INDIGO_LIGHT,
+                        )),
+                        border: const OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: COLOR_INDIGO_LIGHT,
+                            width: 3.0,
+                          ),
+                        ),
+                      ))))
         ])));
   }
 
@@ -148,30 +167,39 @@ class _CommentsScreenState extends State<CommentsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: EdgeInsets.all(3),
+                    padding: const EdgeInsets.all(7),
                     child: Row(
                       children: [
-                        InkWell(
-                          child: Image.asset(
-                            'assets/images/Avatar.png', //TODO: replace with user image
-                            height: USER_ICON_POST_SIZE,
-                            width: USER_ICON_POST_SIZE,
-                          ),
-                          onTap: () {
-                            //TODO: OPEN PROFILE
+                        UserNameToID(
+                          username: snapshot.child('user').value.toString(),
+                          builder: (context, snapshot) {
+                            final userID = snapshot.data;
+                            return InkWell(
+                              onTap: userID == null
+                                  ? null
+                                  : () {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(builder: (_) {
+                                          return ProfileScreen(userID: userID);
+                                        }),
+                                      );
+                                    },
+                              child: UserProfileImage(userID: userID),
+                            );
                           },
                         ),
-                        SizedBox(width: 10),
-                        Text(snapshot.child('user').value.toString(),
-                            style: TextStyle(
-                                color: COLOR_INDIGO_LIGHT,
-                                fontWeight: FontWeight.bold)),
+                        const SizedBox(width: 10),
+                        Text(
+                          snapshot.child('user').value.toString(),
+                          style: COMMENTS_USER,
+                        ),
                       ],
                     ),
                   ),
                   Padding(
-                      padding: EdgeInsets.all(3),
-                      child: Text(snapshot.child('comment').value.toString()))
+                      padding: const EdgeInsets.all(8),
+                      child: Text(snapshot.child('comment').value.toString(),
+                          style: TEXT_PLAIN))
                 ],
               ),
             ),

@@ -266,23 +266,25 @@ class _HomeScreenState extends State<HomeScreen> {
             iconSize: 25,
             splashRadius: 20,
             onPressed: () {
-              //TODO: show all liked posts for logged user
-              // FirebaseAuth.instance.currentUser!.isAnonymous
-              //                         ? AuthScreen()
-              //                         :
-              setState(() {
-                if (_favIconOutlinedFilter == Icons.favorite_border_outlined) {
-                  _favIconOutlinedFilter = Icons.favorite;
-                } else {
-                  _favIconOutlinedFilter = Icons.favorite_border_outlined;
-                }
-                if (searchController.text != "") {
-                  listKey =
-                      Key(DateTime.now().millisecondsSinceEpoch.toString());
-                  query =
-                      ref.orderByChild("title").equalTo(searchController.text);
-                }
-              });
+              FirebaseAuth.instance.currentUser!.isAnonymous
+                  ? Navigator.of(context).push(MaterialPageRoute(builder: (_) {
+                      return AuthScreen();
+                    }))
+                  : setState(() {
+                      if (_favIconOutlinedFilter ==
+                          Icons.favorite_border_outlined) {
+                        _favIconOutlinedFilter = Icons.favorite;
+                      } else {
+                        _favIconOutlinedFilter = Icons.favorite_border_outlined;
+                      }
+                      if (searchController.text != "") {
+                        listKey = Key(
+                            DateTime.now().millisecondsSinceEpoch.toString());
+                        query = ref
+                            .orderByChild("title")
+                            .equalTo(searchController.text);
+                      }
+                    });
               searchBarFocusNode.unfocus();
             },
           ),
@@ -320,8 +322,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 _buildDescription(context, snapshot, index),
                 _buildComments(context, snapshot, index),
                 _buildLikes(context, snapshot, index),
-                //TODO: tags icons
-                //TODO: reactions
               ],
             ),
           ),
@@ -455,7 +455,28 @@ class _HomeScreenState extends State<HomeScreen> {
           position: BadgePosition.topEnd(top: 1, end: -1),
           badgeColor: Colors.deepOrange,
           badgeContent:
-          Text(likesAmount, style: TextStyle(color: Colors.white)),
+              Text(commentsAmount, style: const TextStyle(color: Colors.white)),
+          child: IconButton(
+              icon: const Icon(
+                Icons.comment_bank_sharp,
+                color: COLOR_INDIGO_LIGHT,
+                size: 20,
+              ),
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) {
+                    return FirebaseAuth.instance.currentUser!.isAnonymous
+                        ? AuthScreen()
+                        : CommentsScreen(post: snapshot);
+                  }),
+                );
+              })),
+      Badge(
+          borderRadius: BorderRadius.circular(8),
+          position: BadgePosition.topEnd(top: 1, end: -3),
+          badgeColor: Colors.red,
+          badgeContent:
+              Text(likesAmount, style: const TextStyle(color: Colors.white)),
           child: IconButton(
             icon: Icon(
               Icons.favorite,
@@ -463,6 +484,12 @@ class _HomeScreenState extends State<HomeScreen> {
               size: 25,
             ),
             onPressed: () {
+              if (FirebaseAuth.instance.currentUser!.isAnonymous) {
+                Navigator.of(context).push(MaterialPageRoute(builder: (_) {
+                  return AuthScreen();
+                }));
+              }
+              else {
               String result = snapshot.child('likes/$ownName').value.toString();
               //print(snapshot.child('likes/$ownName').value.toString());
               //print (result);

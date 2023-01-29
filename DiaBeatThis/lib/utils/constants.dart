@@ -32,6 +32,8 @@ const TextStyle POST_CAPTION_INDIGO =
     TextStyle(color: COLOR_INDIGO, fontSize: 16, fontFamily: 'VisbyDemiBold');
 const TextStyle POST_CAPTION_BLACK =
     TextStyle(color: COLOR_BLACK, fontSize: 16, fontFamily: 'VisbyDemiBold');
+const TextStyle PROFILE_RECIPE_CAPTION_BLACK =
+    TextStyle(color: COLOR_BLACK, fontSize: 22, fontFamily: 'VisbyDemiBold');
 const TextStyle TAGS_TOGGLE =
     TextStyle(fontFamily: "VisbyDemiBold", fontSize: 13);
 const TextStyle POST_CAPTION_BLACK_PROFILE =

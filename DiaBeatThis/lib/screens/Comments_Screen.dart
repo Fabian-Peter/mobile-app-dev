@@ -63,13 +63,6 @@ class _CommentsScreenState extends State<CommentsScreen> {
         child: Form(
             key: formKey,
             child: TextFormField(
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return "";
-                  }
-                  return null;
-                },
                 focusNode: commentFocusNode,
                 onTap: () => commentFocusNode.requestFocus(),
                 controller: commentsController,
@@ -80,29 +73,33 @@ class _CommentsScreenState extends State<CommentsScreen> {
                     iconSize: 25,
                     splashRadius: 20,
                     onPressed: () async {
-                      final isValid = formKey.currentState!.validate();
-                      if (!isValid) return;
-                      DataSnapshot snap = await FirebaseDatabase.instance
-                          .ref('Users/$ownName')
-                          .get();
-                      String username = snap.child('username').value.toString();
-                      String postID =
-                          widget.post.child('reference').value.toString();
-                      String comment = commentsController.text;
-                      var timeIdent = new DateTime.now().millisecondsSinceEpoch;
-                      var timeSorter = 0 - timeIdent;
-                      final newComment = <String, dynamic>{
-                        'user': username,
-                        'comment': comment
-                      };
-                      database
-                          .child('post/$postID/comments/$timeSorter')
-                          .set(newComment);
-                      database
-                          .child('post/$postID/CommentsAmount')
-                          .set(ServerValue.increment(1));
-                      clearText();
-                      commentFocusNode.unfocus();
+                      if (commentsController.text == "") {
+                        return;
+                      } else {
+                        DataSnapshot snap = await FirebaseDatabase.instance
+                            .ref('Users/$ownName')
+                            .get();
+                        String username =
+                            snap.child('username').value.toString();
+                        String postID =
+                            widget.post.child('reference').value.toString();
+                        String comment = commentsController.text;
+                        var timeIdent =
+                            new DateTime.now().millisecondsSinceEpoch;
+                        var timeSorter = 0 - timeIdent;
+                        final newComment = <String, dynamic>{
+                          'user': username,
+                          'comment': comment
+                        };
+                        database
+                            .child('post/$postID/comments/$timeSorter')
+                            .set(newComment);
+                        database
+                            .child('post/$postID/CommentsAmount')
+                            .set(ServerValue.increment(1));
+                        clearText();
+                        commentFocusNode.unfocus();
+                      }
                     },
                   ),
                   labelText: 'Enter your comment...',

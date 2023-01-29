@@ -86,17 +86,17 @@ class _SignUpScreen extends State<SignUpScreen> {
                   style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
                       foregroundColor: Colors.black),
-                  icon: const Icon(Icons.image),
+                  icon: const Icon(Icons.image, color: COLOR_INDIGO),
+                  label: const Text('Gallery', style: TEXT_PLAIN_INDIGO),
                   onPressed: () => pickImage(ImageSource.gallery),
-                  label: const Text('Gallery'),
                 ),
                 ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
                       foregroundColor: Colors.black),
+                  icon: const Icon(Icons.camera_alt, color: COLOR_INDIGO),
+                  label: const Text('Camera', style: TEXT_PLAIN_INDIGO),
                   onPressed: () => pickImage(ImageSource.camera),
-                  icon: const Icon(Icons.camera_alt),
-                  label: const Text('Camera'),
                 )
               ]));
         });

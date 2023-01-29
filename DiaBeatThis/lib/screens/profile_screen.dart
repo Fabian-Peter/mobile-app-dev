@@ -45,7 +45,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     UserProfileImage(userID: widget.userID, iconSize: 120),
-                    //_buildEditIcon(context),
+                    const SizedBox(height: 30),
+                    const Text("My Recipes", style: PROFILE_RECIPE_CAPTION_BLACK),
+                    const SizedBox(height: 15),
                     Userposts(userID: widget.userID)
                   ],
                 ),

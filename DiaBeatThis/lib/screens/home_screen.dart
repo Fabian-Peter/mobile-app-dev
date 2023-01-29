@@ -1,3 +1,4 @@
+import 'package:diabeatthis/data/dummy_data.dart';
 import 'package:diabeatthis/screens/auth_screen.dart';
 import 'package:diabeatthis/screens/createRecipe_screen.dart';
 import 'package:diabeatthis/screens/game_screen.dart';
@@ -140,7 +141,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             return FirebaseAuth
                                     .instance.currentUser!.isAnonymous
                                 ? AuthScreen()
-                                : GameScreen();
+                                : CreateRecipeScreen();
                           }),
                         );
                       }),
@@ -189,21 +190,24 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildProfileIcon(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 10),
-      child: InkWell(
-        child: UserProfileImage(
-          userID: currentUser,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(PROFILE_ICON_BAR_SIZE / 2),
+      child: Padding(
+        padding: const EdgeInsets.only(right: 10),
+        child: InkWell(
+          child: UserProfileImage(
+            userID: currentUser,
+          ),
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) {
+                return FirebaseAuth.instance.currentUser!.isAnonymous
+                    ? AuthScreen()
+                    : ProfileScreen(userID: currentUser);
+              }),
+            );
+          },
         ),
-        onTap: () {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) {
-              return FirebaseAuth.instance.currentUser!.isAnonymous
-                  ? AuthScreen()
-                  : ProfileScreen(userID: currentUser);
-            }),
-          );
-        },
       ),
     );
   }
@@ -334,27 +338,33 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildCreator(BuildContext context, DataSnapshot snapshot, int index) {
+    String url = snapshot
+        .child('pictureID')
+        .value
+        .toString(); //TODO: get user image based on username
+
     return Row(
       children: [
         Padding(
           padding: const EdgeInsets.all(8),
-          child: UserNameToID(
-            username: snapshot.child('currentUser').value.toString(),
-            builder: (context, snapshot) {
-              final userID = snapshot.data;
-              return InkWell(
-                onTap: userID == null
-                    ? null
-                    : () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(builder: (_) {
-                            return ProfileScreen(userID: userID);
-                          }),
-                        );
-                      },
-                child: UserProfileImage(userID: userID),
-              );
-            },
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(USER_ICON_POST_SIZE / 2),
+            child: UserNameToID(
+              username: snapshot.child('currentUser').value.toString(),
+              builder: (context, snapshot) {
+                final userID = snapshot.data;
+                return InkWell(
+                  child: UserProfileImage(userID: userID),
+                  onTap: userID == null ? null : () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) {
+                        return ProfileScreen(userID: userID);
+                      }),
+                    );
+                  },
+                );
+              },
+            ),
           ),
         ),
         Text(
@@ -441,7 +451,7 @@ class _HomeScreenState extends State<HomeScreen> {
           position: BadgePosition.topEnd(top: 1, end: -3),
           badgeColor: COLOR_INDIGO_LIGHT,
           badgeContent:
-              Text(commentsAmount, style: const TextStyle(color: Colors.white)),
+              Text(commentsAmount, style: TextStyle(color: Colors.white)),
           child: IconButton(
               icon: const Icon(
                 Icons.comment_bank_sharp,
@@ -462,7 +472,77 @@ class _HomeScreenState extends State<HomeScreen> {
           position: BadgePosition.topEnd(top: 1, end: -3),
           badgeColor: Colors.red,
           badgeContent:
-              Text(likesAmount, style: const TextStyle(color: Colors.white)),
+              Text(likesAmount, style: TextStyle(color: Colors.white)),
+          child: IconButton(
+            icon: Icon(
+              icon,
+              color: Colors.red,
+              size: 20,
+            ),
+            onPressed: () {
+              String result = snapshot.child('likes/$ownName').value.toString();
+              //print(snapshot.child('likes/$ownName').value.toString());
+              //print (result);
+              if (result == 'true') {
+                database.child('post/$ref/likes/$ownName').set('false');
+                print('removed like');
+                database
+                    .child('post/$ref/likeAmount')
+                    .set(ServerValue.increment(-1));
+                icon = Icons.favorite_border_outlined;
+                setState(() {});
+              } else {
+                database.child('post/$ref/likes/$ownName').set('true');
+                database
+                    .child('post/$ref/likeAmount')
+                    .set(ServerValue.increment(1));
+                print('added like');
+                icon = Icons.favorite;
+                setState(() {});
+              }
+            },
+          )),
+      Badge(
+          borderRadius: BorderRadius.circular(8),
+          position: BadgePosition.topEnd(top: 1, end: -3),
+          badgeColor: Colors.red,
+          badgeContent:
+          Text(likesAmount, style: TextStyle(color: Colors.white)),
+          child: IconButton(
+            icon: Icon(
+              icon,
+              color: Colors.red,
+              size: 20,
+            ),
+            onPressed: () {
+              String result = snapshot.child('likes/$ownName').value.toString();
+              //print(snapshot.child('likes/$ownName').value.toString());
+              //print (result);
+              if (result == 'true') {
+                database.child('post/$ref/likes/$ownName').set('false');
+                print('removed like');
+                database
+                    .child('post/$ref/likeAmount')
+                    .set(ServerValue.increment(-1));
+                icon = Icons.favorite_border_outlined;
+                setState(() {});
+              } else {
+                database.child('post/$ref/likes/$ownName').set('true');
+                database
+                    .child('post/$ref/likeAmount')
+                    .set(ServerValue.increment(1));
+                print('added like');
+                icon = Icons.favorite;
+                setState(() {});
+              }
+            },
+          )),
+      Badge(
+          borderRadius: BorderRadius.circular(8),
+          position: BadgePosition.topEnd(top: 1, end: -3),
+          badgeColor: Colors.red,
+          badgeContent:
+          Text(likesAmount, style: TextStyle(color: Colors.white)),
           child: IconButton(
             icon: Icon(
               icon,
@@ -530,8 +610,7 @@ class _UserProfileImageState extends State<UserProfileImage> {
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(USER_ICON_POST_SIZE / 2),
+    return CircleAvatar(
       child: StreamBuilder<String?>(
         stream: userPictureID,
         initialData: null,
@@ -539,17 +618,15 @@ class _UserProfileImageState extends State<UserProfileImage> {
           final picture = snapshot.data;
           if (picture == null) {
             return Image.asset(
-              //TODO: if guest, then show default
-              'assets/images/DefaultIcon.png',
+              //TODO: if guest, then show anonymous profile icon
+              'assets/images/Profile.png',
+              //TODO: replace with user image
               height: PROFILE_ICON_BAR_SIZE,
               width: PROFILE_ICON_BAR_SIZE,
-              fit: BoxFit.cover,
             );
           } else {
             return CachedNetworkImage(
               imageUrl: picture,
-              height: PROFILE_ICON_BAR_SIZE,
-              width: PROFILE_ICON_BAR_SIZE,
               fit: BoxFit.cover,
               placeholder: (context, url) => const CircularProgressIndicator(),
             );

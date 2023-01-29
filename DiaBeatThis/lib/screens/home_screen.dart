@@ -461,9 +461,7 @@ class _HomeScreenState extends State<HomeScreen> {
     var happyAmount = snapshot.child('happyAmount').value.toString();
     var unhappyAmount = snapshot.child('unhappyAmount').value.toString();
     var commentsAmount = snapshot.child('CommentsAmount').value.toString();
-    if (snapshot.child('likes/$ownName').value.toString() == 'true') {
-      print('working until here');
-    }
+   
     //if(snapshot.child('likes/$ownName').value.toString().contains('true')){
     //  print(snapshot.child('likes/$ownName').value.toString());
     //  print('working');

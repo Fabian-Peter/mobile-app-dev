@@ -10,6 +10,7 @@ import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/material.dart';
 import 'package:swipe_cards/swipe_cards.dart';
 
+import '../main.dart';
 import 'Comments_Screen.dart';
 import 'auth_screen.dart';
 
@@ -222,7 +223,7 @@ class _GameResultScreenState extends State<GameResultScreen> {
             onPressed: () {
               Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(builder: (context) => const HomeScreen()),
+                  MaterialPageRoute(builder: (context) => const AuthGate()),
                   (Route<dynamic> route) => false);
             },
           )),

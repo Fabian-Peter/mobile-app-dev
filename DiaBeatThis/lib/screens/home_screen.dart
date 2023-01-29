@@ -355,13 +355,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 final userID = snapshot.data;
                 return InkWell(
                   child: UserProfileImage(userID: userID),
-                  onTap: userID == null ? null : () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) {
-                        return ProfileScreen(userID: userID);
-                      }),
-                    );
-                  },
+                  onTap: userID == null
+                      ? null
+                      : () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(builder: (_) {
+                              return ProfileScreen(userID: userID);
+                            }),
+                          );
+                        },
                 );
               },
             ),
@@ -441,7 +443,6 @@ class _HomeScreenState extends State<HomeScreen> {
     var commentsAmount = snapshot.child('CommentsAmount').value.toString();
     if (snapshot.child('likes/$ownName').value.toString() == 'true') {
       print('working until here');
-
     }
     //if(snapshot.child('likes/$ownName').value.toString().contains('true')){
     //  print(snapshot.child('likes/$ownName').value.toString());
@@ -451,33 +452,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Row(mainAxisAlignment: MainAxisAlignment.start, children: [
       Badge(
-          borderRadius: BorderRadius.circular(8),
-          position: BadgePosition.topEnd(top: 1, end: -1),
-          badgeColor: Colors.deepOrange,
-          badgeContent:
-              Text(commentsAmount, style: const TextStyle(color: Colors.white)),
-          child: IconButton(
-              icon: const Icon(
-                Icons.comment_bank_sharp,
-                color: COLOR_INDIGO_LIGHT,
-                size: 20,
-              ),
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) {
-                    return FirebaseAuth.instance.currentUser!.isAnonymous
-                        ? AuthScreen()
-                        : CommentsScreen(post: snapshot);
-                  }),
-                );
-              })),
-      Badge(
-          borderRadius: BorderRadius.circular(8),
-          position: BadgePosition.topEnd(top: 1, end: -3),
-          badgeColor: Colors.red,
-          badgeContent:
-              Text(likesAmount, style: const TextStyle(color: Colors.white)),
-          child: IconButton(
+        borderRadius: BorderRadius.circular(8),
+        position: BadgePosition.topEnd(top: 1, end: -3),
+        badgeColor: Colors.red,
+        badgeContent:
+            Text(likesAmount, style: const TextStyle(color: Colors.white)),
+        child: IconButton(
             icon: Icon(
               Icons.favorite,
               color: Colors.deepOrange,
@@ -488,35 +468,37 @@ class _HomeScreenState extends State<HomeScreen> {
                 Navigator.of(context).push(MaterialPageRoute(builder: (_) {
                   return AuthScreen();
                 }));
-              }
-              else {
-              String result = snapshot.child('likes/$ownName').value.toString();
-              //print(snapshot.child('likes/$ownName').value.toString());
-              //print (result);
-              if (result == 'true') {
-                database.child('post/$ref/likes/$ownName').set('false');
-                print('removed like');
-                database
-                    .child('post/$ref/likeAmount')
-                    .set(ServerValue.increment(-1));
-                icon = Icons.favorite_border_outlined;
-                setState(() {});
               } else {
-                database.child('post/$ref/likes/$ownName').set('true');
-                database
-                    .child('post/$ref/likeAmount')
-                    .set(ServerValue.increment(1));
-                print('added like');
-                icon = Icons.favorite;
-                setState(() {});
+                String result =
+                    snapshot.child('likes/$ownName').value.toString();
+                //print(snapshot.child('likes/$ownName').value.toString());
+                //print (result);
+                if (result == 'true') {
+                  database.child('post/$ref/likes/$ownName').set('false');
+                  print('removed like');
+                  database
+                      .child('post/$ref/likeAmount')
+                      .set(ServerValue.increment(-1));
+                  icon = Icons.favorite_border_outlined;
+                  setState(() {});
+                } else {
+                  database.child('post/$ref/likes/$ownName').set('true');
+                  database
+                      .child('post/$ref/likeAmount')
+                      .set(ServerValue.increment(1));
+                  print('added like');
+                  icon = Icons.favorite;
+                  setState(() {});
+                }
               }
-            },
-          )),Badge(
+            }),
+      ),
+      Badge(
           borderRadius: BorderRadius.circular(8),
           position: BadgePosition.topEnd(top: 1, end: -1),
           badgeColor: Colors.red,
           badgeContent:
-          Text(bloodSugarAmount, style: TextStyle(color: Colors.white)),
+              Text(bloodSugarAmount, style: TextStyle(color: Colors.white)),
           child: IconButton(
             icon: Icon(
               Icons.format_color_reset,
@@ -524,25 +506,32 @@ class _HomeScreenState extends State<HomeScreen> {
               size: 20,
             ),
             onPressed: () {
-              String result = snapshot.child('bloodSugar/$ownName').value.toString();
-              //print(snapshot.child('likes/$ownName').value.toString());
-              //print (result);
-              if (result == 'true') {
-                database.child('post/$ref/bloodSugar/$ownName').set('false');
-                print('removed bloodSugar');
-                database
-                    .child('post/$ref/bloodSugarAmount')
-                    .set(ServerValue.increment(-1));
-                icon = Icons.favorite_border_outlined;
-                setState(() {});
+              if (FirebaseAuth.instance.currentUser!.isAnonymous) {
+                Navigator.of(context).push(MaterialPageRoute(builder: (_) {
+                  return AuthScreen();
+                }));
               } else {
-                database.child('post/$ref/bloodSugar/$ownName').set('true');
-                database
-                    .child('post/$ref/bloodSugarAmount')
-                    .set(ServerValue.increment(1));
-                print('added bloodSugar');
-                icon = Icons.favorite;
-                setState(() {});
+                String result =
+                    snapshot.child('bloodSugar/$ownName').value.toString();
+                //print(snapshot.child('likes/$ownName').value.toString());
+                //print (result);
+                if (result == 'true') {
+                  database.child('post/$ref/bloodSugar/$ownName').set('false');
+                  print('removed bloodSugar');
+                  database
+                      .child('post/$ref/bloodSugarAmount')
+                      .set(ServerValue.increment(-1));
+                  icon = Icons.favorite_border_outlined;
+                  setState(() {});
+                } else {
+                  database.child('post/$ref/bloodSugar/$ownName').set('true');
+                  database
+                      .child('post/$ref/bloodSugarAmount')
+                      .set(ServerValue.increment(1));
+                  print('added bloodSugar');
+                  icon = Icons.favorite;
+                  setState(() {});
+                }
               }
             },
           )),
@@ -559,25 +548,32 @@ class _HomeScreenState extends State<HomeScreen> {
               size: 20,
             ),
             onPressed: () {
-              String result = snapshot.child('happy/$ownName').value.toString();
-              //print(snapshot.child('likes/$ownName').value.toString());
-              //print (result);
-              if (result == 'true') {
-                database.child('post/$ref/happy/$ownName').set('false');
-                print('removed happy');
-                database
-                    .child('post/$ref/happyAmount')
-                    .set(ServerValue.increment(-1));
-                icon = Icons.favorite_border_outlined;
-                setState(() {});
+              if (FirebaseAuth.instance.currentUser!.isAnonymous) {
+                Navigator.of(context).push(MaterialPageRoute(builder: (_) {
+                  return AuthScreen();
+                }));
               } else {
-                database.child('post/$ref/happy/$ownName').set('true');
-                database
-                    .child('post/$ref/happyAmount')
-                    .set(ServerValue.increment(1));
-                print('added happy');
-                icon = Icons.favorite;
-                setState(() {});
+                String result =
+                    snapshot.child('happy/$ownName').value.toString();
+                //print(snapshot.child('likes/$ownName').value.toString());
+                //print (result);
+                if (result == 'true') {
+                  database.child('post/$ref/happy/$ownName').set('false');
+                  print('removed happy');
+                  database
+                      .child('post/$ref/happyAmount')
+                      .set(ServerValue.increment(-1));
+                  icon = Icons.favorite_border_outlined;
+                  setState(() {});
+                } else {
+                  database.child('post/$ref/happy/$ownName').set('true');
+                  database
+                      .child('post/$ref/happyAmount')
+                      .set(ServerValue.increment(1));
+                  print('added happy');
+                  icon = Icons.favorite;
+                  setState(() {});
+                }
               }
             },
           )),
@@ -586,7 +582,7 @@ class _HomeScreenState extends State<HomeScreen> {
           position: BadgePosition.topEnd(top: 1, end: -1),
           badgeColor: COLOR_INDIGO_LIGHT,
           badgeContent:
-          Text(unhappyAmount, style: TextStyle(color: Colors.white)),
+              Text(unhappyAmount, style: TextStyle(color: Colors.white)),
           child: IconButton(
             icon: Icon(
               Icons.sentiment_very_dissatisfied,
@@ -594,36 +590,42 @@ class _HomeScreenState extends State<HomeScreen> {
               size: 20,
             ),
             onPressed: () {
-              String result = snapshot.child('unhappy/$ownName').value.toString();
-              //print(snapshot.child('likes/$ownName').value.toString());
-              //print (result);
-              if (result == 'true') {
-                database.child('post/$ref/unhappy/$ownName').set('false');
-                print('removed unhappy');
-                database
-                    .child('post/$ref/unhappyAmount')
-                    .set(ServerValue.increment(-1));
-                icon = Icons.favorite_border_outlined;
-                setState(() {});
+              if (FirebaseAuth.instance.currentUser!.isAnonymous) {
+                Navigator.of(context).push(MaterialPageRoute(builder: (_) {
+                  return AuthScreen();
+                }));
               } else {
-                database.child('post/$ref/unhappy/$ownName').set('true');
-                database
-                    .child('post/$ref/unhappyAmount')
-                    .set(ServerValue.increment(1));
-                print('added unhappy');
-                icon = Icons.favorite;
-                setState(() {});
+                String result =
+                    snapshot.child('unhappy/$ownName').value.toString();
+                //print(snapshot.child('likes/$ownName').value.toString());
+                //print (result);
+                if (result == 'true') {
+                  database.child('post/$ref/unhappy/$ownName').set('false');
+                  print('removed unhappy');
+                  database
+                      .child('post/$ref/unhappyAmount')
+                      .set(ServerValue.increment(-1));
+                  icon = Icons.favorite_border_outlined;
+                  setState(() {});
+                } else {
+                  database.child('post/$ref/unhappy/$ownName').set('true');
+                  database
+                      .child('post/$ref/unhappyAmount')
+                      .set(ServerValue.increment(1));
+                  print('added unhappy');
+                  icon = Icons.favorite;
+                  setState(() {});
+                }
               }
             },
           )),
-
       Spacer(),
       Badge(
           borderRadius: BorderRadius.circular(8),
           position: BadgePosition.topEnd(top: 1, end: -1),
           badgeColor: COLOR_INDIGO_LIGHT,
           badgeContent:
-          Text(commentsAmount, style: TextStyle(color: Colors.white)),
+              Text(commentsAmount, style: TextStyle(color: Colors.white)),
           child: IconButton(
               icon: const Icon(
                 Icons.comment_rounded,

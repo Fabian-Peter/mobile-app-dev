@@ -127,12 +127,6 @@ flutter:
   # see https://flutter.dev/custom-fonts/#from-packages
 
   fonts:
-    - family: Aloja
-      fonts:
-        - asset: assets/fonts/aloja_font.ttf
-    - family: Visby
-      fonts:
-        - asset: assets/fonts/VisbyRegular.otf
     - family: VisbyMedium
       fonts:
         - asset: assets/fonts/VisbyMedium.otf

@@ -162,10 +162,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           onPressed: () {
                             Navigator.of(context).push(
                               MaterialPageRoute(builder: (_) {
-                                return FirebaseAuth
-                                        .instance.currentUser!.isAnonymous
-                                    ? AuthScreen()
-                                    : GameScreen();
+                                return GameScreen();
                               }),
                             );
                           }),
@@ -405,8 +402,10 @@ class _HomeScreenState extends State<HomeScreen> {
         vertical: 1,
       ),
       child: Center(
-        child: Text(snapshot.child('title').value.toString(),
-            style: HEADLINE_BOLD_BLACK, ),
+        child: Text(
+          snapshot.child('title').value.toString(),
+          style: HEADLINE_BOLD_BLACK,
+        ),
       ),
     );
   }
@@ -461,7 +460,7 @@ class _HomeScreenState extends State<HomeScreen> {
     var happyAmount = snapshot.child('happyAmount').value.toString();
     var unhappyAmount = snapshot.child('unhappyAmount').value.toString();
     var commentsAmount = snapshot.child('CommentsAmount').value.toString();
-   
+
     //if(snapshot.child('likes/$ownName').value.toString().contains('true')){
     //  print(snapshot.child('likes/$ownName').value.toString());
     //  print('working');
@@ -492,11 +491,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   } else {
                     String result =
                         snapshot.child('likes/$ownName').value.toString();
-                    //print(snapshot.child('likes/$ownName').value.toString());
-                    //print (result);
                     if (result == 'true') {
                       database.child('post/$ref/likes/$ownName').set('false');
-                      print('removed like');
                       database
                           .child('post/$ref/likeAmount')
                           .set(ServerValue.increment(-1));
@@ -507,7 +503,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       database
                           .child('post/$ref/likeAmount')
                           .set(ServerValue.increment(1));
-                      print('added like');
                       icon = Icons.favorite;
                       setState(() {});
                     }
@@ -535,13 +530,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   } else {
                     String result =
                         snapshot.child('bloodSugar/$ownName').value.toString();
-                    //print(snapshot.child('likes/$ownName').value.toString());
-                    //print (result);
                     if (result == 'true') {
                       database
                           .child('post/$ref/bloodSugar/$ownName')
                           .set('false');
-                      print('removed bloodSugar');
                       database
                           .child('post/$ref/bloodSugarAmount')
                           .set(ServerValue.increment(-1));
@@ -554,7 +546,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       database
                           .child('post/$ref/bloodSugarAmount')
                           .set(ServerValue.increment(1));
-                      print('added bloodSugar');
                       icon = Icons.favorite;
                       setState(() {});
                     }
@@ -582,11 +573,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   } else {
                     String result =
                         snapshot.child('happy/$ownName').value.toString();
-                    //print(snapshot.child('likes/$ownName').value.toString());
-                    //print (result);
                     if (result == 'true') {
                       database.child('post/$ref/happy/$ownName').set('false');
-                      print('removed happy');
                       database
                           .child('post/$ref/happyAmount')
                           .set(ServerValue.increment(-1));
@@ -597,7 +585,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       database
                           .child('post/$ref/happyAmount')
                           .set(ServerValue.increment(1));
-                      print('added happy');
                       icon = Icons.favorite;
                       setState(() {});
                     }
@@ -625,11 +612,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   } else {
                     String result =
                         snapshot.child('unhappy/$ownName').value.toString();
-                    //print(snapshot.child('likes/$ownName').value.toString());
-                    //print (result);
                     if (result == 'true') {
                       database.child('post/$ref/unhappy/$ownName').set('false');
-                      print('removed unhappy');
                       database
                           .child('post/$ref/unhappyAmount')
                           .set(ServerValue.increment(-1));
@@ -640,7 +624,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       database
                           .child('post/$ref/unhappyAmount')
                           .set(ServerValue.increment(1));
-                      print('added unhappy');
                       icon = Icons.favorite;
                       setState(() {});
                     }

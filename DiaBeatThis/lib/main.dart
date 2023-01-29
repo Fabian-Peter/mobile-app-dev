@@ -45,7 +45,7 @@ class MyApp extends StatelessWidget {
               print('error${snapshot.error.toString()}');
               return const Text('Something went wrong!');
             } else if (snapshot.hasData) {
-              return const HomeScreen();
+              return const AuthGate();
             } else {
               return const Center(
                 child: CircularProgressIndicator(),

@@ -1,10 +1,8 @@
-import 'package:badges/badges.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:diabeatthis/screens/home_screen.dart';
 import 'package:diabeatthis/screens/settings_screen.dart';
 import 'package:diabeatthis/utils/constants.dart';
 import 'package:diabeatthis/screens/post_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
@@ -19,8 +17,6 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   final ref = FirebaseDatabase.instance.ref("post");
-
-  IconData _favIconOutlined = Icons.favorite_outline;
 
   @override
   void initState() {
@@ -39,7 +35,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            const SizedBox(height: 3),
+            const SizedBox(height: 25),
             SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Container(
@@ -48,7 +44,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    UserProfileImage(userID: widget.userID),
+                    SizedBox(
+                        height: 120,
+                        width: 120,
+                        child: UserProfileImage(userID: widget.userID)),
                     _buildEditIcon(context),
                     Userposts(userID: widget.userID)
                   ],
@@ -63,7 +62,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildEditIcon(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5),
+      padding: const EdgeInsets.symmetric(vertical: 25),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
         FloatingActionButton.extended(
           heroTag: "editButton",
@@ -198,7 +197,7 @@ class _UserpostsState extends State<Userposts> {
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: 9,
-        vertical: 7,
+        vertical: 6,
       ),
       child: InkWell(
         child: Container(
@@ -218,12 +217,10 @@ class _UserpostsState extends State<Userposts> {
           child: SafeArea(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _buildTitle(context, snapshot),
                 _buildImage(context, snapshot),
-                _buildCommentsAndLikes(context, snapshot),
-                //TODO: tags icons
-                //TODO: reactions
               ],
             ),
           ),
@@ -241,15 +238,11 @@ class _UserpostsState extends State<Userposts> {
 
   Widget _buildTitle(BuildContext context, DataSnapshot snapshot) {
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 8,
-        vertical: 1,
-      ),
+      padding: const EdgeInsets.only(left: 10, right: 10, top: 9, bottom: 4),
       child: Center(
         child: Text(
           snapshot.child('title').value.toString(),
-          style: HEADLINE_BOLD_BLACK,
-          overflow: TextOverflow.ellipsis,
+          style: POST_CAPTION_BLACK_PROFILE,
         ),
       ),
     );
@@ -258,10 +251,7 @@ class _UserpostsState extends State<Userposts> {
   Widget _buildImage(BuildContext context, DataSnapshot snapshot) {
     String url = snapshot.child('pictureID').value.toString();
     return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 9,
-        vertical: 8,
-      ),
+      padding: const EdgeInsets.only(left: 6, right: 6, bottom: 10),
       child: AspectRatio(
         aspectRatio: 2,
         child: ClipRRect(
@@ -274,65 +264,5 @@ class _UserpostsState extends State<Userposts> {
         ),
       ),
     );
-  }
-
-  Widget _buildCommentsAndLikes(BuildContext context, DataSnapshot snapshot) {
-    String ref = snapshot.child('reference').value.toString();
-    String ownName = FirebaseAuth.instance.currentUser!.uid;
-    var likesAmount = snapshot.child('likeAmount').value.toString();
-    print(snapshot.child('likes/$ownName').value.toString());
-    if (snapshot.child('likes/$ownName').value.toString() == 'true') {
-      print('working until here');
-    }
-    return Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-      Badge(
-        borderRadius: BorderRadius.circular(8),
-        position: BadgePosition.topEnd(top: 1, end: -3),
-        badgeColor: COLOR_INDIGO_LIGHT,
-        badgeContent: const Text('0', style: TextStyle(color: Colors.white)),
-        child: IconButton(
-          icon: const Icon(
-            Icons.comment_bank_sharp,
-            color: COLOR_INDIGO_LIGHT,
-            size: 20,
-          ),
-          onPressed: () {},
-        ),
-      ),
-      Badge(
-        borderRadius: BorderRadius.circular(8),
-        position: BadgePosition.topEnd(top: 1, end: -3),
-        badgeColor: Colors.red,
-        badgeContent:
-            Text(likesAmount, style: const TextStyle(color: Colors.white)),
-        child: IconButton(
-          icon: Icon(
-            icon,
-            color: Colors.red,
-            size: 20,
-          ),
-          onPressed: () {
-            String result = snapshot.child('likes/$ownName').value.toString();
-            if (result == 'true') {
-              database.child('post/$ref/likes/$ownName').set('false');
-              print('removed like');
-              database
-                  .child('post/$ref/likeAmount')
-                  .set(ServerValue.increment(-1));
-              icon = Icons.favorite_border_outlined;
-              setState(() {});
-            } else {
-              database.child('post/$ref/likes/$ownName').set('true');
-              database
-                  .child('post/$ref/likeAmount')
-                  .set(ServerValue.increment(1));
-              print('added like');
-              icon = Icons.favorite;
-              setState(() {});
-            }
-          },
-        ),
-      )
-    ]);
   }
 }

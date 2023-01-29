@@ -89,7 +89,7 @@ class _PostScreenState extends State<PostScreen> {
                 context, _buildIngredients(context), 'Ingredients'),
             _buildContainerCaption(
                 context, _buildGuide(context), 'Instructions'),
-            _buildCommunity(context, snapshot),
+            //_buildCommunity(context, snapshot),
           ],
         ),
       ),
@@ -222,125 +222,125 @@ class _PostScreenState extends State<PostScreen> {
             style: TEXT_PLAIN));
   }
 
-  Widget _buildCommunity(BuildContext context, DataSnapshot snapshot) {
-    //TODO: add reactions
-    //TODO: add comments
+ //Widget _buildCommunity(BuildContext context, DataSnapshot snapshot) {
+ //  //TODO: add reactions
+ //  //TODO: add comments
 
-    var likesAmount = widget.post.child('likeAmount').value.toString();
-    final ref = FirebaseDatabase.instance.ref("post");
-    String commentsAmount =
-        widget.post.child('CommentsAmount').value.toString();
-    String bloodSugarAmount =
-        widget.post.child('CommentsAmount').value.toString();
-    String happyAmount = widget.post.child('CommentsAmount').value.toString();
-    String unhappyAmount = widget.post.child('CommentsAmount').value.toString();
+ //  var likesAmount = widget.post.child('likeAmount').value.toString();
+ //  final ref = FirebaseDatabase.instance.ref("post");
+ //  String commentsAmount =
+ //      widget.post.child('CommentsAmount').value.toString();
+ //  String bloodSugarAmount =
+ //      widget.post.child('CommentsAmount').value.toString();
+ //  String happyAmount = widget.post.child('CommentsAmount').value.toString();
+ //  String unhappyAmount = widget.post.child('CommentsAmount').value.toString();
 
-    return Padding(
-      padding: const EdgeInsets.only(top: 20),
-      child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-        Badge(
-          borderRadius: BorderRadius.circular(8),
-          position: BadgePosition.topEnd(top: 1, end: 2),
-          badgeColor: Colors.deepOrange,
-          badgeContent:
-              Text(likesAmount, style: TextStyle(color: Colors.white)),
-          child: IconButton(
-            icon: Icon(
-              icon,
-              color: Colors.deepOrange,
-              size: 25,
-            ),
-            onPressed: () {
-              if (FirebaseAuth.instance.currentUser!.isAnonymous) {
-                Navigator.of(context).push(MaterialPageRoute(builder: (_) {
-                  return AuthScreen();
-                }));
-              }
-            },
-          ),
-        ),
-        Badge(
-            borderRadius: BorderRadius.circular(8),
-            position: BadgePosition.topEnd(top: 1, end: 2),
-            badgeColor: Colors.red,
-            badgeContent:
-                Text(bloodSugarAmount, style: TextStyle(color: Colors.white)),
-            child: IconButton(
-                icon: const Icon(
-                  Icons.format_color_reset,
-                  color: Colors.red,
-                  size: 20,
-                ),
-                onPressed: () {
-                  if (FirebaseAuth.instance.currentUser!.isAnonymous) {
-                    Navigator.of(context).push(MaterialPageRoute(builder: (_) {
-                      return AuthScreen();
-                    }));
-                  }
-                })),
-        Badge(
-            borderRadius: BorderRadius.circular(8),
-            position: BadgePosition.topEnd(top: 1, end: 2),
-            badgeColor: Colors.green,
-            badgeContent:
-                Text(happyAmount, style: TextStyle(color: Colors.white)),
-            child: IconButton(
-                icon: const Icon(
-                  Icons.sentiment_very_satisfied_outlined,
-                  color: Colors.green,
-                  size: 20,
-                ),
-                onPressed: () {
-                  if (FirebaseAuth.instance.currentUser!.isAnonymous) {
-                    Navigator.of(context).push(MaterialPageRoute(builder: (_) {
-                      return AuthScreen();
-                    }));
-                  }
-                })),
-        Badge(
-            borderRadius: BorderRadius.circular(8),
-            position: BadgePosition.topEnd(top: 1, end: 2),
-            badgeColor: COLOR_INDIGO_LIGHT,
-            badgeContent:
-                Text(unhappyAmount, style: TextStyle(color: Colors.white)),
-            child: IconButton(
-                icon: const Icon(
-                  Icons.sentiment_very_dissatisfied,
-                  color: COLOR_INDIGO_LIGHT,
-                  size: 20,
-                ),
-                onPressed: () {
-                  if (FirebaseAuth.instance.currentUser!.isAnonymous) {
-                    Navigator.of(context).push(MaterialPageRoute(builder: (_) {
-                      return AuthScreen();
-                    }));
-                  }
-                })),
-        Spacer(),
-        Badge(
-            borderRadius: BorderRadius.circular(8),
-            position: BadgePosition.topEnd(top: -1, end: 3),
-            badgeColor: COLOR_INDIGO,
-            badgeContent:
-                Text(commentsAmount, style: TextStyle(color: Colors.white)),
-            child: IconButton(
-                icon: const Icon(
-                  Icons.comment_rounded,
-                  color: COLOR_INDIGO,
-                  size: 20,
-                ),
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) {
-                        return CommentsScreen(post: widget.post);
-                      },
-                    ),
-                  );
-                })),
-      ]),
-    );
-  }
+ //  return Padding(
+ //    padding: const EdgeInsets.only(top: 20),
+ //    child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+ //      Badge(
+ //        borderRadius: BorderRadius.circular(8),
+ //        position: BadgePosition.topEnd(top: 1, end: 2),
+ //        badgeColor: Colors.deepOrange,
+ //        badgeContent:
+ //            Text(likesAmount, style: TextStyle(color: Colors.white)),
+ //        child: IconButton(
+ //          icon: Icon(
+ //            icon,
+ //            color: Colors.deepOrange,
+ //            size: 25,
+ //          ),
+ //          onPressed: () {
+ //            if (FirebaseAuth.instance.currentUser!.isAnonymous) {
+ //              Navigator.of(context).push(MaterialPageRoute(builder: (_) {
+ //                return AuthScreen();
+ //              }));
+ //            }
+ //          },
+ //        ),
+ //      ),
+ //      Badge(
+ //          borderRadius: BorderRadius.circular(8),
+ //          position: BadgePosition.topEnd(top: 1, end: 2),
+ //          badgeColor: Colors.red,
+ //          badgeContent:
+ //              Text(bloodSugarAmount, style: TextStyle(color: Colors.white)),
+ //          child: IconButton(
+ //              icon: const Icon(
+ //                Icons.format_color_reset,
+ //                color: Colors.red,
+ //                size: 20,
+ //              ),
+ //              onPressed: () {
+ //                if (FirebaseAuth.instance.currentUser!.isAnonymous) {
+ //                  Navigator.of(context).push(MaterialPageRoute(builder: (_) {
+ //                    return AuthScreen();
+ //                  }));
+ //                }
+ //              })),
+ //      Badge(
+ //          borderRadius: BorderRadius.circular(8),
+ //          position: BadgePosition.topEnd(top: 1, end: 2),
+ //          badgeColor: Colors.green,
+ //          badgeContent:
+ //              Text(happyAmount, style: TextStyle(color: Colors.white)),
+ //          child: IconButton(
+ //              icon: const Icon(
+ //                Icons.sentiment_very_satisfied_outlined,
+ //                color: Colors.green,
+ //                size: 20,
+ //              ),
+ //              onPressed: () {
+ //                if (FirebaseAuth.instance.currentUser!.isAnonymous) {
+ //                  Navigator.of(context).push(MaterialPageRoute(builder: (_) {
+ //                    return AuthScreen();
+ //                  }));
+ //                }
+ //              })),
+ //      Badge(
+ //          borderRadius: BorderRadius.circular(8),
+ //          position: BadgePosition.topEnd(top: 1, end: 2),
+ //          badgeColor: COLOR_INDIGO_LIGHT,
+ //          badgeContent:
+ //              Text(unhappyAmount, style: TextStyle(color: Colors.white)),
+ //          child: IconButton(
+ //              icon: const Icon(
+ //                Icons.sentiment_very_dissatisfied,
+ //                color: COLOR_INDIGO_LIGHT,
+ //                size: 20,
+ //              ),
+ //              onPressed: () {
+ //                if (FirebaseAuth.instance.currentUser!.isAnonymous) {
+ //                  Navigator.of(context).push(MaterialPageRoute(builder: (_) {
+ //                    return AuthScreen();
+ //                  }));
+ //                }
+ //              })),
+ //      Spacer(),
+ //      Badge(
+ //          borderRadius: BorderRadius.circular(8),
+ //          position: BadgePosition.topEnd(top: -1, end: 3),
+ //          badgeColor: COLOR_INDIGO,
+ //          badgeContent:
+ //              Text(commentsAmount, style: TextStyle(color: Colors.white)),
+ //          child: IconButton(
+ //              icon: const Icon(
+ //                Icons.comment_rounded,
+ //                color: COLOR_INDIGO,
+ //                size: 20,
+ //              ),
+ //              onPressed: () {
+ //                Navigator.of(context).push(
+ //                  MaterialPageRoute(
+ //                    builder: (_) {
+ //                      return CommentsScreen(post: widget.post);
+ //                    },
+ //                  ),
+ //                );
+ //              })),
+ //    ]),
+ //  );
+ //}
 
   Widget _buildContainerCaption(
       BuildContext context, Widget widget, String caption) {

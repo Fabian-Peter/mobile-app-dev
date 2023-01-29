@@ -1,4 +1,3 @@
-import 'package:diabeatthis/data/dummy_data.dart';
 import 'package:diabeatthis/screens/auth_screen.dart';
 import 'package:diabeatthis/screens/createRecipe_screen.dart';
 import 'package:diabeatthis/screens/game_screen.dart';
@@ -101,7 +100,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 _buildSearchBar(context),
                 Flexible(
                   child: FirebaseAnimatedList(
-                      query: ref.orderByChild('timeSorter'),
+                      query: query,
+                      key: listKey,
                       defaultChild: const Text("Loading...", style: TEXT_PLAIN),
                       itemBuilder: (context, snapshot, animation, index) {
                         Object? ingredientsValues =
@@ -209,7 +209,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-
   Widget _buildSearchBar(BuildContext context) {
     return Padding(
         padding: const EdgeInsets.only(left: 10, right: 10),
@@ -264,6 +263,7 @@ class _HomeScreenState extends State<HomeScreen> {
             iconSize: 25,
             splashRadius: 20,
             onPressed: () {
+              String ownName = FirebaseAuth.instance.currentUser!.uid;
               FirebaseAuth.instance.currentUser!.isAnonymous
                   ? Navigator.of(context).push(MaterialPageRoute(builder: (_) {
                       return AuthScreen();
@@ -272,15 +272,15 @@ class _HomeScreenState extends State<HomeScreen> {
                       if (_favIconOutlinedFilter ==
                           Icons.favorite_border_outlined) {
                         _favIconOutlinedFilter = Icons.favorite;
-                      } else {
-                        _favIconOutlinedFilter = Icons.favorite_border_outlined;
-                      }
-                      if (searchController.text != "") {
                         listKey = Key(
                             DateTime.now().millisecondsSinceEpoch.toString());
-                        query = ref
-                            .orderByChild("title")
-                            .equalTo(searchController.text);
+                        query =
+                            ref.orderByChild('likes/$ownName').equalTo("true");
+                      } else {
+                        _favIconOutlinedFilter = Icons.favorite_border_outlined;
+                        listKey = Key(
+                            DateTime.now().millisecondsSinceEpoch.toString());
+                        query = ref.orderByChild('timeSorter');
                       }
                     });
               searchBarFocusNode.unfocus();
@@ -348,12 +348,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 onTap: userID == null
                     ? null
                     : () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) {
-                      return ProfileScreen(userID: userID);
-                    }),
-                  );
-                },
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) {
+                            return ProfileScreen(userID: userID);
+                          }),
+                        );
+                      },
                 child: UserProfileImage(userID: userID),
               );
             },
@@ -678,7 +678,6 @@ class _UserProfileImageState extends State<UserProfileImage> {
           final picture = snapshot.data;
           if (picture == null) {
             return Image.asset(
-              //TODO: if guest, then show default
               'assets/images/DefaultIcon.png',
               height: PROFILE_ICON_BAR_SIZE,
               width: PROFILE_ICON_BAR_SIZE,
@@ -698,7 +697,6 @@ class _UserProfileImageState extends State<UserProfileImage> {
     );
   }
 }
-
 
 class UserNameToID extends StatefulWidget {
   const UserNameToID({Key? key, required this.username, required this.builder})

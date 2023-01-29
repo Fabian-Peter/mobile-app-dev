@@ -360,13 +360,13 @@ class _PostScreenState extends State<PostScreen> {
         Badge(
             borderRadius: BorderRadius.circular(8),
             position: BadgePosition.topEnd(top: -1, end: 3),
-            badgeColor: COLOR_INDIGO_LIGHT,
+            badgeColor: COLOR_INDIGO,
             badgeContent:
                 Text(commentsAmount, style: TextStyle(color: Colors.white)),
             child: IconButton(
                 icon: const Icon(
                   Icons.comment_rounded,
-                  color: COLOR_INDIGO_LIGHT,
+                  color: COLOR_INDIGO,
                   size: 20,
                 ),
                 onPressed: () {

@@ -406,7 +406,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       child: Center(
         child: Text(snapshot.child('title').value.toString(),
-            style: HEADLINE_BOLD_BLACK),
+            style: HEADLINE_BOLD_BLACK, ),
       ),
     );
   }
@@ -652,15 +652,15 @@ class _HomeScreenState extends State<HomeScreen> {
           Spacer(),
           Badge(
               borderRadius: BorderRadius.circular(8),
-              position: BadgePosition.topEnd(top: 1, end: -1),
-              badgeColor: COLOR_INDIGO_LIGHT,
+              position: BadgePosition.topEnd(top: 1, end: 1),
+              badgeColor: COLOR_INDIGO,
               animationType: BadgeAnimationType.fade,
               badgeContent:
                   Text(commentsAmount, style: TextStyle(color: Colors.white)),
               child: IconButton(
                   icon: const Icon(
                     Icons.comment_rounded,
-                    color: COLOR_INDIGO_LIGHT,
+                    color: COLOR_INDIGO,
                     size: 20,
                   ),
                   onPressed: () {

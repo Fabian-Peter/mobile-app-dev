@@ -304,7 +304,7 @@ class _PostScreenState extends State<PostScreen> {
             position: BadgePosition.topEnd(top: 1, end: 2),
             badgeColor: Colors.red,
             badgeContent:
-                Text(commentsAmount, style: TextStyle(color: Colors.white)),
+                Text(bloodSugarAmount, style: TextStyle(color: Colors.white)),
             child: IconButton(
                 icon: const Icon(
                   Icons.format_color_reset,
@@ -323,7 +323,7 @@ class _PostScreenState extends State<PostScreen> {
             position: BadgePosition.topEnd(top: 1, end: 2),
             badgeColor: Colors.green,
             badgeContent:
-                Text(commentsAmount, style: TextStyle(color: Colors.white)),
+                Text(happyAmount, style: TextStyle(color: Colors.white)),
             child: IconButton(
                 icon: const Icon(
                   Icons.sentiment_very_satisfied_outlined,
@@ -342,7 +342,7 @@ class _PostScreenState extends State<PostScreen> {
             position: BadgePosition.topEnd(top: 1, end: 2),
             badgeColor: COLOR_INDIGO_LIGHT,
             badgeContent:
-                Text(commentsAmount, style: TextStyle(color: Colors.white)),
+                Text(unhappyAmount, style: TextStyle(color: Colors.white)),
             child: IconButton(
                 icon: const Icon(
                   Icons.sentiment_very_dissatisfied,

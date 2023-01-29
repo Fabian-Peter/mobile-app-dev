@@ -154,7 +154,7 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
             inAsyncCall: _isInAsyncCall,
             // demo of some additional parameters
             opacity: 0.5,
-            progressIndicator: CircularProgressIndicator(),
+            progressIndicator: const CircularProgressIndicator(),
 
             child: _buildForm(context),
           ),

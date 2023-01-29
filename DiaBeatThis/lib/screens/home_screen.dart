@@ -54,11 +54,6 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
   }
 
-  //void getComments() async{
-  //  DataSnapshot snippy = await FirebaseDatabase.instance.ref().orderByChild('comments').limitToFirst(3).get();
-  //  print(snippy.value);
-  //}
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -443,12 +438,6 @@ class _HomeScreenState extends State<HomeScreen> {
     var unhappyAmount = snapshot.child('unhappyAmount').value.toString();
     var commentsAmount = snapshot.child('CommentsAmount').value.toString();
 
-    //if(snapshot.child('likes/$ownName').value.toString().contains('true')){
-    //  print(snapshot.child('likes/$ownName').value.toString());
-    //  print('working');
-    //  icon == Icons.favorite;
-    //}
-
     return Padding(
         padding: const EdgeInsets.only(top: 8),
         child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
@@ -497,7 +486,7 @@ class _HomeScreenState extends State<HomeScreen> {
               badgeColor: Colors.red,
               animationType: BadgeAnimationType.fade,
               badgeContent:
-                  Text(bloodSugarAmount, style: TextStyle(color: Colors.white)),
+                  Text(bloodSugarAmount, style: const TextStyle(color: Colors.white)),
               child: IconButton(
                 icon: const Icon(
                   Icons.format_color_reset,
@@ -540,7 +529,7 @@ class _HomeScreenState extends State<HomeScreen> {
               badgeColor: Colors.green,
               animationType: BadgeAnimationType.fade,
               badgeContent:
-                  Text(happyAmount, style: TextStyle(color: Colors.white)),
+                  Text(happyAmount, style: const TextStyle(color: Colors.white)),
               child: IconButton(
                 icon: const Icon(
                   Icons.sentiment_very_satisfied_outlined,
@@ -579,7 +568,7 @@ class _HomeScreenState extends State<HomeScreen> {
               badgeColor: COLOR_INDIGO_LIGHT,
               animationType: BadgeAnimationType.fade,
               badgeContent:
-                  Text(unhappyAmount, style: TextStyle(color: Colors.white)),
+                  Text(unhappyAmount, style: const TextStyle(color: Colors.white)),
               child: IconButton(
                 icon: const Icon(
                   Icons.sentiment_very_dissatisfied,
@@ -612,14 +601,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   }
                 },
               )),
-          Spacer(),
+          const Spacer(),
           Badge(
               borderRadius: BorderRadius.circular(8),
               position: BadgePosition.topEnd(top: 1, end: 1),
               badgeColor: COLOR_INDIGO,
               animationType: BadgeAnimationType.fade,
               badgeContent:
-                  Text(commentsAmount, style: TextStyle(color: Colors.white)),
+                  Text(commentsAmount, style: const TextStyle(color: Colors.white)),
               child: IconButton(
                   icon: const Icon(
                     Icons.comment_rounded,

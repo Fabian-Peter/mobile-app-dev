@@ -486,7 +486,7 @@ class _GameResultScreenState extends State<GameResultScreen> {
               badgeColor: Colors.red,
               animationType: BadgeAnimationType.fade,
               badgeContent:
-                  Text(bloodSugarAmount, style: TextStyle(color: Colors.white)),
+                  Text(bloodSugarAmount, style: const TextStyle(color: Colors.white)),
               child: IconButton(
                 icon: const Icon(
                   Icons.format_color_reset,
@@ -529,7 +529,7 @@ class _GameResultScreenState extends State<GameResultScreen> {
               badgeColor: Colors.green,
               animationType: BadgeAnimationType.fade,
               badgeContent:
-                  Text(happyAmount, style: TextStyle(color: Colors.white)),
+                  Text(happyAmount, style: const TextStyle(color: Colors.white)),
               child: IconButton(
                 icon: const Icon(
                   Icons.sentiment_very_satisfied_outlined,
@@ -568,7 +568,7 @@ class _GameResultScreenState extends State<GameResultScreen> {
               badgeColor: COLOR_INDIGO_LIGHT,
               animationType: BadgeAnimationType.fade,
               badgeContent:
-                  Text(unhappyAmount, style: TextStyle(color: Colors.white)),
+                  Text(unhappyAmount, style: const TextStyle(color: Colors.white)),
               child: IconButton(
                 icon: const Icon(
                   Icons.sentiment_very_dissatisfied,
@@ -608,7 +608,7 @@ class _GameResultScreenState extends State<GameResultScreen> {
               badgeColor: COLOR_INDIGO,
               animationType: BadgeAnimationType.fade,
               badgeContent:
-                  Text(commentsAmount, style: TextStyle(color: Colors.white)),
+                  Text(commentsAmount, style: const TextStyle(color: Colors.white)),
               child: IconButton(
                   icon: const Icon(
                     Icons.comment_rounded,

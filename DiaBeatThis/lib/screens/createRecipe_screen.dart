@@ -246,7 +246,7 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
           padding: const EdgeInsets.all(9.0),
           child: TextFormField(
             inputFormatters: [
-              LengthLimitingTextInputFormatter(17),
+              LengthLimitingTextInputFormatter(25),
             ],
             autovalidateMode: AutovalidateMode.onUserInteraction,
             validator: (value) {
@@ -342,7 +342,7 @@ class _CreateRecipeScreenState extends State<CreateRecipeScreen> {
                 return null;
               },
               controller: ingredientsQuantityControllers[index],
-              keyboardType: TextInputType.number,
+              keyboardType: TextInputType.multiline,
               decoration: const InputDecoration(
                 labelStyle: TextStyle(
                     fontFamily: "VisbyMedium",

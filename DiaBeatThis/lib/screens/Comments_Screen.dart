@@ -125,24 +125,20 @@ class _CommentsScreenState extends State<CommentsScreen> {
   }
 
   Widget _buildProfileIcon(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(PROFILE_ICON_BAR_SIZE / 2),
-      child: Padding(
-        padding: const EdgeInsets.only(right: 10),
-        child: InkWell(
-          child: UserProfileImage(
-            userID: currentUser,
-          ),
-          onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) {
-                return FirebaseAuth.instance.currentUser!.isAnonymous
-                    ? AuthScreen()
-                    : ProfileScreen(userID: currentUser);
-              }),
-            );
-          },
-        ),
+    return Padding(
+      padding: const EdgeInsets.only(right: 10),
+      child: InkWell(
+        child: UserProfileImage(
+            userID: currentUser, iconSize: PROFILE_ICON_BAR_SIZE),
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) {
+              return FirebaseAuth.instance.currentUser!.isAnonymous
+                  ? AuthScreen()
+                  : ProfileScreen(userID: currentUser);
+            }),
+          );
+        },
       ),
     );
   }
@@ -190,7 +186,9 @@ class _CommentsScreenState extends State<CommentsScreen> {
                                         }),
                                       );
                                     },
-                              child: UserProfileImage(userID: userID),
+                              child: UserProfileImage(
+                                  userID: userID,
+                                  iconSize: PROFILE_ICON_BAR_SIZE),
                             );
                           },
                         ),

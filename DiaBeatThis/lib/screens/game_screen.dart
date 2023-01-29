@@ -279,6 +279,7 @@ class _GameResultScreenState extends State<GameResultScreen> {
       child: InkWell(
         child: UserProfileImage(
           userID: currentUser,
+          iconSize: PROFILE_ICON_BAR_SIZE,
         ),
         onTap: () {
           Navigator.of(context).push(
@@ -357,7 +358,8 @@ class _GameResultScreenState extends State<GameResultScreen> {
                           }),
                         );
                       },
-                child: UserProfileImage(userID: userID),
+                child: UserProfileImage(
+                    userID: userID, iconSize: PROFILE_ICON_BAR_SIZE),
               );
             },
           ),

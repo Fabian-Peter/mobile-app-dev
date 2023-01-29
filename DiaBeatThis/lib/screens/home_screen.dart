@@ -204,6 +204,7 @@ class _HomeScreenState extends State<HomeScreen> {
       child: InkWell(
         child: UserProfileImage(
           userID: currentUser,
+          iconSize: PROFILE_ICON_BAR_SIZE,
         ),
         onTap: () {
           Navigator.of(context).push(
@@ -365,7 +366,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           }),
                         );
                       },
-                child: UserProfileImage(userID: userID),
+                child: UserProfileImage(
+                    userID: userID, iconSize: PROFILE_ICON_BAR_SIZE),
               );
             },
           ),
@@ -657,8 +659,11 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class UserProfileImage extends StatefulWidget {
-  const UserProfileImage({Key? key, required this.userID}) : super(key: key);
+  const UserProfileImage(
+      {Key? key, required this.userID, required this.iconSize})
+      : super(key: key);
   final String? userID;
+  final double iconSize;
 
   @override
   State<UserProfileImage> createState() => _UserProfileImageState();
@@ -691,7 +696,7 @@ class _UserProfileImageState extends State<UserProfileImage> {
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      borderRadius: BorderRadius.circular(USER_ICON_POST_SIZE / 2),
+      borderRadius: BorderRadius.circular(widget.iconSize / 2),
       child: StreamBuilder<String?>(
         stream: userPictureID,
         initialData: null,
@@ -700,15 +705,15 @@ class _UserProfileImageState extends State<UserProfileImage> {
           if (picture == null) {
             return Image.asset(
               'assets/images/DefaultIcon.png',
-              height: PROFILE_ICON_BAR_SIZE,
-              width: PROFILE_ICON_BAR_SIZE,
+              height: widget.iconSize,
+              width: widget.iconSize,
               fit: BoxFit.cover,
             );
           } else {
             return CachedNetworkImage(
               imageUrl: picture,
-              height: PROFILE_ICON_BAR_SIZE,
-              width: PROFILE_ICON_BAR_SIZE,
+              height: widget.iconSize,
+              width: widget.iconSize,
               fit: BoxFit.cover,
               placeholder: (context, url) => const CircularProgressIndicator(),
             );

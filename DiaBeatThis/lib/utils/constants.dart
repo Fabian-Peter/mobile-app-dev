@@ -33,7 +33,7 @@ const TextStyle POST_CAPTION_BLACK =
 const TextStyle TAGS_TOGGLE =
     TextStyle(fontFamily: "VisbyDemiBold", fontSize: 13);
 const TextStyle POST_CAPTION_BLACK_PROFILE =
-    TextStyle(color: COLOR_BLACK, fontSize: 13, fontFamily: 'VisbyDemiBold');
+    TextStyle(color: COLOR_BLACK, fontSize: 11, fontFamily: 'VisbyDemiBold');
 const TextStyle COMMENTS_USER = TextStyle(
     color: COLOR_INDIGO_LIGHT, fontFamily: 'VisbyDemiBold', fontSize: 15);
 

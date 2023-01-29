@@ -443,10 +443,12 @@ class _HomeScreenState extends State<HomeScreen> {
     return Row(mainAxisAlignment: MainAxisAlignment.start, children: [
       Badge(
         borderRadius: BorderRadius.circular(8),
-        position: BadgePosition.topEnd(top: 1, end: -3),
-        badgeColor: Colors.red,
+        position: BadgePosition.topEnd(top: 1, end: 2),
+        badgeColor: Colors.deepOrange,
+        animationType: BadgeAnimationType.fade,
         badgeContent:
             Text(likesAmount, style: const TextStyle(color: Colors.white)),
+
         child: IconButton(
             icon: Icon(
               Icons.favorite,
@@ -485,8 +487,9 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       Badge(
           borderRadius: BorderRadius.circular(8),
-          position: BadgePosition.topEnd(top: 1, end: -1),
+          position: BadgePosition.topEnd(top: 1, end: 2),
           badgeColor: Colors.red,
+          animationType: BadgeAnimationType.fade,
           badgeContent:
               Text(bloodSugarAmount, style: TextStyle(color: Colors.white)),
           child: IconButton(
@@ -527,8 +530,9 @@ class _HomeScreenState extends State<HomeScreen> {
           )),
       Badge(
           borderRadius: BorderRadius.circular(8),
-          position: BadgePosition.topEnd(top: 1, end: -1),
+          position: BadgePosition.topEnd(top: 1, end: 2),
           badgeColor: Colors.green,
+          animationType: BadgeAnimationType.fade,
           badgeContent:
               Text(happyAmount, style: TextStyle(color: Colors.white)),
           child: IconButton(
@@ -569,8 +573,9 @@ class _HomeScreenState extends State<HomeScreen> {
           )),
       Badge(
           borderRadius: BorderRadius.circular(1),
-          position: BadgePosition.topEnd(top: 1, end: -1),
+          position: BadgePosition.topEnd(top: 1, end: 2),
           badgeColor: COLOR_INDIGO_LIGHT,
+          animationType: BadgeAnimationType.fade,
           badgeContent:
               Text(unhappyAmount, style: TextStyle(color: Colors.white)),
           child: IconButton(
@@ -614,6 +619,7 @@ class _HomeScreenState extends State<HomeScreen> {
           borderRadius: BorderRadius.circular(8),
           position: BadgePosition.topEnd(top: 1, end: -1),
           badgeColor: COLOR_INDIGO_LIGHT,
+          animationType: BadgeAnimationType.fade,
           badgeContent:
               Text(commentsAmount, style: TextStyle(color: Colors.white)),
           child: IconButton(

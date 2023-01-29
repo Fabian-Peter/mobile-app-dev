@@ -113,7 +113,8 @@ class _PostScreenState extends State<PostScreen> {
                         }),
                       );
                     },
-              child: UserProfileImage(userID: userID),
+              child: UserProfileImage(
+                  userID: userID, iconSize: PROFILE_ICON_BAR_SIZE),
             );
           },
         ),
@@ -148,6 +149,7 @@ class _PostScreenState extends State<PostScreen> {
       child: InkWell(
         child: UserProfileImage(
           userID: currentUser,
+          iconSize: PROFILE_ICON_BAR_SIZE,
         ),
         onTap: () {
           Navigator.of(context).push(
@@ -377,52 +379,6 @@ class _PostScreenState extends State<PostScreen> {
                   );
                 })),
       ]),
-    );
-  }
-
-  Widget _buildComments(context, snapshot, index) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 9,
-        vertical: 7,
-      ),
-      child: InkWell(
-        child: Container(
-          decoration: BoxDecoration(
-            color: COLOR_WHITE,
-            border: Border.all(width: 3, color: COLOR_INDIGO_LIGHT),
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.5),
-                spreadRadius: 2,
-                blurRadius: 3,
-                offset: const Offset(0, 3),
-              ),
-            ],
-          ),
-          child: SafeArea(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildCommenter(context, snapshot, index),
-                //TODO: tags icons
-                //TODO: reactions
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCommenter(context, snapshot, index) {
-    return Row(
-      children: [
-        Padding(
-            padding: const EdgeInsets.all(8),
-            child: Text(snapshot.child('comment')))
-      ],
     );
   }
 

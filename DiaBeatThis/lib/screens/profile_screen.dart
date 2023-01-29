@@ -44,10 +44,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    SizedBox(
-                        height: 120,
-                        width: 120,
-                        child: UserProfileImage(userID: widget.userID)),
+                    UserProfileImage(userID: widget.userID, iconSize: 120),
                     _buildEditIcon(context),
                     Userposts(userID: widget.userID)
                   ],

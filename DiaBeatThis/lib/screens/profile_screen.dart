@@ -256,7 +256,15 @@ class _UserpostsState extends State<Userposts> {
           child: CachedNetworkImage(
             imageUrl: url,
             fit: BoxFit.cover,
-            placeholder: (context, url) => const CircularProgressIndicator(),
+            placeholder: (context, url) => const Center(
+              child: SizedBox(
+                width: 20.0,
+                height: 20.0,
+                child: CircularProgressIndicator(
+                  strokeWidth: 1,
+                ),
+              ),
+            ),
           ),
         ),
       ),

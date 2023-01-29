@@ -71,7 +71,7 @@ class _GameScreenState extends State<GameScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text("Tinder",
+          title: const Text("Meat your Meal",
               style: TextStyle(fontFamily: "VisbyDemiBold")),
         ),
         body: Center(
@@ -455,7 +455,7 @@ class _GameResultScreenState extends State<GameResultScreen> {
             badgeContent:
                 Text(likesAmount, style: const TextStyle(color: Colors.white)),
             child: IconButton(
-                icon: Icon(
+                icon: const Icon(
                   Icons.favorite,
                   color: Colors.deepOrange,
                   size: 25,
@@ -498,7 +498,7 @@ class _GameResultScreenState extends State<GameResultScreen> {
               badgeContent:
                   Text(bloodSugarAmount, style: TextStyle(color: Colors.white)),
               child: IconButton(
-                icon: Icon(
+                icon: const Icon(
                   Icons.format_color_reset,
                   color: Colors.red,
                   size: 20,
@@ -545,7 +545,7 @@ class _GameResultScreenState extends State<GameResultScreen> {
               badgeContent:
                   Text(happyAmount, style: TextStyle(color: Colors.white)),
               child: IconButton(
-                icon: Icon(
+                icon: const Icon(
                   Icons.sentiment_very_satisfied_outlined,
                   color: Colors.green,
                   size: 20,
@@ -588,7 +588,7 @@ class _GameResultScreenState extends State<GameResultScreen> {
               badgeContent:
                   Text(unhappyAmount, style: TextStyle(color: Colors.white)),
               child: IconButton(
-                icon: Icon(
+                icon: const Icon(
                   Icons.sentiment_very_dissatisfied,
                   color: COLOR_INDIGO_LIGHT,
                   size: 20,

@@ -38,14 +38,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(height: 25),
             SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: Container(
+              child: SizedBox(
                 width: MediaQuery.of(context).size.width,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     UserProfileImage(userID: widget.userID, iconSize: 120),
-                    _buildEditIcon(context),
+                    //_buildEditIcon(context),
                     Userposts(userID: widget.userID)
                   ],
                 ),
@@ -130,8 +130,6 @@ class Userposts extends StatefulWidget {
 class _UserpostsState extends State<Userposts> {
   late final Stream<List<DataSnapshot>> userposts;
   IconData icon = Icons.favorite_border_outlined;
-  final database = FirebaseDatabase.instance.refFromURL(
-      "https://diabeathis-f8ee3-default-rtdb.europe-west1.firebasedatabase.app");
 
   @override
   void initState() {

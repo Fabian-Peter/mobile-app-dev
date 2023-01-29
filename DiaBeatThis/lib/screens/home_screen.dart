@@ -6,7 +6,7 @@ import 'package:diabeatthis/screens/profile_screen.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart' hide User;
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:diabeatthis/utils/constants.dart';
 import 'package:flutter/rendering.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -49,6 +49,8 @@ class _HomeScreenState extends State<HomeScreen> {
   FocusNode searchBarFocusNode = FocusNode();
   String searchWord = "";
 
+  final streamAuth = FirebaseAuth.instance.authStateChanges();
+
   @override
   void initState() {
     super.initState();
@@ -61,117 +63,133 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => FocusScope.of(context).unfocus(),
-      onPanDown: (_) => FocusScope.of(context).unfocus(),
-      child: Scaffold(
-        appBar: AppBar(
-          titleSpacing: 10,
-          title: const Padding(
-            padding: EdgeInsets.only(bottom: 2),
-            child: Text('DiaBeatThis!', style: DIABEATTHIS_LOGO),
-          ),
-          actions: <Widget>[
-            Row(
-              children: [_buildLogButton(context), _buildProfileIcon(context)],
-            ),
-          ],
-        ),
-        body: NotificationListener<UserScrollNotification>(
-          onNotification: (notification) {
-            if (notification.direction == ScrollDirection.forward) {
-              if (!isVisible) {
-                setState(() => isVisible = true);
-              }
-            } else if (notification.direction == ScrollDirection.reverse) {
-              if (isVisible) {
-                setState(() => isVisible = false);
-              }
-            } else if (notification.direction == ScrollDirection.reverse) {
-              if (isVisible) {
-                setState(() => isVisible = false);
-              }
-            }
-            return true;
-          },
-          child: SafeArea(
-            child: Column(
-              children: [
-                const SizedBox(height: 3),
-                _buildSearchBar(context),
-                Flexible(
-                  child: FirebaseAnimatedList(
-                      query: query,
-                      key: listKey,
-                      defaultChild: const Center(
-                        child: SizedBox(
-                          width: 60.0,
-                          height: 60.0,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2.5,
-                          ),
-                        ),
-                      ),
-                      itemBuilder: (context, snapshot, animation, index) {
-                        Object? ingredientsValues =
-                            snapshot.child('ingredients').value;
-                        Object? titleValue = snapshot.child('title').value;
-                        if (searchWord != "") {
-                          if (ingredientsValues
-                                  .toString()
-                                  .toLowerCase()
-                                  .contains(searchWord) ||
-                              titleValue
-                                  .toString()
-                                  .toLowerCase()
-                                  .contains(searchWord)) {
-                            return _buildPosts(context, snapshot, index);
-                          }
-                        } else {
-                          return _buildPosts(context, snapshot, index);
-                        }
-                        return const SizedBox();
-                      }),
+    return StreamBuilder<User?>(
+      stream: streamAuth,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return const Center(child: Text("Something went wrong!"));
+        } else if (!snapshot.hasData) {
+          return AuthScreen();
+        }
+        return GestureDetector(
+          onTap: () => FocusScope.of(context).unfocus(),
+          onPanDown: (_) => FocusScope.of(context).unfocus(),
+          child: Scaffold(
+            appBar: AppBar(
+              titleSpacing: 10,
+              title: const Padding(
+                padding: EdgeInsets.only(bottom: 2),
+                child: Text('DiaBeatThis!', style: DIABEATTHIS_LOGO),
+              ),
+              actions: <Widget>[
+                Row(
+                  children: [
+                    _buildLogButton(context),
+                    _buildProfileIcon(context)
+                  ],
                 ),
               ],
             ),
-          ),
-        ),
-        floatingActionButton: isVisible
-            ? Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  FloatingActionButton(
-                      heroTag: "btn_game",
-                      child: const Icon(Icons.restaurant_menu, size: 35),
-                      onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(builder: (_) {
-                            return FirebaseAuth
-                                    .instance.currentUser!.isAnonymous
-                                ? AuthScreen()
-                                : GameScreen();
+            body: NotificationListener<UserScrollNotification>(
+              onNotification: (notification) {
+                if (notification.direction == ScrollDirection.forward) {
+                  if (!isVisible) {
+                    setState(() => isVisible = true);
+                  }
+                } else if (notification.direction == ScrollDirection.reverse) {
+                  if (isVisible) {
+                    setState(() => isVisible = false);
+                  }
+                } else if (notification.direction == ScrollDirection.reverse) {
+                  if (isVisible) {
+                    setState(() => isVisible = false);
+                  }
+                }
+                return true;
+              },
+              child: SafeArea(
+                child: Column(
+                  children: [
+                    const SizedBox(height: 3),
+                    _buildSearchBar(context),
+                    Flexible(
+                      child: FirebaseAnimatedList(
+                          query: query,
+                          key: listKey,
+                          defaultChild: const Center(
+                            child: SizedBox(
+                              width: 60.0,
+                              height: 60.0,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2.5,
+                              ),
+                            ),
+                          ),
+                          itemBuilder: (context, snapshot, animation, index) {
+                            Object? ingredientsValues =
+                                snapshot.child('ingredients').value;
+                            Object? titleValue = snapshot.child('title').value;
+                            if (searchWord != "") {
+                              if (ingredientsValues
+                                      .toString()
+                                      .toLowerCase()
+                                      .contains(searchWord) ||
+                                  titleValue
+                                      .toString()
+                                      .toLowerCase()
+                                      .contains(searchWord)) {
+                                return _buildPosts(context, snapshot, index);
+                              }
+                            } else {
+                              return _buildPosts(context, snapshot, index);
+                            }
+                            return const SizedBox();
                           }),
-                        );
-                      }),
-                  const SizedBox(height: 15),
-                  FloatingActionButton(
-                    heroTag: "btn_create",
-                    child: const Icon(Icons.add, size: 35),
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) {
-                          return FirebaseAuth.instance.currentUser!.isAnonymous
-                              ? AuthScreen()
-                              : CreateRecipeScreen();
-                        }),
-                      );
-                    },
-                  ),
-                ],
-              )
-            : null,
-      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            floatingActionButton: isVisible
+                ? Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      FloatingActionButton(
+                          heroTag: "btn_game",
+                          child: const Icon(Icons.restaurant_menu, size: 35),
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(builder: (_) {
+                                return FirebaseAuth
+                                        .instance.currentUser!.isAnonymous
+                                    ? AuthScreen()
+                                    : GameScreen();
+                              }),
+                            );
+                          }),
+                      const SizedBox(height: 15),
+                      FloatingActionButton(
+                        heroTag: "btn_create",
+                        child: const Icon(Icons.add, size: 35),
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(builder: (_) {
+                              return FirebaseAuth
+                                      .instance.currentUser!.isAnonymous
+                                  ? AuthScreen()
+                                  : CreateRecipeScreen();
+                            }),
+                          );
+                        },
+                      ),
+                    ],
+                  )
+                : null,
+          ),
+        );
+      },
     );
   }
 

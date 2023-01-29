@@ -16,6 +16,10 @@ Future<void> main() async {
   if (user == null) {
     await FirebaseAuth.instance.signInAnonymously();
   }
+  FirebaseUIAuth.configureProviders([
+    EmailAuthProvider(),
+    // other providers
+  ]);
   runApp(MyApp());
 }
 
@@ -41,7 +45,7 @@ class MyApp extends StatelessWidget {
               print('error${snapshot.error.toString()}');
               return const Text('Something went wrong!');
             } else if (snapshot.hasData) {
-              return const AuthGate();
+              return const HomeScreen();
             } else {
               return const Center(
                 child: CircularProgressIndicator(),
@@ -57,10 +61,6 @@ class AuthGate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    FirebaseUIAuth.configureProviders([
-      EmailAuthProvider(),
-      // other providers
-    ]);
     return StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {

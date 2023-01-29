@@ -262,23 +262,25 @@ class _HomeScreenState extends State<HomeScreen> {
             iconSize: 25,
             splashRadius: 20,
             onPressed: () {
-              //TODO: show all liked posts for logged user
-              // FirebaseAuth.instance.currentUser!.isAnonymous
-              //                         ? AuthScreen()
-              //                         :
-              setState(() {
-                if (_favIconOutlinedFilter == Icons.favorite_border_outlined) {
-                  _favIconOutlinedFilter = Icons.favorite;
-                } else {
-                  _favIconOutlinedFilter = Icons.favorite_border_outlined;
-                }
-                if (searchController.text != "") {
-                  listKey =
-                      Key(DateTime.now().millisecondsSinceEpoch.toString());
-                  query =
-                      ref.orderByChild("title").equalTo(searchController.text);
-                }
-              });
+              FirebaseAuth.instance.currentUser!.isAnonymous
+                  ? Navigator.of(context).push(MaterialPageRoute(builder: (_) {
+                      return AuthScreen();
+                    }))
+                  : setState(() {
+                      if (_favIconOutlinedFilter ==
+                          Icons.favorite_border_outlined) {
+                        _favIconOutlinedFilter = Icons.favorite;
+                      } else {
+                        _favIconOutlinedFilter = Icons.favorite_border_outlined;
+                      }
+                      if (searchController.text != "") {
+                        listKey = Key(
+                            DateTime.now().millisecondsSinceEpoch.toString());
+                        query = ref
+                            .orderByChild("title")
+                            .equalTo(searchController.text);
+                      }
+                    });
               searchBarFocusNode.unfocus();
             },
           ),
@@ -316,8 +318,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 _buildDescription(context, snapshot, index),
                 _buildComments(context, snapshot, index),
                 _buildLikes(context, snapshot, index),
-                //TODO: tags icons
-                //TODO: reactions
               ],
             ),
           ),
@@ -450,11 +450,11 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               onPressed: () {
                 Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) {
-                      return CommentsScreen(post: snapshot);
-                    },
-                  ),
+                  MaterialPageRoute(builder: (_) {
+                    return FirebaseAuth.instance.currentUser!.isAnonymous
+                        ? AuthScreen()
+                        : CommentsScreen(post: snapshot);
+                  }),
                 );
               })),
       Badge(
@@ -470,6 +470,12 @@ class _HomeScreenState extends State<HomeScreen> {
               size: 20,
             ),
             onPressed: () {
+              if (FirebaseAuth.instance.currentUser!.isAnonymous) {
+                Navigator.of(context).push(MaterialPageRoute(builder: (_) {
+                  return AuthScreen();
+                }));
+              }
+              else {
               String result = snapshot.child('likes/$ownName').value.toString();
               //print(snapshot.child('likes/$ownName').value.toString());
               //print (result);
@@ -490,7 +496,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 icon = Icons.favorite;
                 setState(() {});
               }
-            },
+            }},
           ))
     ]);
   }
